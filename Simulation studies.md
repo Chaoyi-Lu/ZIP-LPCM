@@ -23,3 +23,24 @@ Here we refer to that file for more details.
 
 The scenario 1 network is randomly generated from a ZIP-LPCM with the following code.
 
+``` r
+SS1_Scenario1_Directed_ZIPLPCM <-
+  Simulation_Directed_ZIPLPCM(beta=3,P=matrix(c(0.4,0.1,0.05,0.1,0.05,  0.05,0.4,0.1,0.05,0.1,  0.1,0.05,0.4,0.1,0.05,
+                                                0.05,0.1,0.05,0.4,0.1,  0.1,0.05,0.1,0.05,0.4),5,5),
+                              mu=matrix(c(-1.5,-1.5,-1.5, -2,2,0, 2,-2,0, 2,2,-2, -2,-2,2),nrow=3,ncol=5),
+                              tau=c(1/0.25,1/0.5,1/0.75,1/1,1/1.25),d=3,
+                              z=c(rep(1,5),rep(2,10),rep(3,15),rep(4,20),rep(5,25)),seed=NULL)
+```
+
+The corresponding model parameters and latent variables are in line with those introduced in the paper.
+This simulation function brings the following contents for a ZIP-LPCM network.
+
+``` r
+SS1_Scenario1_Directed_ZIPLPCM$Y
+SS1_Scenario1_Directed_ZIPLPCM$nu
+SS1_Scenario1_Directed_ZIPLPCM$z
+SS1_Scenario1_Directed_ZIPLPCM$U
+SS1_Scenario1_Directed_ZIPLPCM$Z
+```
+
+Here, "Y" is the $N \times N$ adjacency matrix of the network, "nu" is the $N \times N$ unusual zero indicator
