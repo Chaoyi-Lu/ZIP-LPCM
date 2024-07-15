@@ -45,6 +45,51 @@ SS1_Scenario1_Directed_ZIPLPCM$Z
 
 Here, "Y" is the $N \times N$ adjacency matrix of the network, "nu" is a $N \times N$ matrix storing the unusual zero indicator between each pair of individuals, "U" is a $N \times d$ latent variable containing the generated latent positions used for simulating the network, "z" is an $1\times N$ vector storing the pre-specified clustering while "Z" is the corresponding $N\times K$ matrix form of the clustering, where $K$ is the number of non-empty clusters.
 Recall here that we treat the above model parameters and latent variables used for simulating the network as the reference, denoted by $(\cdot)^*$.
+The network and these references can be stored following the code below.
 
-We can visualize the network via the corresponding 3-dimensional interactive plot of the reference latent positions $\boldsymbol{U}^*$, clustering $\boldsymbol{z}^*$ and interactions $\boldsymbol{Y}$.
-The plot is uploaded on Github at [`Interactive 3-d latent positions plots/SS1_Scenario1_InteractivePlot.html`]
+``` r
+write.csv(SS1_Scenario1_Directed_ZIPLPCM$Y,"Datasets/SS1_Scenario1_Directed_ZIPLPCM_Y.csv", row.names = FALSE)
+write.csv(SS1_Scenario1_Directed_ZIPLPCM$nu,"Datasets/SS1_Scenario1_Directed_ZIPLPCM_nu.csv", row.names = FALSE)
+write.csv(SS1_Scenario1_Directed_ZIPLPCM$z,"Datasets/SS1_Scenario1_Directed_ZIPLPCM_z.csv", row.names = FALSE)
+write.csv(SS1_Scenario1_Directed_ZIPLPCM$U,"Datasets/SS1_Scenario1_Directed_ZIPLPCM_U.csv", row.names = FALSE)
+write.csv(SS1_Scenario1_Directed_ZIPLPCM_A,"Datasets/SS1_Scenario1_Directed_ZIPLPCM_A.csv", row.names = FALSE)
+```
+
+where "A" here corresponds to the exogenous node attributes $\boldsymbol{c}$ we denote in the paper, and is a contaminated
+version of the true clustering $\boldsymbol{z}^\*$, reallocating the clustering of 20 out of 75 nodes following the code:
+
+``` r
+SS1_Scenario1_Directed_ZIPLPCM_A <- SS1_Scenario1_Directed_ZIPLPCM$z
+SS1_Scenario1_Directed_ZIPLPCM_A[sample(length(SS1_Scenario1_Directed_ZIPLPCM$z),20)] <- sample(1:5,20,replace=TRUE)
+```
+
+We can visualize the network via the 3-dimensional interactive plot of the reference latent positions $\boldsymbol{U}^\*$, the reference clustering $\boldsymbol{z}^*$ and those interactions stored in $\boldsymbol{Y}$.
+The plot is uploaded on Github at [`\Interactive 3-d latent positions plots/SS1_Scenario1_InteractivePlot.html`], and can be reproduced following the code below.
+
+``` r
+g_obs <- graph_from_adjacency_matrix(SS1_Scenario1_Directed_ZIPLPCM$Y,mode = "directed",weighted = TRUE)
+E(g_obs)$color <- colorRampPalette(brewer.pal(9,"Greys")[c(3,9)])(max(SS1_Scenario1_Directed_ZIPLPCM$Y))[E(g_obs)$weight]
+betw <- betweenness(g_obs) # evaluate the betweeness of the network
+VertexSize <- sqrt(betw/1.5+mean(betw))*1 # set the vertex size
+
+library("plotly")
+fig <- plot_ly() %>% # plot the reference clustering and U
+  add_markers(x = SS1_Scenario1_Directed_ZIPLPCM$U[,1],
+              y = SS1_Scenario1_Directed_ZIPLPCM$U[,2],
+              z = SS1_Scenario1_Directed_ZIPLPCM$U[,3],
+              text=paste("Node:",1:nrow(SS1_Scenario1_Directed_ZIPLPCM$Y),"<br>z*:",SS1_Scenario1_Directed_ZIPLPCM$z),
+              size=VertexSize,sizes=c(100,300),
+              color=as.factor(SS1_Scenario1_Directed_ZIPLPCM$z),colors=My_colors[6:10]
+  )
+Edges <- get.edgelist(g_obs)
+for (i in 1:nrow(Edges)){
+  fig <- fig %>%
+    add_trace(x = SS1_Scenario1_Directed_ZIPLPCM$U[Edges[i,],1],
+              y = SS1_Scenario1_Directed_ZIPLPCM$U[Edges[i,],2],
+              z = SS1_Scenario1_Directed_ZIPLPCM$U[Edges[i,],3],
+              text=paste("Weight:",E(g_obs)$weight[i]),
+              type = "scatter3d", mode = "lines", showlegend = FALSE,line = list(color = E(g_obs)$color[i], width = 0.35*E(g_obs)$weight[i]))
+}
+fig <- fig %>% layout(title = "ZIP-LPCM U* and z*",scene = list(xaxis = list(title = 'x1'),yaxis = list(title = 'x2'),zaxis = list(title = 'x3')))
+fig
+```
