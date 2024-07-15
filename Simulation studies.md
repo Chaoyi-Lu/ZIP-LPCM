@@ -44,3 +44,7 @@ SS1_Scenario1_Directed_ZIPLPCM$Z
 ```
 
 Here, "Y" is the $N \times N$ adjacency matrix of the network, "nu" is a $N \times N$ matrix storing the unusual zero indicator between each pair of individuals, "U" is a $N \times d$ latent variable containing the generated latent positions used for simulating the network, "z" is an $1\times N$ vector storing the pre-specified clustering while "Z" is the corresponding $N\times K$ matrix form of the clustering, where $K$ is the number of non-empty clusters.
+Recall here that we treat the above model parameters and latent variables used for simulating the network as the reference, denoted by $(\cdot)^*$.
+
+We can visualize the network via the corresponding 3-dimensional interactive plot of the reference latent positions $\boldsymbol{U}^*$, clustering $\boldsymbol{z}^*$ and interactions $\boldsymbol{Y}$.
+The plot is uploaded on Github at [`Interactive 3-d latent positions plots/SS1_Scenario1_InteractivePlot.html`]
