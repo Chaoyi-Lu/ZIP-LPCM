@@ -43,4 +43,4 @@ SS1_Scenario1_Directed_ZIPLPCM$U
 SS1_Scenario1_Directed_ZIPLPCM$Z
 ```
 
-Here, "Y" is the $N \times N$ adjacency matrix of the network, "nu" is the $N \times N$ unusual zero indicator
+Here, "Y" is the $N \times N$ adjacency matrix of the network, "nu" is a $N \times N$ matrix storing the unusual zero indicator between each pair of individuals, "U" is a $N \times d$ latent variable containing the generated latent positions used for simulating the network, "z" is an $1\time N$ vector storing the pre-specified clustering while "Z" is the corresponding $N\times K$ matrix form of the clustering, where $K$ is the number of non-empty clusters.
