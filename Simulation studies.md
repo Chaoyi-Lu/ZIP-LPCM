@@ -45,10 +45,10 @@ SS1_Scenario1_Directed_ZIPLPCM$U
 SS1_Scenario1_Directed_ZIPLPCM$Z
 ```
 
-Here, "Y" corresponds to the $N \times N$ adjacency matrix $\boldsymbol{Y}$ of the network with each entry $y_{ij}$ indicating the interaction weight from node $i$ to node $j$; "nu" corresponds to the $N \times N$ unusual zero indicator matrix $\boldsymbol{\nu}$ with each entry $\nu_{ij}\in \\{0,1\\}$ indicating whether the corresponding $y_{ij}$ is an unusual zero ($\nu_{ij}=1$) or not ($\nu_{ij}=0$); "U" corresponds to the latent position variable $\boldsymbol{U}$ which is a $N \times d$ matrix with each row $i$ storing the corresponding latent position assigned to the node $i$; "Z" corresponds to $\boldsymbol{Z}$ which is the $N\times K$ matrix form of the clustering $\boldsymbol{z}$.
+Here, "Y" corresponds to the $N \times N$ adjacency matrix $\boldsymbol{Y}$ of the network with each entry $y_{ij}$ indicating the interaction weight from node $i$ to node $j$; "nu" corresponds to the $N \times N$ unusual zero indicator matrix $\boldsymbol{\nu}$ with each entry $\nu_{ij}\in \\{0,1\\}$ indicating whether the corresponding $y_{ij}$ is an unusual zero ($\nu_{ij}=1$) or not ($\nu_{ij}=0$); "U" corresponds to the latent position variable $\boldsymbol{U}$ which is a $N \times d$ matrix with each row $i$ storing the corresponding latent position $\boldsymbol{u_i}$ assigned to the node $i$; "Z" corresponds to $\boldsymbol{Z}$ which is the $N\times K$ matrix form of the clustering $\boldsymbol{z}$.
 Recall here that we treat the simulated latent variables and the above model parameters used for simulating the network as the references, denoted by $(\cdot)^*$.
 
-These model parameters $\boldsymbol{\mu}^\*,\boldsymbol{\tau}^\*,\beta^\*$ and $\boldsymbol{P}^\*$ are also stored as variables in the code following below.
+These model parameters $\boldsymbol{\mu}^\*,\boldsymbol{\tau}^\*,\beta^\*$ and $\boldsymbol{P}^\*$ are also stored as variables in the code below.
 
 ``` r
 SS1_Scenario1_Directed_ZIPLPCM_mu <- matrix(c(-1.5,-1.5,-1.5, -2,2,0, 2,-2,0, 2,2,-2, -2,-2,2),nrow=3,ncol=5)
@@ -62,7 +62,11 @@ SS1_Scenario1_Directed_ZIPLPCM_P_m0 <- (SS1_Scenario1_Directed_ZIPLPCM_p/(SS1_Sc
   ((SS1_Scenario1_Directed_ZIPLPCM$Y+diag(1,nrow(SS1_Scenario1_Directed_ZIPLPCM$Y)))==0)
 ```
 
-where `SS1_Scenario1_Directed_ZIPLPCM_P_ij` above corresponds to an individual level $N \times N$ matrix $\boldsymbol{p}$ with each entry $p_{ij}=p_{z_iz_j}$
+where `SS1_Scenario1_Directed_ZIPLPCM_p` above corresponds to an individual level $N \times N$ matrix $\boldsymbol{p}$ with each entry $p_{ij}=p_{z_iz_j}$ while `SS1_Scenario1_Directed_ZIPLPCM_P_m0` is also an individual level $N \times N$ matrix with each entry corresponding to the statistic:
+
+$$\text{P}(\nu_{ij}=1|y_{ij}=0,p_{z_iz_j},\beta,\boldsymbol{u_i},\boldsymbol{u_j})=\frac{p_{z_iz_j}}{p_{z_iz_j}+(1-p_{z_iz_j})f_{\text{Pois}}(0|\text{exp}(\beta-||\boldsymbol{u_i}-\boldsymbol{u_j}||)},$$ 
+
+which is the conditional probability of an unusual zero provided that the corresponding observed interaction is a zero interaction.
 
 The simulated network as well as the simulated latent variables can be stored following the code below.
 
