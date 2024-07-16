@@ -62,7 +62,7 @@ SS1_Scenario1_Directed_ZIPLPCM_P_m0 <- (SS1_Scenario1_Directed_ZIPLPCM_p/(SS1_Sc
   ((SS1_Scenario1_Directed_ZIPLPCM$Y+diag(1,nrow(SS1_Scenario1_Directed_ZIPLPCM$Y)))==0)
 ```
 
-where `SS1_Scenario1_Directed_ZIPLPCM_p` above corresponds to an individual level $N \times N$ matrix $\boldsymbol{p}$ with each entry $p_{ij}=p_{z_iz_j}$, while `SS1_Scenario1_Directed_ZIPLPCM_P_m0` is also an individual level $N \times N$ matrix with each entry corresponding to the statistic:
+where `SS1_Scenario1_Directed_ZIPLPCM_p` above corresponds to an individual-level $N \times N$ matrix $\boldsymbol{p}$ with each entry being $p_{z_iz_j}$, while `SS1_Scenario1_Directed_ZIPLPCM_P_m0` is also an individual level $N \times N$ matrix with each entry corresponding to the statistic:
 
 $$\text{P}(\nu_{ij}=1|y_{ij}=0,p_{z_iz_j},\beta,\boldsymbol{u_i},\boldsymbol{u_j})=\frac{p_{z_iz_j}}{p_{z_iz_j}+(1-p_{z_iz_j})f_{\text{Pois}}(0|\text{exp}(\beta-||\boldsymbol{u_i}-\boldsymbol{u_j}||)},$$ 
 
