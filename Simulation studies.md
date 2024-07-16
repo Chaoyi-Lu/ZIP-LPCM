@@ -119,4 +119,4 @@ fig
 
 The above code for the interactive 3-d plot also attached some texts or notes for each node and each non-zero interaction to help readers have a better understanding of the network.
 If the readers put the mouse pointer on each node of the interactive plot, there will be a comment bracket showing (i) the coordinate of the node, (ii) the node number (e.g. node 1, node 2, ...), (iii) the reference clustering of the node.
-If mouse pointer is put on each interaction, the bracket will show (i) either the start coordinate or the end coordinate of the interaction vector, (ii) the interaction weight, (iii) an indicator of whether the interaction is from node $i$ to node $j$ where $i<j$, i.e., whether $y_{ij}$ is the upper-diagonal entry of the $\boldsymbol{Y}$.
+If mouse pointer is put on each interaction, the bracket will show (i) either the start coordinate or the end coordinate of the interaction vector, (ii) the interaction weight, (iii) an indicator of whether the interaction is from node $i$ to node $j$ where $i\< j$, i.e., whether $y_{ij}$ is the upper-diagonal entry of the $\boldsymbol{Y}$.
