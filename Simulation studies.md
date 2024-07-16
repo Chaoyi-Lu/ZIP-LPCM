@@ -237,4 +237,58 @@ table(SS1_Scenario1_Directed_ZIPLPCM$Y[!is.nan((SS1_Scenario1_Directed_ZIPLPCM$Y
 hist(SS1_Scenario1_Directed_ZIPLPCM$Y[!is.nan((SS1_Scenario1_Directed_ZIPLPCM$Y+diag(NaN,75)))],200,xlab = "",ylab = "", main = "")
 ```
 
+We follow the similar simulation process above to simulate the scenario 2 network.
+The scenario 2 network is randomly generated from a Pois-LPCM with the following code.
 
+``` r
+SS1_Scenario2_Directed_PoisLPCM <-
+  Simulation_Directed_PoissonLPCM(beta=3,mu=matrix(c(-1.5,-1.5,-1.5, -2,2,0, 2,-2,0, 2,2,-2, -2,-2,2),nrow=3,ncol=5),
+tau=c(1/0.25,1/0.5,1/0.75,1/1,1/1.25),d=3,z=c(rep(1,5),rep(2,10),rep(3,15),rep(4,20),rep(5,25)),seed=NULL)
+```
+
+This brings the following contents for a Pois-LPCM network.
+
+``` r
+SS1_Scenario1_Directed_PoisLPCM$Y
+SS1_Scenario1_Directed_PoisLPCM$z
+SS1_Scenario1_Directed_PoisLPCM$U
+SS1_Scenario1_Directed_PoisLPCM$Z
+```
+
+These model parameters $\boldsymbol{\mu}^\*,\boldsymbol{\tau}^\*$ and $\beta^\*$ are stored as variables in the code below.
+
+``` r
+SS1_Scenario2_Directed_PoisLPCM_mu <- matrix(c(-1.5,-1.5,-1.5, -2,2,0, 2,-2,0, 2,2,-2, -2,-2,2),nrow=3,ncol=5)
+SS1_Scenario2_Directed_PoisLPCM_tau <- c(1/0.25,1/0.5,1/0.75,1/1,1/1.25)
+SS1_Scenario2_Directed_PoisLPCM_beta <- 3
+```
+
+The simulated network as well as the simulated latent variables are stored by the following code.
+
+``` r
+write.csv(SS1_Scenario2_Directed_PoisLPCM$Y,"Datasets/SS1_Scenario2_Directed_PoisLPCM_Y.csv", row.names = FALSE)
+write.csv(SS1_Scenario2_Directed_PoisLPCM$z,"Datasets/SS1_Scenario2_Directed_PoisLPCM_z.csv", row.names = FALSE)
+write.csv(SS1_Scenario2_Directed_PoisLPCM$U,"Datasets/SS1_Scenario2_Directed_PoisLPCM_U.csv", row.names = FALSE)
+write.csv(SS1_Scenario2_Directed_PoisLPCM_A,"Datasets/SS1_Scenario2_Directed_PoisLPCM_A.csv", row.names = FALSE)
+```
+
+where we follow the similar manner to contaminate the true clustering to obtain the exogenous node attributes.
+The practitioners can also consider using the same node attributes as the scenario 1 here.
+
+``` r
+SS1_Scenario2_Directed_PoisLPCM_A <- SS1_Scenario2_Directed_PoisLPCM$z
+SS1_Scenario2_Directed_PoisLPCM_A[sample(length(SS1_Scenario2_Directed_PoisLPCM$z),20)] <- sample(1:5,20,replace=TRUE)
+```
+
+Thus the data can be reloaded again via:
+
+``` r
+SS1_Scenario2_Directed_PoisLPCM <- 
+  list(Y = as.matrix(read.csv("Datasets/SS1_Scenario2_Directed_PoisLPCM_Y.csv",header = TRUE)),
+       z = c(as.matrix(read.csv("Datasets/SS1_Scenario2_Directed_PoisLPCM_z.csv",header = TRUE))),
+       U = as.matrix(read.csv("Datasets/SS1_Scenario2_Directed_PoisLPCM_U.csv",header = TRUE)),
+       A = c(as.matrix(read.csv("Datasets/SS1_Scenario2_Directed_PoisLPCM_A.csv",header = TRUE)))) # same A as scenario1
+SS1_Scenario2_Directed_PoisLPCM$Z <- t(t(matrix(SS1_Scenario2_Directed_PoisLPCM$z,length(SS1_Scenario2_Directed_PoisLPCM$z),max(SS1_Scenario2_Directed_PoisLPCM$z)))==(1:max(SS1_Scenario2_Directed_PoisLPCM$z)))*1
+colnames(SS1_Scenario2_Directed_PoisLPCM$Y) <- c()
+colnames(SS1_Scenario2_Directed_PoisLPCM$U) <- c()
+```
