@@ -110,9 +110,13 @@ for (i in 1:nrow(Edges)){
     add_trace(x = SS1_Scenario1_Directed_ZIPLPCM$U[Edges[i,],1],
               y = SS1_Scenario1_Directed_ZIPLPCM$U[Edges[i,],2],
               z = SS1_Scenario1_Directed_ZIPLPCM$U[Edges[i,],3],
-              text=paste("Weight:",E(g_obs)$weight[i]),
+              text=paste("Weight:",E(g_obs)$weight[i],"<br>UpperDiag?:",Edges[i,1]<Edges[i,2]),
               type = "scatter3d", mode = "lines", showlegend = FALSE,line = list(color = E(g_obs)$color[i], width = 0.35*E(g_obs)$weight[i]))
 }
 fig <- fig %>% layout(title = "ZIP-LPCM U* and z*",scene = list(xaxis = list(title = 'x1'),yaxis = list(title = 'x2'),zaxis = list(title = 'x3')))
 fig
 ```
+
+The above code for the interactive 3-d plot also attached some texts or notes for each node and each non-zero interaction to help readers have a better understanding of the network.
+If the readers put the mouse pointer on each node of the interactive plot, there will be a comment bracket showing (i) the coordinate of the node, (ii) the node number (e.g. node 1, node 2, ...), (iii) the reference clustering of the node.
+If mouse pointer is put on each interaction, the bracket will show (i) either the start coordinate or the end coordinate of the interaction vector, (ii) the interaction weight, (iii) an indicator of whether the interaction is from node $i$ to node $j$ where $i<j$, i.e., whether $y_{ij}$ is the upper-diagonal entry of the $\boldsymbol{Y}$.
