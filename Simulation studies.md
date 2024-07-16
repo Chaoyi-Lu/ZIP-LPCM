@@ -287,7 +287,7 @@ SS1_Scenario2_Directed_PoisLPCM <-
   list(Y = as.matrix(read.csv("Datasets/SS1_Scenario2_Directed_PoisLPCM_Y.csv",header = TRUE)),
        z = c(as.matrix(read.csv("Datasets/SS1_Scenario2_Directed_PoisLPCM_z.csv",header = TRUE))),
        U = as.matrix(read.csv("Datasets/SS1_Scenario2_Directed_PoisLPCM_U.csv",header = TRUE)),
-       A = c(as.matrix(read.csv("Datasets/SS1_Scenario2_Directed_PoisLPCM_A.csv",header = TRUE)))) # same A as scenario1
+       A = c(as.matrix(read.csv("Datasets/SS1_Scenario2_Directed_PoisLPCM_A.csv",header = TRUE))))
 SS1_Scenario2_Directed_PoisLPCM$Z <- t(t(matrix(SS1_Scenario2_Directed_PoisLPCM$z,length(SS1_Scenario2_Directed_PoisLPCM$z),max(SS1_Scenario2_Directed_PoisLPCM$z)))==(1:max(SS1_Scenario2_Directed_PoisLPCM$z)))*1
 colnames(SS1_Scenario2_Directed_PoisLPCM$Y) <- c()
 colnames(SS1_Scenario2_Directed_PoisLPCM$U) <- c()
