@@ -117,10 +117,76 @@ fig <- fig %>% layout(title = "ZIP-LPCM U* and z*",scene = list(xaxis = list(tit
 fig
 ```
 
+Running the code above would bring some warning messages and these are raised by some package bugs which are not yet resolved.
+However, these bugs would not affect our output and the readers can ignore those warning messages.
 The above code for the interactive 3-d plot also attached some texts or notes for each node and each non-zero interaction to help readers have a better understanding of the network.
 If the readers put the mouse pointer on each node of the interactive plot, there will be a comment bracket showing (i) the coordinate of the node, (ii) the node number (e.g. node 1, node 2, ...), (iii) the reference clustering of the node.
 If mouse pointer is put on each interaction, the bracket will show (i) either the start coordinate or the end coordinate of the interaction vector, (ii) the interaction weight, (iii) an indicator of whether the interaction is from node $i$ to node $j$ where $i\< j$, i.e., whether $y_{ij}$ is the upper-diagonal entry of the $\boldsymbol{Y}$.
 
 The Figure 1 in the ZIP-LPCM-MFM paper can be recovered following the code below where the functions `subplot()` and `orca()` are leveraged to aggregate multiple interactive plots from different specific angles in one figure and to output a high-quality screenshot, respectively.
 
+``` r
+g_obs <- graph_from_adjacency_matrix(SS1_Scenario1_Directed_ZIPLPCM$Y,mode = "directed",weighted = TRUE)
+E(g_obs)$color <- colorRampPalette(brewer.pal(9,"Greys")[c(3,9)])(max(SS1_Scenario1_Directed_ZIPLPCM$Y))[E(g_obs)$weight]
+betw <- betweenness(g_obs)
+VertexSize <- sqrt(betw/1.5+mean(betw))*1
 
+library("plotly")
+# First interactive plot
+fig1 <- plot_ly(scene ="scene1") %>% 
+  add_markers(x = SS1_Scenario1_Directed_ZIPLPCM$U[,1],
+              y = SS1_Scenario1_Directed_ZIPLPCM$U[,2],
+              z = SS1_Scenario1_Directed_ZIPLPCM$U[,3],
+              text=paste("Node:",1:nrow(SS1_Scenario1_Directed_ZIPLPCM$Y),"<br>z*:",SS1_Scenario1_Directed_ZIPLPCM$z),
+              size=VertexSize,sizes=c(100,300),showlegend = TRUE,
+              color=as.factor(SS1_Scenario1_Directed_ZIPLPCM$z),colors=My_colors[6:10]
+  )
+Edges <- get.edgelist(g_obs)
+for (i in 1:nrow(Edges)){
+  fig1 <- fig1 %>%
+    add_trace(x = SS1_Scenario1_Directed_ZIPLPCM$U[Edges[i,],1],
+              y = SS1_Scenario1_Directed_ZIPLPCM$U[Edges[i,],2],
+              z = SS1_Scenario1_Directed_ZIPLPCM$U[Edges[i,],3],
+              text=paste("Weight:",E(g_obs)$weight[i],"<br>UpperDiag?:",Edges[i,1]<Edges[i,2]),
+              type = "scatter3d", mode = "lines", showlegend = FALSE,line = list(color = E(g_obs)$color[i], width = 0.35*E(g_obs)$weight[i]))
+}
+# Second interactive plot
+fig2 <- plot_ly(scene ="scene2") %>% 
+  add_markers(x = SS1_Scenario1_Directed_ZIPLPCM$U[,1],
+              y = SS1_Scenario1_Directed_ZIPLPCM$U[,2],
+              z = SS1_Scenario1_Directed_ZIPLPCM$U[,3],
+              text=paste("Node:",1:nrow(SS1_Scenario1_Directed_ZIPLPCM$Y),"<br>z*:",SS1_Scenario1_Directed_ZIPLPCM$z),
+              size=VertexSize,sizes=c(100,300),showlegend = FALSE,
+              color=as.factor(SS1_Scenario1_Directed_ZIPLPCM$z),colors=My_colors[6:10]
+  )
+Edges <- get.edgelist(g_obs)
+for (i in 1:nrow(Edges)){
+  fig2 <- fig2 %>%
+    add_trace(x = SS1_Scenario1_Directed_ZIPLPCM$U[Edges[i,],1],
+              y = SS1_Scenario1_Directed_ZIPLPCM$U[Edges[i,],2],
+              z = SS1_Scenario1_Directed_ZIPLPCM$U[Edges[i,],3],
+              text=paste("Weight:",E(g_obs)$weight[i],"<br>UpperDiag?:",Edges[i,1]<Edges[i,2]),
+              type = "scatter3d", mode = "lines", showlegend = FALSE,line = list(color = E(g_obs)$color[i], width = 0.35*E(g_obs)$weight[i]))
+}
+# Combine two plots in one and set the default visualizing angles
+fig <- subplot(fig1, fig2) 
+fig <- fig %>% layout(title = "", margin = list(l = 0,r = 0,b = 0,t = 0,pad = 0),
+                      scene = list(domain=list(x=c(0,1/2),y=c(0,1)),
+                                   xaxis = list(title = ''),yaxis = list(title = ''),zaxis = list(title = ''),
+                                   camera = list(eye = list(x = 1.25, y = 1.25, z = 1.25)), # set the default visualizing angle
+                                   aspectmode='auto'),
+                      scene2 = list(domain=list(x=c(1/2,0.999),y=c(0,1)),
+                                    xaxis = list(title = ''),yaxis = list(title = ''),zaxis = list(title = ''),
+                                    camera = list(eye = list(x = -1.25, y = 1.25, z = 1.25)),
+                                    aspectmode='auto'))
+fig
+```
+
+Running the `fig` above will directly output an interactive plot which contains two interactive subplots.
+The two interactive subplots are exactly the same but with different default visualizing angles.
+Direct screenshoot of the interactive plot would bring a very low-quality figure.
+Thus we leverage the function `orca()` shown below to obtain a high-quality screenshot of the interactive plots.
+
+``` r
+orca(fig, "SS1_Sce1_Obs.pdf",scale=1,width=1800,height=850)
+```
