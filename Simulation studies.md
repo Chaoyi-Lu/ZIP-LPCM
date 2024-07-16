@@ -63,10 +63,32 @@ SS1_Scenario1_Directed_ZIPLPCM_A <- SS1_Scenario1_Directed_ZIPLPCM$z
 SS1_Scenario1_Directed_ZIPLPCM_A[sample(length(SS1_Scenario1_Directed_ZIPLPCM$z),20)] <- sample(1:5,20,replace=TRUE)
 ```
 
-We can visualize the network via the 3-dimensional interactive plot of the reference latent positions $\boldsymbol{U}^\*$, the reference clustering $\boldsymbol{z}^*$ and those interactions stored in $\boldsymbol{Y}$.
+Once we stored the simulated network, we can reload the data again following the code below.
+
+``` r
+SS1_Scenario1_Directed_ZIPLPCM <- 
+  list(Y = as.matrix(read.csv("Datasets/SS1_Scenario1_Directed_ZIPLPCM_Y.csv",header = TRUE)),
+       nu = as.matrix(read.csv("Datasets/SS1_Scenario1_Directed_ZIPLPCM_nu.csv",header = TRUE)),
+       z = c(as.matrix(read.csv("Datasets/SS1_Scenario1_Directed_ZIPLPCM_z.csv",header = TRUE))),
+       U = as.matrix(read.csv("Datasets/SS1_Scenario1_Directed_ZIPLPCM_U.csv",header = TRUE)),
+       A = c(as.matrix(read.csv("Datasets/SS1_Scenario1_Directed_ZIPLPCM_A.csv",header = TRUE))))
+SS1_Scenario1_Directed_ZIPLPCM$Z <- t(t(matrix(SS1_Scenario1_Directed_ZIPLPCM$z,length(SS1_Scenario1_Directed_ZIPLPCM$z),max(SS1_Scenario1_Directed_ZIPLPCM$z)))==(1:max(SS1_Scenario1_Directed_ZIPLPCM$z)))*1
+colnames(SS1_Scenario1_Directed_ZIPLPCM$Y) <- c()
+colnames(SS1_Scenario1_Directed_ZIPLPCM$nu) <- c()
+colnames(SS1_Scenario1_Directed_ZIPLPCM$U) <- c()
+```
+
+We can visualize the network via the 3-dimensional interactive plot of the reference latent positions $\boldsymbol{U}^\*$, the reference clustering $\boldsymbol{z}^\*$ and those interactions stored in $\boldsymbol{Y}$.
 The plot is uploaded on Github at [`\Interactive 3-d latent positions plots/SS1_Scenario1_InteractivePlot.html`], and can be reproduced following the code below.
 
 ``` r
+library("igraph")
+library("RColorBrewer")
+
+My_colors <- c(brewer.pal(10,"RdBu")[c(4,7)],brewer.pal(10,"PRGn")[c(7,4)],brewer.pal(9,"YlOrBr")[3],
+               brewer.pal(10,"RdBu")[c(2,9)],brewer.pal(10,"PRGn")[c(9,2)],brewer.pal(9,"YlOrBr")[6],
+               brewer.pal(9,"Reds")[c(9,6)],brewer.pal(9,"RdPu")[5],brewer.pal(9,"Greys")[c(3,6,9)],brewer.pal(9,"GnBu")[5])
+
 g_obs <- graph_from_adjacency_matrix(SS1_Scenario1_Directed_ZIPLPCM$Y,mode = "directed",weighted = TRUE)
 E(g_obs)$color <- colorRampPalette(brewer.pal(9,"Greys")[c(3,9)])(max(SS1_Scenario1_Directed_ZIPLPCM$Y))[E(g_obs)$weight]
 betw <- betweenness(g_obs) # evaluate the betweeness of the network
