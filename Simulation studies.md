@@ -33,7 +33,7 @@ SS1_Scenario1_Directed_ZIPLPCM <-
 ```
 
 The corresponding model parameters and latent variables are in line with those introduced in the ZIP-LPCM-MFM paper.
-This simulation function brings the following contents for a ZIP-LPCM network.
+The above simulation function brings the following contents for a ZIP-LPCM network.
 
 ``` r
 SS1_Scenario1_Directed_ZIPLPCM$Y
@@ -43,7 +43,7 @@ SS1_Scenario1_Directed_ZIPLPCM$U
 SS1_Scenario1_Directed_ZIPLPCM$Z
 ```
 
-Here, "Y" is the $N \times N$ adjacency matrix of the network, "nu" is a $N \times N$ matrix storing the unusual zero indicator between each pair of individuals, "U" is a $N \times d$ latent variable containing the generated latent positions used for simulating the network, "z" is an $1\times N$ vector storing the pre-specified clustering while "Z" is the corresponding $N\times K$ matrix form of the clustering, where $K$ is the number of non-empty clusters.
+Here, "Y" corresponds to the $N \times N$ adjacency matrix $\boldsymbol{Y}$ of the network with each entry $y_{ij}$ indicating the interaction weight from node $i$ to node $j$; "nu" corresponds to the $N \times N$ unusual zero indicator matrix $\boldsymbol{\nu}$ with each entry $\nu_{ij}\in \{0,1\}$ indicating whether the corresponding $y_{ij}$ is an unusual zero ($\nu_{ij}=1$) or not ($\nu_{ij}=0$); "U" corresponds to the latent position variable $\boldsymbol{U}$ used for simulating the network and is a $N \times d$ matrix with each row $i$ storing the corresponding latent position assigned for the node $i$; "z" corresponds to the latent clutering or membership variable $\boldsymbol{z}$ which is an $1\times N$ vector storing the pre-specified clustering while "Z" corresponds to $\boldsymbol{z}$ which is the corresponding $N\times K$ matrix form of the clustering. Here, $K$ is the number of non-empty clusters.
 Recall here that we treat the above model parameters and latent variables used for simulating the network as the reference, denoted by $(\cdot)^*$.
 The network and these references can be stored following the code below.
 
