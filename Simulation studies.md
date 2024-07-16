@@ -68,6 +68,7 @@ While `SS1_Scenario1_Directed_ZIPLPCM_P_m0` is also an individual level $N \time
 $$\text{P}(\nu_{ij}=1|y_{ij}=0,p_{z_iz_j},\beta,\boldsymbol{u_i},\boldsymbol{u_j})=\frac{p_{z_iz_j}}{p_{z_iz_j}+(1-p_{z_iz_j})f_{\text{Pois}}(0|\text{exp}(\beta-||\boldsymbol{u_i}-\boldsymbol{u_j}||)},$$ 
 
 which is the conditional probability of an unusual zero provided that the corresponding observed interaction is a zero interaction.
+Both of these two statistics are evaluated based on reference model parameters and latent variables here, and thus are treated as the corresponding reference statistics.
 
 The simulated network as well as the simulated latent variables can be stored following the code below.
 
