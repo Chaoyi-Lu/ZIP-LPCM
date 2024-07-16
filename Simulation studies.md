@@ -191,3 +191,5 @@ However, before running the `orca()` function in the package `plotly`, the reade
 ``` r
 orca(fig, "SS1_Scenario1_RefU.pdf",scale=1,width=1800,height=850)
 ```
+
+The above code will output exactly the same figure as the Figure 1 of the ZIP-LPCM-MFM paper.
