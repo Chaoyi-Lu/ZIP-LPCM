@@ -79,7 +79,8 @@ colnames(SS1_Scenario1_Directed_ZIPLPCM$U) <- c()
 ```
 
 We can visualize the network via the 3-dimensional interactive plot of the reference latent positions $\boldsymbol{U}^\*$, the reference clustering $\boldsymbol{z}^\*$ and those interactions stored in $\boldsymbol{Y}$.
-The plot is uploaded on Github at [`\Interactive 3-d latent positions plots/SS1_Scenario1_InteractivePlot.html`], and can be reproduced following the code below.
+The plot is uploaded on Github at [`/Interactive 3-d latent positions plots/SS1_Scenario1_InteractivePlot.html`], and can be reproduced following the code below.
+However, the Github cannot directly load the [`SS1_Scenario1_InteractivePlot.html`] file, so the readers need to download it first in order to see the interactive 3-d plot.
 
 ``` r
 library("igraph")
