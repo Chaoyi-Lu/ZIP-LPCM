@@ -32,6 +32,8 @@ SS1_Scenario1_Directed_ZIPLPCM <-
                               z=c(rep(1,5),rep(2,10),rep(3,15),rep(4,20),rep(5,25)),seed=NULL)
 ```
 
+where (i) "beta" corresponds to the intercept parameter $\beta$ of the model, (ii) "P" corresponds to the $\boldsymbol{P}$ which is a group-level $K \times K$ matrix indicating the probability of unusual zero for the interactions between each pair of groups, (iii) "mu" and "tau" correspond to the $\boldsymbol{\mu}$ and $\boldsymbol{\tau}$ which are, respectively, the group centres and the group precisions of the corresponding multivariate normal distribution, (iv) "z" corresponds to the latent clutering or membership variable $\boldsymbol{z}$ which is an $1\times N$ vector storing the pre-specified clustering. Here, $K$ is the number of non-empty clusters that can be easily extracted from $\boldsymbol{z}$.
+
 The corresponding model parameters and latent variables are in line with those introduced in the ZIP-LPCM-MFM paper.
 The above simulation function brings the following contents for a ZIP-LPCM network.
 
@@ -43,9 +45,26 @@ SS1_Scenario1_Directed_ZIPLPCM$U
 SS1_Scenario1_Directed_ZIPLPCM$Z
 ```
 
-Here, "Y" corresponds to the $N \times N$ adjacency matrix $\boldsymbol{Y}$ of the network with each entry $y_{ij}$ indicating the interaction weight from node $i$ to node $j$; "nu" corresponds to the $N \times N$ unusual zero indicator matrix $\boldsymbol{\nu}$ with each entry $\nu_{ij}\in \{0,1\}$ indicating whether the corresponding $y_{ij}$ is an unusual zero ($\nu_{ij}=1$) or not ($\nu_{ij}=0$); "U" corresponds to the latent position variable $\boldsymbol{U}$ used for simulating the network and is a $N \times d$ matrix with each row $i$ storing the corresponding latent position assigned for the node $i$; "z" corresponds to the latent clutering or membership variable $\boldsymbol{z}$ which is an $1\times N$ vector storing the pre-specified clustering while "Z" corresponds to $\boldsymbol{z}$ which is the corresponding $N\times K$ matrix form of the clustering. Here, $K$ is the number of non-empty clusters.
-Recall here that we treat the above model parameters and latent variables used for simulating the network as the reference, denoted by $(\cdot)^*$.
-The network and these references can be stored following the code below.
+Here, "Y" corresponds to the $N \times N$ adjacency matrix $\boldsymbol{Y}$ of the network with each entry $y_{ij}$ indicating the interaction weight from node $i$ to node $j$; "nu" corresponds to the $N \times N$ unusual zero indicator matrix $\boldsymbol{\nu}$ with each entry $\nu_{ij}\in \{0,1\}$ indicating whether the corresponding $y_{ij}$ is an unusual zero ($\nu_{ij}=1$) or not ($\nu_{ij}=0$); "U" corresponds to the latent position variable $\boldsymbol{U}$ used for simulating the network and is a $N \times d$ matrix with each row $i$ storing the corresponding latent position assigned for the node $i$; "Z" corresponds to $\boldsymbol{z}$ which is the $N\times K$ matrix form of the clustering $\boldsymbol{z}$.
+Recall here that we treat the simulated latent variables and the above model parameters used for simulating the network as the references, denoted by $(\cdot)^*$.
+
+These model parameters $\boldsymbol{\mu}^\*,\boldsymbol{\tau}^\*,\beta^\*$ and $\boldsymbol{P}^\*$ are also stored as variables in the code following below.
+
+``` r
+SS1_Scenario1_Directed_ZIPLPCM_mu <- matrix(c(-1.5,-1.5,-1.5, -2,2,0, 2,-2,0, 2,2,-2, -2,-2,2),nrow=3,ncol=5)
+SS1_Scenario1_Directed_ZIPLPCM_tau <- c(1/0.25,1/0.5,1/0.75,1/1,1/1.25)
+SS1_Scenario1_Directed_ZIPLPCM_beta <- 3
+SS1_Scenario1_Directed_ZIPLPCM_P <- matrix(c(0.4,0.1,0.05,0.1,0.05,  0.05,0.4,0.1,0.05,0.1,  0.1,0.05,0.4,0.1,0.05,  
+                                             0.05,0.1,0.05,0.4,0.1,  0.1,0.05,0.1,0.05,0.4),5,5)
+SS1_Scenario1_Directed_ZIPLPCM_p <- SS1_Scenario1_Directed_ZIPLPCM$Z%*%SS1_Scenario1_Directed_ZIPLPCM_P%*%t(SS1_Scenario1_Directed_ZIPLPCM$Z)
+library(Rfast) # for Rfast::Dist()
+SS1_Scenario1_Directed_ZIPLPCM_P_m0 <- (SS1_Scenario1_Directed_ZIPLPCM_p/(SS1_Scenario1_Directed_ZIPLPCM_p+(1-SS1_Scenario1_Directed_ZIPLPCM_p)*dpois(0,exp(SS1_Scenario1_Directed_ZIPLPCM_beta-Rfast::Dist(SS1_Scenario1_Directed_ZIPLPCM$U)))))*
+  ((SS1_Scenario1_Directed_ZIPLPCM$Y+diag(1,nrow(SS1_Scenario1_Directed_ZIPLPCM$Y)))==0)
+```
+
+where `SS1_Scenario1_Directed_ZIPLPCM_P_ij` above corresponds to an individual level $N \times N$ matrix $\boldsymbol{p}$ with each entry $p_{ij}=p_{z_iz_j}$
+
+The simulated network as well as the simulated latent variables can be stored following the code below.
 
 ``` r
 write.csv(SS1_Scenario1_Directed_ZIPLPCM$Y,"Datasets/SS1_Scenario1_Directed_ZIPLPCM_Y.csv", row.names = FALSE)
@@ -211,3 +230,4 @@ table(SS1_Scenario1_Directed_ZIPLPCM$Y[!is.nan((SS1_Scenario1_Directed_ZIPLPCM$Y
 # Plot the distribution of interaction weights
 hist(SS1_Scenario1_Directed_ZIPLPCM$Y[!is.nan((SS1_Scenario1_Directed_ZIPLPCM$Y+diag(NaN,75)))],200,xlab = "",ylab = "", main = "")
 ```
+
