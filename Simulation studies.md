@@ -292,3 +292,37 @@ SS1_Scenario2_Directed_PoisLPCM$Z <- t(t(matrix(SS1_Scenario2_Directed_PoisLPCM$
 colnames(SS1_Scenario2_Directed_PoisLPCM$Y) <- c()
 colnames(SS1_Scenario2_Directed_PoisLPCM$U) <- c()
 ```
+
+The simulated network can be visualized via the 3-dimensional interactive plot uploaded on Github at [`/Interactive 3-d latent positions plots/SS1_Scenario2_InteractivePlot.html`], and can be reproduced following the code below.
+
+``` r
+library("igraph")
+library("RColorBrewer")
+My_colors <- c(brewer.pal(10,"RdBu")[c(4,7)],brewer.pal(10,"PRGn")[c(7,4)],brewer.pal(9,"YlOrBr")[3],
+               brewer.pal(10,"RdBu")[c(2,9)],brewer.pal(10,"PRGn")[c(9,2)],brewer.pal(9,"YlOrBr")[6],
+               brewer.pal(9,"Reds")[c(9,6)],brewer.pal(9,"RdPu")[5],brewer.pal(9,"Greys")[c(3,6,9)],brewer.pal(9,"GnBu")[5])
+g_obs <- graph_from_adjacency_matrix(SS1_Scenario2_Directed_PoisLPCM$Y,mode = "directed",weighted = TRUE)
+E(g_obs)$color <- colorRampPalette(brewer.pal(9,"Greys")[c(3,9)])(max(SS1_Scenario2_Directed_PoisLPCM$Y))[E(g_obs)$weight]
+betw <- betweenness(g_obs) 
+VertexSize <- sqrt(betw/1.5+mean(betw))*1
+library("plotly")
+fig <- plot_ly() %>% # plot the reference clustering and U
+  add_markers(x = SS1_Scenario2_Directed_PoisLPCM$U[,1],
+              y = SS1_Scenario2_Directed_PoisLPCM$U[,2],
+              z = SS1_Scenario2_Directed_PoisLPCM$U[,3],
+              text=paste("Node:",1:nrow(SS1_Scenario2_Directed_PoisLPCM$Y),"<br>z*:",SS1_Scenario2_Directed_PoisLPCM$z),
+              size=VertexSize,sizes=c(100,300),
+              color=as.factor(SS1_Scenario2_Directed_PoisLPCM$z),colors=My_colors[6:10]
+  )
+Edges <- get.edgelist(g_obs)
+for (i in 1:nrow(Edges)){
+  fig <- fig %>%
+    add_trace(x = SS1_Scenario2_Directed_PoisLPCM$U[Edges[i,],1],
+              y = SS1_Scenario2_Directed_PoisLPCM$U[Edges[i,],2],
+              z = SS1_Scenario2_Directed_PoisLPCM$U[Edges[i,],3],
+              text=paste("Weight:",E(g_obs)$weight[i],"<br>UpperDiag?:",Edges[i,1]<Edges[i,2]),
+              type = "scatter3d", mode = "lines", showlegend = FALSE,line = list(color = E(g_obs)$color[i], width = 0.25*E(g_obs)$weight[i]))
+}
+fig <- fig %>% layout(title = "Pois-LPCM U* and z*",scene = list(xaxis = list(title = 'x1'),yaxis = list(title = 'x2'),zaxis = list(title = 'x3')))
+fig
+```
