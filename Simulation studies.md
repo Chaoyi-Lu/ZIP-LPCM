@@ -193,3 +193,21 @@ orca(fig, "SS1_Scenario1_RefU.pdf",scale=1,width=1800,height=850)
 ```
 
 The above code will output exactly the same figure as the Figure 1 of the ZIP-LPCM-MFM paper.
+
+The following code provides some extra statistics about the interaction weights of the scenario 1 network.
+
+``` r
+# Number/proportion of true 0
+sum(SS1_Scenario1_Directed_ZIPLPCM$nu[SS1_Scenario1_Directed_ZIPLPCM$Y == 0]==0)-75
+(sum(SS1_Scenario1_Directed_ZIPLPCM$nu[SS1_Scenario1_Directed_ZIPLPCM$Y == 0]==0)-75)/(75*74)
+# Number/proportion of unusual 0
+sum(SS1_Scenario1_Directed_ZIPLPCM$nu[SS1_Scenario1_Directed_ZIPLPCM$Y == 0]==1)
+(sum(SS1_Scenario1_Directed_ZIPLPCM$nu[SS1_Scenario1_Directed_ZIPLPCM$Y == 0]==1))/(75*74)
+# Number/proportion of non 0
+sum(SS1_Scenario1_Directed_ZIPLPCM$nu[SS1_Scenario1_Directed_ZIPLPCM$Y != 0]==0)
+(sum(SS1_Scenario1_Directed_ZIPLPCM$nu[SS1_Scenario1_Directed_ZIPLPCM$Y != 0]==0))/(75*74)
+# Distribution of interaction weights
+table(SS1_Scenario1_Directed_ZIPLPCM$Y[!is.nan((SS1_Scenario1_Directed_ZIPLPCM$Y+diag(NaN,75)))])
+# Plot the distribution of interaction weights
+hist(SS1_Scenario1_Directed_ZIPLPCM$Y[!is.nan((SS1_Scenario1_Directed_ZIPLPCM$Y+diag(NaN,75)))],200,xlab = "",ylab = "", main = "")
+```
