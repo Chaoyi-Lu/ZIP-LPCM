@@ -184,9 +184,10 @@ fig
 
 Running the `fig` above will directly output an interactive plot which contains two interactive subplots.
 The two interactive subplots are exactly the same but with different default visualizing angles.
-Direct screenshoot of the interactive plot would bring a very low-quality figure.
+Direct screenshot of the interactive plot would bring an low-quality figure.
 Thus we leverage the function `orca()` shown below to obtain a high-quality screenshot of the interactive plots.
+However, before running the `orca()` function in the package `plotly`, the readers need to first install the "orca" app following the Github instructions: [https://plotly.com/r/static-image-export/](https://plotly.com/r/static-image-export/) and [https://github.com/plotly/orca#installation](https://github.com/plotly/orca#installation).
 
 ``` r
-orca(fig, "SS1_Sce1_Obs.pdf",scale=1,width=1800,height=850)
+orca(fig, "SS1_Scenario1_RefU.pdf",scale=1,width=1800,height=850)
 ```
