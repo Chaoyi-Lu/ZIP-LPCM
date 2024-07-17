@@ -327,7 +327,7 @@ fig <- fig %>% layout(title = "Pois-LPCM U* and z*",scene = list(xaxis = list(ti
 fig
 ```
 
-The heatmap plots shown in Figure 2 of the ZIP-LPCM-MFM paper can be reproduced following the code:
+The adjacency matrices heatmap plots shown in Figure 2 of the ZIP-LPCM-MFM paper can be reproduced following the code:
 
 ``` r
 library("RColorBrewer")
