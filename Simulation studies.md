@@ -503,7 +503,7 @@ sd(abs(SS1_Scenario1_Directed_ZIPLPCM_Sup_ZIPLPCM_T12k_R1_hat_D-dist(SS1_Scenari
 # 0.20134
 ```
 
-The next step is to obtain the summarized clustering or a point estimate of the clustering $\boldsymbol{\hat{z}}$ by minimizing the expected posterior VI loss with respect to $\boldsymbol{z}$ following a greedy algorithm proposed by [Rastelli, R. and Friel, N. (2018)](https://pubmed.ncbi.nlm.nih.gov/30220822/).
+The next step is to obtain the summarized clustering or a point estimate of the clustering $`\hat{\boldsymbol{z}}`$ by minimizing the expected posterior VI loss with respect to $\boldsymbol{z}$ following a greedy algorithm proposed by [Rastelli, R. and Friel, N. (2018)](https://pubmed.ncbi.nlm.nih.gov/30220822/).
 However, we begin with obtaining the marginal posterior mode of the posterior clustering chain shown below.
 
 ``` r
@@ -536,5 +536,18 @@ for (t in 1:nrow(SS1_Scenario1_Directed_ZIPLPCM_Sup_ZIPLPCM_T12k_R1_LSz_States))
       length(SS1_Scenario1_Directed_ZIPLPCM_Sup_ZIPLPCM_T12k_R1_LSz_StatesIteration[[t]]))
 }
 SS1_Scenario1_Directed_ZIPLPCM_Sup_ZIPLPCM_T12k_R1_hat_z <- SS1_Scenario1_Directed_ZIPLPCM_Sup_ZIPLPCM_T12k_R1_LSz_States[which.max(SS1_Scenario1_Directed_ZIPLPCM_Sup_ZIPLPCM_T12k_R1_LSz_StatesFrequency),] # initialize the clustering state as the marginal posterior mode
-
 ```
+
+Then we apply the Rastelli and Friel (2018) greedy algorithm to obtain the $`\hat{\boldsymbol{z}}`$:
+
+``` r
+library(GreedyEPL) # obtain the summarized z by the greedy algorithm proposed by Rastelli and Friel (2018)
+output <- MinimiseEPL(SS1_Scenario1_Directed_ZIPLPCM_Sup_ZIPLPCM_T12k_R1_LSz[iteration_after_burn_in,],
+                      list(Kup = 15, loss_type = "VI",decision_init = SS1_Scenario1_Directed_ZIPLPCM_Sup_ZIPLPCM_T12k_R1_hat_z))
+table(output$decision,SS1_Scenario1_Directed_ZIPLPCM_Sup_ZIPLPCM_T12k_R1_hat_z,dnn = c("","")) # check whether the the output is the same as the marginal posterior mode
+output$EPL # check minEVI posterior loss: 0.009159308
+SS1_Scenario1_Directed_ZIPLPCM_Sup_ZIPLPCM_T12k_R1_hat_z <- output$decision # Save output as the summarized z
+```
+
+where the `output$EPL` code above returns the statistic $`\mathbb{E}_{\boldsymbol{z}}[\text{VI}(\hat{\boldsymbol{z}},\boldsymbol{z}) \mid \boldsymbol{Y}]`$ shown in the 4th column of Table 1 of the ZIP-LPCM-MFM paper for the "ZIP-LPCM Sup Beta(1,9)" case in scenario 1.
+The VI distance between the $`\hat{\boldsymbol{z}}`$ and $`\boldsymbol{z}^*`$
