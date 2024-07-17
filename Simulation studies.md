@@ -375,4 +375,21 @@ Fig
 
 ## Simulation study 1 implementations and post-processing
 
+The supervised undirected partially collapsed Metropolis-within-Gibbs algorithm for ZIP-LPCM can be implemented on the scenario 1 network following the code:
 
+``` r
+# Supervised ZIP-LPCM-MFM implementations with T=12000 Beta(1,9) R1
+start.time <- Sys.time()
+SS1_Scenario1_Directed_ZIPLPCM_Sup_ZIPLPCM_T12k_R1 <- 
+  MwG_Directed_ZIPLPCM(Y = SS1_Scenario1_Directed_ZIPLPCM$Y,T = 12000,omega=0.01,alpha1=1,alpha2=0.103,alpha=3,beta1=1,beta2=9,
+                       sigma2prop_beta=0.06^2,sigma2prop_U=0.06,d=3,z=1:nrow(SS1_Scenario1_Directed_ZIPLPCM$Y),
+                       p_eject=0.5,A=SS1_Scenario1_Directed_ZIPLPCM$A,omega_c=1)
+end.time <- Sys.time()
+SS1_Scenario1_Directed_ZIPLPCM_Sup_ZIPLPCM_T12k_R1_time <- end.time - start.time
+SS1_Scenario1_Directed_ZIPLPCM_Sup_ZIPLPCM_T12k_R1_time
+# Time difference of 24.18005 mins
+# save.image("SS1_Scenario1_Directed_ZIPLPCM_Sup_ZIPLPCM_T12k_R1.RData")
+```
+
+where the prior parameters are set to be $(\omega=0.01,\alpha_1=1,\alpha_2=0.103,\alpha=3)$ which are all in agreement with those stated in the ZIP-LPCM-MFM paper.
+The unusual zero probability prior is set to be $\text{Beta}(1,9)$ above, corresponding to the "ZIP-LPCM Sup Beta(1,9)" case we show in the paper.
