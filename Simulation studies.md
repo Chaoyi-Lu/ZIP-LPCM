@@ -466,6 +466,12 @@ plot(SS1_Scenario1_Directed_ZIPLPCM_Sup_ZIPLPCM_T12k_R1_LSz_Like,type = "l",xlab
 ```
 
 where the traceplot above can illustrate the good mixing of the posterior samples we obtained.
+We can also have a look at the traceplot of the posterior samples of $K$:
+
+``` r
+# Check the trace plot of K
+plot(SS1_Scenario1_Directed_ZIPLPCM_T12k_R1$K,type = "l",xlab = "",ylab = "", main = "K Trace Plot",cex.axis = 0.8)
+```
 
 
 
