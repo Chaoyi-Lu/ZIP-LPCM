@@ -417,7 +417,7 @@ for (t in 1:nrow(SS1_Scenario1_Directed_ZIPLPCM_Sup_ZIPLPCM_T12k_R1$z)){
 ```
 
 We also apply Procrustes transform on each iteration's posterior latent positions with respect to the reference clustering in order for easier visulization comparisons.
-Note that the Procrustes transform is not necessarily to be applied here because we finally assess the performance of the latent positions via the corresponding distance matrix.
+Note that the Procrustes transform is not necessarily to be applied here because we assess the performance of the latent positions via the corresponding distance matrix.
 
 ``` r
 # Apply Procrustes Transform on posterior latent positions U
@@ -465,13 +465,40 @@ for (t in 1:nrow(SS1_Scenario1_Directed_ZIPLPCM_Sup_ZIPLPCM_T12k_R1$z)){
 plot(SS1_Scenario1_Directed_ZIPLPCM_Sup_ZIPLPCM_T12k_R1_LSz_Like,type = "l",xlab = "",ylab = "", main = "Likelihood",cex.axis = 0.8)
 ```
 
-where the traceplot above can illustrate the good mixing of the posterior samples we obtained.
+where the traceplot of the complete likelihood above can illustrate the good mixing of the posterior samples we obtained.
 We can also have a look at the traceplot of the posterior samples of $K$:
 
 ``` r
 # Check the trace plot of K
-plot(SS1_Scenario1_Directed_ZIPLPCM_T12k_R1$K,type = "l",xlab = "",ylab = "", main = "K Trace Plot",cex.axis = 0.8)
+plot(SS1_Scenario1_Directed_ZIPLPCM_Sup_ZIPLPCM_T12k_R1$K,type = "l",xlab = "",ylab = "", main = "K Trace Plot",cex.axis = 0.8)
 ```
 
+Then we obtain a $N \times N$ distance matrix $\boldsymbol{D}$ whose lower-diagonal entries are $\\{d_{ij}:=||\boldsymbol{u_i}-\boldsymbol{u_j}||\\}_{i,j=1;i>j}^N$ for each iteration's latent positions:
 
+``` r
+# Obtain distance matrix D for each iteration
+SS1_Scenario1_Directed_ZIPLPCM_Sup_ZIPLPCM_T12k_R1_D <- list()
+for (t in 1:nrow(SS1_Scenario1_Directed_ZIPLPCM_Sup_ZIPLPCM_T12k_R1$z)){
+  SS1_Scenario1_Directed_ZIPLPCM_Sup_ZIPLPCM_T12k_R1_D[[t]] <- dist(SS1_Scenario1_Directed_ZIPLPCM_Sup_ZIPLPCM_T12k_R1_PTU[[t]])
+  if ((t%%1000) == 0){
+    cat("t=",t,"\n") # monitor the process
+  }
+}
+```
 
+Since the distance matrix is invariant under any rotation or translation of the latent positions, so it's more reliable to for the analysis of latent positions compared to the positions themselves.
+We can then obtain the summarized $\hat{\boldsymbol{D}}$ with each entry being $`\hat{d}_{ij}`$ by posterior mean of each $`d_{ij}`$, i.e.,
+
+``` r
+SS1_Scenario1_Directed_ZIPLPCM_Sup_ZIPLPCM_T12k_R1_hat_D <- Reduce("+",SS1_Scenario1_Directed_ZIPLPCM_Sup_ZIPLPCM_T12k_R1_D[iteration_after_burn_in])/length(iteration_after_burn_in)
+```
+
+The statistic $`\mathbb{E}(\\{|\hat{d}_{ij}-d^*_{ij}|\\}){\scriptsize [\text{sd}]}`$ in the 5th column of the Table 1 in the ZIP-LPCM-MFM paper can be obtained for the "ZIP-LPCM Sup Beta(1,9)" case in scenario 1 following:
+
+``` r
+# Compare \hat{d}_{ij} and d^*_{ij} via the mean and sd of the |bias(d_{ij})|
+mean(abs(SS1_Scenario1_Directed_ZIPLPCM_Sup_ZIPLPCM_T12k_R1_hat_D-dist(SS1_Scenario1_Directed_ZIPLPCM$U)))
+# 0.2493543
+sd(abs(SS1_Scenario1_Directed_ZIPLPCM_Sup_ZIPLPCM_T12k_R1_hat_D-dist(SS1_Scenario1_Directed_ZIPLPCM$U)))
+# 0.20134
+```
