@@ -214,7 +214,7 @@ Thus we leverage the function `orca()` shown below to obtain a high-quality scre
 However, before running the `orca()` function in the package `plotly`, the readers need to first install the "orca" app following the Github instructions: [https://plotly.com/r/static-image-export/](https://plotly.com/r/static-image-export/) and [https://github.com/plotly/orca#installation](https://github.com/plotly/orca#installation).
 
 ``` r
-orca(fig, "SS1_Scenario1_RefU.pdf",scale=1,width=1800,height=850)
+orca(fig, "SS1_Sce1_Obs.pdf",scale=1,width=1800,height=850)
 ```
 
 The above code will output exactly the same figure as the Figure 1 of the ZIP-LPCM-MFM paper.
@@ -325,4 +325,50 @@ for (i in 1:nrow(Edges)){
 }
 fig <- fig %>% layout(title = "Pois-LPCM U* and z*",scene = list(xaxis = list(title = 'x1'),yaxis = list(title = 'x2'),zaxis = list(title = 'x3')))
 fig
+```
+
+The heatmap plots shown in Figure 2 of the ZIP-LPCM-MFM paper can be reproduced following the code:
+
+``` r
+library("RColorBrewer")
+library("pheatmap")
+My_colors <- c(brewer.pal(10,"RdBu")[c(4,7)],brewer.pal(10,"PRGn")[c(7,4)],brewer.pal(9,"YlOrBr")[3],
+               brewer.pal(10,"RdBu")[c(2,9)],brewer.pal(10,"PRGn")[c(9,2)],brewer.pal(9,"YlOrBr")[6],
+               brewer.pal(9,"Reds")[c(9,6)],brewer.pal(9,"RdPu")[5],brewer.pal(9,"Greys")[c(3,6,9)],brewer.pal(9,"GnBu")[5])
+
+SS1_Scenario1_Directed_ZIPLPCM_Y_dataframe <- as.data.frame(SS1_Scenario1_Directed_ZIPLPCM$Y)
+rownames(SS1_Scenario1_Directed_ZIPLPCM_Y_dataframe) <- colnames(SS1_Scenario1_Directed_ZIPLPCM_Y_dataframe) <- 1:nrow(SS1_Scenario1_Directed_ZIPLPCM$Y)
+annotation_row_z_ref <- as.data.frame(as.factor(matrix(SS1_Scenario1_Directed_ZIPLPCM$z,length(SS1_Scenario1_Directed_ZIPLPCM$z),1)))
+colnames(annotation_row_z_ref) <- "z_ref"
+annotation_colors_z_ref <- My_colors[c(6:10)]
+names(annotation_colors_z_ref) <- sort(unique(annotation_row_z_ref$z_ref))
+SS1_Scenario1_Directed_ZIPLPCM_Y_heatmap <-
+  pheatmap(SS1_Scenario1_Directed_ZIPLPCM_Y_dataframe[order(SS1_Scenario1_Directed_ZIPLPCM$z),order(SS1_Scenario1_Directed_ZIPLPCM$z)],
+           color=colorRampPalette(brewer.pal(9,"YlOrRd"))(max(SS1_Scenario1_Directed_ZIPLPCM$Y)+1),
+           cluster_cols = FALSE,cluster_rows= FALSE,show_rownames=FALSE,show_colnames=FALSE,border_color=FALSE,legend=TRUE,
+           annotation_row = annotation_row_z_ref,annotation_col = annotation_row_z_ref,
+           annotation_colors=list(z_ref=annotation_colors_z_ref),annotation_names_row=FALSE,annotation_names_col=FALSE,annotation_legend=FALSE,
+           gaps_row=c(which(diff(sort(SS1_Scenario1_Directed_ZIPLPCM$z))!=0)),gaps_col=c(which(diff(sort(SS1_Scenario1_Directed_ZIPLPCM$z))!=0)))
+
+SS1_Scenario2_Directed_PoisLPCM_Y_dataframe <- as.data.frame(SS1_Scenario2_Directed_PoisLPCM$Y)
+rownames(SS1_Scenario2_Directed_PoisLPCM_Y_dataframe) <- colnames(SS1_Scenario2_Directed_PoisLPCM_Y_dataframe) <- 1:nrow(SS1_Scenario2_Directed_PoisLPCM$Y)
+annotation_row_z_ref <- as.data.frame(as.factor(matrix(SS1_Scenario2_Directed_PoisLPCM$z,length(SS1_Scenario2_Directed_PoisLPCM$z),1)))
+colnames(annotation_row_z_ref) <- "z_ref"
+annotation_colors_z_ref <- My_colors[c(6:10)]
+names(annotation_colors_z_ref) <- sort(unique(annotation_row_z_ref$z_ref))
+SS1_Scenario2_Directed_PoisLPCM_Y_heatmap <-
+  pheatmap(SS1_Scenario2_Directed_PoisLPCM_Y_dataframe[order(SS1_Scenario2_Directed_PoisLPCM$z),order(SS1_Scenario2_Directed_PoisLPCM$z)],
+           color=colorRampPalette(brewer.pal(9,"YlOrRd"))(max(SS1_Scenario1_Directed_ZIPLPCM$Y)+1)[1:(max(SS1_Scenario2_Directed_PoisLPCM$Y)+1)],
+           cluster_cols = FALSE,cluster_rows= FALSE,show_rownames=FALSE,show_colnames=FALSE,border_color=FALSE,legend=TRUE,
+           annotation_row = annotation_row_z_ref,annotation_col = annotation_row_z_ref,
+           annotation_colors=list(z_ref=annotation_colors_z_ref),annotation_names_row=FALSE,annotation_names_col=FALSE,annotation_legend=FALSE,
+           gaps_row=c(which(diff(sort(SS1_Scenario2_Directed_PoisLPCM$z))!=0)),gaps_col=c(which(diff(sort(SS1_Scenario2_Directed_PoisLPCM$z))!=0)))
+
+library("grid")
+library("gridExtra")
+g <- grid.arrange(SS1_Scenario1_Directed_ZIPLPCM_Y_heatmap[[4]],
+                  SS1_Scenario2_Directed_PoisLPCM_Y_heatmap[[4]],
+                  nrow=1,ncol=2,vp=viewport(width=1, height=1))
+Fig <- cowplot::ggdraw(g)
+Fig
 ```
