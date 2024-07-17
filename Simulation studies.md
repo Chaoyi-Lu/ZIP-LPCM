@@ -391,7 +391,9 @@ SS1_Scenario1_Directed_ZIPLPCM_Sup_ZIPLPCM_T12k_R1_time
 # save.image("SS1_Scenario1_Directed_ZIPLPCM_Sup_ZIPLPCM_T12k_R1.RData")
 ```
 
-where we focus on 3-dimensional latent positions here, and the prior parameters are set to be $(\omega=0.01,\alpha_1=1,\alpha_2=0.103,\alpha=3)$ which are all in agreement with those stated in the ZIP-LPCM-MFM paper.
+where we focus on 3-dimensional latent positions here and the algorithm is implemented for 12,000 iterations.
+The prior parameters are set to be $(\omega=0.01,\alpha_1=1,\alpha_2=0.103,\alpha=3)$ which are all in agreement with those stated in the ZIP-LPCM-MFM paper.
 The unusual zero probability prior is set to be $\text{Beta}(1,9)$ above, corresponding to the "ZIP-LPCM Sup Beta(1,9)" case we show in the paper.
 We also attached a reference running time of the code above and it took 24.18005 mins for the above algorithm to finish on a laptop equipped with eight 1.80GHz processors.
 The proposal variances of the Metropolis-Hastings steps of $\beta$ and $\boldsymbol{U}$ are, respectively, tuned to be $\sigma^2_{\beta}=0.06$ and $\sigma^2_{\boldsymbol{U}}=0.06$ as shown above.
+Finally, the output can be saved via `save.image()` function.
