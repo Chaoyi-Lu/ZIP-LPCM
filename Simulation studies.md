@@ -70,7 +70,7 @@ $$\text{P}(\nu_{ij}=1|y_{ij}=0,p_{z_iz_j},\beta,\boldsymbol{u_i},\boldsymbol{u_j
 which is the conditional probability of an unusual zero provided that the corresponding observed interaction is a zero interaction.
 Both of these two statistics are evaluated based on reference model parameters and latent variables here, and thus are treated as the corresponding reference statistics.
 
-The simulated network as well as the simulated latent variables can be stored following the code below.
+The simulated network as well as the simulated latent variables can be stored in separate `.csv` files following the code below.
 
 ``` r
 write.csv(SS1_Scenario1_Directed_ZIPLPCM$Y,"Datasets/SS1_Scenario1_Directed_ZIPLPCM_Y.csv", row.names = FALSE)
@@ -88,7 +88,7 @@ SS1_Scenario1_Directed_ZIPLPCM_A <- SS1_Scenario1_Directed_ZIPLPCM$z
 SS1_Scenario1_Directed_ZIPLPCM_A[sample(length(SS1_Scenario1_Directed_ZIPLPCM$z),20)] <- sample(1:5,20,replace=TRUE)
 ```
 
-Once we stored the simulated network, we can reload the data again following the code below.
+Once we stored the simulated network, we can reload the data again following the code:
 
 ``` r
 SS1_Scenario1_Directed_ZIPLPCM <- 
@@ -117,7 +117,7 @@ My_colors <- c(brewer.pal(10,"RdBu")[c(4,7)],brewer.pal(10,"PRGn")[c(7,4)],brewe
 
 g_obs <- graph_from_adjacency_matrix(SS1_Scenario1_Directed_ZIPLPCM$Y,mode = "directed",weighted = TRUE)
 E(g_obs)$color <- colorRampPalette(brewer.pal(9,"Greys")[c(3,9)])(max(SS1_Scenario1_Directed_ZIPLPCM$Y))[E(g_obs)$weight]
-betw <- betweenness(g_obs) # evaluate the betweeness of the network
+betw <- betweenness(g_obs) # evaluate the betweeness
 VertexSize <- sqrt(betw/1.5+mean(betw))*1 # set the vertex size
 
 library("plotly")
@@ -146,7 +146,7 @@ Running the code above would bring some warning messages and these are raised by
 However, these bugs would not affect our output and the readers can ignore those warning messages.
 The above code for the interactive 3-d plot also attached some texts or notes for each node and each non-zero interaction to help readers have a better understanding of the network.
 If the readers put the mouse pointer on each node of the interactive plot, there will be a comment bracket showing (i) the coordinate of the node, (ii) the node number (e.g. node 1, node 2, ...), (iii) the reference clustering of the node.
-If mouse pointer is put on each interaction, the bracket will show (i) either the start coordinate or the end coordinate of the interaction vector, (ii) the interaction weight, (iii) an indicator of whether the interaction is from node $i$ to node $j$ where $i\< j$, i.e., whether $y_{ij}$ is the upper-diagonal entry of the $\boldsymbol{Y}$.
+If the mouse pointer is put on each non-zero interaction, the bracket will show (i) either the start coordinate or the end coordinate of the interaction vector, (ii) the interaction weight, (iii) an indicator of whether the interaction is from node $i$ to node $j$ where $i\< j$, i.e., whether the corresponding $y_{ij}$ is the upper-diagonal entry of the $\boldsymbol{Y}$.
 
 The Figure 1 in the ZIP-LPCM-MFM paper can be recovered following the code below where the functions `subplot()` and `orca()` are leveraged to aggregate multiple interactive plots from different specific angles in one figure and to output a high-quality screenshot, respectively.
 
@@ -263,7 +263,7 @@ SS1_Scenario2_Directed_PoisLPCM_tau <- c(1/0.25,1/0.5,1/0.75,1/1,1/1.25)
 SS1_Scenario2_Directed_PoisLPCM_beta <- 3
 ```
 
-The simulated network as well as the simulated latent variables are stored by the following code.
+The simulated network as well as the simulated latent variables can be stored in `.csv` files by the following code.
 
 ``` r
 write.csv(SS1_Scenario2_Directed_PoisLPCM$Y,"Datasets/SS1_Scenario2_Directed_PoisLPCM_Y.csv", row.names = FALSE)
@@ -272,7 +272,7 @@ write.csv(SS1_Scenario2_Directed_PoisLPCM$U,"Datasets/SS1_Scenario2_Directed_Poi
 write.csv(SS1_Scenario2_Directed_PoisLPCM_A,"Datasets/SS1_Scenario2_Directed_PoisLPCM_A.csv", row.names = FALSE)
 ```
 
-where we follow the similar manner to contaminate the true clustering to obtain the exogenous node attributes.
+where we follow the similar manner as the scenario 1 to contaminate the true clustering to obtain the exogenous node attributes below.
 The practitioners can also consider using the same node attributes as the scenario 1 here.
 
 ``` r
