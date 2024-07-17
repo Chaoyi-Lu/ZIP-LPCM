@@ -19,7 +19,7 @@ source("Functions.R")
 Within the [`Functions.R`] file, we also added some comments to explain the corresponding lines of the code.
 Here we refer to that file for more details.
 
-## Simulation study 1
+## Simulation study 1 simulations
 
 The scenario 1 network of this first simulation study is randomly generated from a ZIP-LPCM with the following code.
 
@@ -372,3 +372,7 @@ g <- grid.arrange(SS1_Scenario1_Directed_ZIPLPCM_Y_heatmap[[4]],
 Fig <- cowplot::ggdraw(g)
 Fig
 ```
+
+## Simulation study 1 implementations and post-processing
+
+
