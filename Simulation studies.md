@@ -395,5 +395,77 @@ where we focus on 3-dimensional latent positions here and the algorithm is imple
 The prior parameters are set to be $(\omega=0.01,\alpha_1=1,\alpha_2=0.103,\alpha=3)$ which are all in agreement with those stated in the ZIP-LPCM-MFM paper.
 The unusual zero probability prior is set to be $\text{Beta}(1,9)$ above, corresponding to the "ZIP-LPCM Sup Beta(1,9)" case we show in the paper.
 We also attached a reference running time of the code above and it took 24.18005 mins for the above algorithm to finish on a laptop equipped with eight 1.80GHz processors.
-The proposal variances of the Metropolis-Hastings steps of $\beta$ and $\boldsymbol{U}$ are, respectively, tuned to be $\sigma^2_{\beta}=0.06$ and $\sigma^2_{\boldsymbol{U}}=0.06$ as shown above.
+The proposal variances of the Metropolis-Hastings (M-H) steps of $\beta$ and $\boldsymbol{U}$ are, respectively, tuned to be $\sigma^2_{\beta}=0.06$ and $\sigma^2_{\boldsymbol{U}}=0.06$ as shown above.
 Finally, the output can be saved via `save.image()` function.
+Here we don't set the `set.seed()` here because the output are generally shown to be robust to multiple implementations.
+
+Once we obtained the posterior chains of $\boldsymbol{z},\boldsymbol{U},\boldsymbol{\nu},K,\boldsymbol{X},\boldsymbol{P},\beta$ as well as the acceptance rates of the M-H steps, we need to first label-switch the posterior clustering and the corresponding clustering dependent model parameter $\boldsymbol{P}$:
+
+``` r
+# Apply label switching on the post clustering z
+SS1_Scenario1_Directed_ZIPLPCM_Sup_ZIPLPCM_T12k_R1_LSz <- matrix(NA,nrow=nrow(SS1_Scenario1_Directed_ZIPLPCM_Sup_ZIPLPCM_T12k_R1$z),ncol=ncol(SS1_Scenario1_Directed_ZIPLPCM_Sup_ZIPLPCM_T12k_R1$z))
+SS1_Scenario1_Directed_ZIPLPCM_Sup_ZIPLPCM_T12k_R1_LSP <- list()
+for (t in 1:nrow(SS1_Scenario1_Directed_ZIPLPCM_Sup_ZIPLPCM_T12k_R1$z)){
+  LS_temp <- LabelSwitching_SG2003(z = SS1_Scenario1_Directed_ZIPLPCM_Sup_ZIPLPCM_T12k_R1$z[t,],
+                                   matrix_KbyK = SS1_Scenario1_Directed_ZIPLPCM_Sup_ZIPLPCM_T12k_R1$P[[t]])
+  SS1_Scenario1_Directed_ZIPLPCM_Sup_ZIPLPCM_T12k_R1_LSz[t,] <- LS_temp$z
+  SS1_Scenario1_Directed_ZIPLPCM_Sup_ZIPLPCM_T12k_R1_LSP[[t]] <- LS_temp$matrix_KbyK
+  if ((t%%1000) == 0){
+    cat("t=",t,"\n") # monitor the process
+  }
+}
+```
+
+We also apply Procrustes transform on each iteration's posterior latent positions with respect to the reference clustering in order for easier visulization comparisons.
+Note that the Procrustes transform is not necessarily to be applied here because we finally assess the performance of the latent positions via the corresponding distance matrix.
+
+``` r
+# Apply Procrustes Transform on posterior latent positions U
+library("IMIFA")
+SS1_Scenario1_Directed_ZIPLPCM_Sup_ZIPLPCM_T12k_R1_PTU <- list()
+for (t in 1:nrow(SS1_Scenario1_Directed_ZIPLPCM_Sup_ZIPLPCM_T12k_R1$z)){
+  SS1_Scenario1_Directed_ZIPLPCM_Sup_ZIPLPCM_T12k_R1_PTU[[t]] <-
+    Procrustes(SS1_Scenario1_Directed_ZIPLPCM_Sup_ZIPLPCM_T12k_R1$U[[t]],
+               SS1_Scenario1_Directed_ZIPLPCM$U, translate = TRUE ,dilate = FALSE)$X.new
+  if ((t%%1000) == 0){
+    cat("t=",t,"\n") # monitor the process
+  }
+}
+```
+
+We set the burn-in and the iterations after burn-in below.
+Note that the first element of each posterior chain is the initial state.
+
+``` r
+# Define the burn in
+iteration_after_burn_in <- 2002:12001
+burn_in <- 2001
+```
+
+The complete likelihood for each iteration can be obtained by:
+
+``` r
+## Evaluate the complete likelihood for each iteration
+SS1_Scenario1_Directed_ZIPLPCM_Sup_ZIPLPCM_T12k_R1_LSz_Like <- c()
+for (t in 1:nrow(SS1_Scenario1_Directed_ZIPLPCM_Sup_ZIPLPCM_T12k_R1$z)){
+  SS1_Scenario1_Directed_ZIPLPCM_Sup_ZIPLPCM_T12k_R1_LSz_Like <-
+    c(SS1_Scenario1_Directed_ZIPLPCM_Sup_ZIPLPCM_T12k_R1_LSz_Like,
+      Directed_ZIPLPCM_pgh_MFM_Likelihood(X=SS1_Scenario1_Directed_ZIPLPCM_Sup_ZIPLPCM_T12k_R1$X[[t]],
+                                          U=SS1_Scenario1_Directed_ZIPLPCM_Sup_ZIPLPCM_T12k_R1_PTU[[t]],
+                                          beta=SS1_Scenario1_Directed_ZIPLPCM_Sup_ZIPLPCM_T12k_R1$beta[t],
+                                          nu=SS1_Scenario1_Directed_ZIPLPCM_Sup_ZIPLPCM_T12k_R1$nu[[t]],
+                                          P=SS1_Scenario1_Directed_ZIPLPCM_Sup_ZIPLPCM_T12k_R1_LSP[[t]],
+                                          z=SS1_Scenario1_Directed_ZIPLPCM_Sup_ZIPLPCM_T12k_R1_LSz[t,],
+                                          alpha1=1,alpha2=0.103,omega=0.01,  alpha=3,
+                                          A=SS1_Scenario1_Directed_ZIPLPCM$A,omega_c=1))
+  if ((t%%1000) == 0){
+    cat("t=",t,"\n") # monitor the process
+  }
+}
+plot(SS1_Scenario1_Directed_ZIPLPCM_Sup_ZIPLPCM_T12k_R1_LSz_Like,type = "l",xlab = "",ylab = "", main = "Likelihood",cex.axis = 0.8)
+```
+
+where the traceplot above can illustrate the good mixing of the posterior samples we obtained.
+
+
+
