@@ -378,7 +378,7 @@ Fig
 The supervised undirected partially collapsed Metropolis-within-Gibbs algorithm for ZIP-LPCM can be implemented on the scenario 1 network following the code:
 
 ``` r
-# Supervised ZIP-LPCM-MFM implementations with T=12000 Beta(1,9) R1
+# Supervised ZIP-LPCM-MFM implementations with T=12000 Beta(1,9) Round 1
 start.time <- Sys.time()
 SS1_Scenario1_Directed_ZIPLPCM_Sup_ZIPLPCM_T12k_R1 <- 
   MwG_Directed_ZIPLPCM(Y = SS1_Scenario1_Directed_ZIPLPCM$Y,T = 12000,omega=0.01,alpha1=1,alpha2=0.103,alpha=3,beta1=1,beta2=9,
