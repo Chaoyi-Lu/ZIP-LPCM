@@ -564,4 +564,62 @@ vi.dist(SS1_Scenario1_Directed_ZIPLPCM_Sup_ZIPLPCM_T12k_R1_hat_z,SS1_Scenario1_D
 # 0
 ```
 
-The code for obtaining the marginal posterior mode of the posterior clustering can also help us obtain $\hat{\boldsymbol{U}}$
+The code for obtaining the marginal posterior mode of the posterior clustering can also help us obtain $\hat{\boldsymbol{U}}$ following (23) of the **ZIP-LPCM-MFM** paper, that is,
+
+``` r
+# Obtain a point estimate of U
+SS1_Scenario1_Directed_ZIPLPCM_Sup_ZIPLPCM_T12k_R1_LSz_hat_zIteration <- # extract all the iterations whose clustering is identical to hat_z
+  SS1_Scenario1_Directed_ZIPLPCM_Sup_ZIPLPCM_T12k_R1_LSz_StatesIteration[[
+    which(apply(t(SS1_Scenario1_Directed_ZIPLPCM_Sup_ZIPLPCM_T12k_R1_LSz_States)==
+                  SS1_Scenario1_Directed_ZIPLPCM_Sup_ZIPLPCM_T12k_R1_hat_z,2,sum)==length(SS1_Scenario1_Directed_ZIPLPCM_Sup_ZIPLPCM_T12k_R1_hat_z))
+  ]]
+SS1_Scenario1_Directed_ZIPLPCM_Sup_ZIPLPCM_T12k_R1_MaxLikeHatz_iteration <- SS1_Scenario1_Directed_ZIPLPCM_Sup_ZIPLPCM_T12k_R1_LSz_hat_zIteration[
+  which.max(SS1_Scenario1_Directed_ZIPLPCM_Sup_ZIPLPCM_T12k_R1_LSz_Like[SS1_Scenario1_Directed_ZIPLPCM_Sup_ZIPLPCM_T12k_R1_LSz_hat_zIteration])] # find the state that maximizes the complete likelihood
+SS1_Scenario1_Directed_ZIPLPCM_Sup_ZIPLPCM_T12k_R1_hat_U <-
+  SS1_Scenario1_Directed_ZIPLPCM_Sup_ZIPLPCM_T12k_R1_PTU[[SS1_Scenario1_Directed_ZIPLPCM_Sup_ZIPLPCM_T12k_R1_MaxLikeHatz_iteration]]
+```
+
+Then we can also build an interactive 3-d plot for the $\hat{\boldsymbol{U}}$ along with the $\hat{\boldsymbol{z}}$:
+
+``` r
+library("igraph")
+library("RColorBrewer")
+My_colors <- c(brewer.pal(10,"RdBu")[c(4,7)],brewer.pal(10,"PRGn")[c(7,4)],brewer.pal(9,"YlOrBr")[3],
+               brewer.pal(10,"RdBu")[c(2,9)],brewer.pal(10,"PRGn")[c(9,2)],brewer.pal(9,"YlOrBr")[6],
+               brewer.pal(9,"Reds")[c(9,6)],brewer.pal(9,"RdPu")[5],brewer.pal(9,"Greys")[c(3,6,9)],brewer.pal(9,"GnBu")[5])
+g_obs <- graph_from_adjacency_matrix(SS1_Scenario1_Directed_ZIPLPCM$Y,mode = "directed",weighted = TRUE)
+E(g_obs)$color <- colorRampPalette(brewer.pal(9,"Greys")[c(3,9)])(max(SS1_Scenario1_Directed_ZIPLPCM$Y))[E(g_obs)$weight]
+betw <- betweenness(g_obs)
+VertexSize <- sqrt(betw/1.5+mean(betw))*1
+library("plotly")
+fig <- plot_ly() %>%
+  add_markers(x = SS1_Scenario1_Directed_ZIPLPCM_Sup_ZIPLPCM_T12k_R1_hat_U[,1],
+              y = SS1_Scenario1_Directed_ZIPLPCM_Sup_ZIPLPCM_T12k_R1_hat_U[,2],
+              z = SS1_Scenario1_Directed_ZIPLPCM_Sup_ZIPLPCM_T12k_R1_hat_U[,3],
+              text=paste("Node:",1:nrow(SS1_Scenario1_Directed_ZIPLPCM$Y),"<br>z_ref:",SS1_Scenario1_Directed_ZIPLPCM$z),
+              size=VertexSize,sizes=c(100,300),
+              color=as.factor(SS1_Scenario1_Directed_ZIPLPCM_Sup_ZIPLPCM_T12k_R1_hat_z),
+              colors=My_colors[6:10]
+  )
+Edges <- get.edgelist(g_obs)
+for (i in 1:nrow(Edges)){
+  fig <- fig %>%
+    add_trace(x = SS1_Scenario1_Directed_ZIPLPCM_Sup_ZIPLPCM_T12k_R1_hat_U[Edges[i,],1],
+              y = SS1_Scenario1_Directed_ZIPLPCM_Sup_ZIPLPCM_T12k_R1_hat_U[Edges[i,],2],
+              z = SS1_Scenario1_Directed_ZIPLPCM_Sup_ZIPLPCM_T12k_R1_hat_U[Edges[i,],3],
+              text=paste("Weight:",E(g_obs)$weight[i],"<br>UpperDiag?:",Edges[i,1]<Edges[i,2]),
+              type = "scatter3d", mode = "lines", showlegend = FALSE,line = list(color = E(g_obs)$color[i], width = 0.35*E(g_obs)$weight[i]))
+}
+fig <- fig %>% layout(title = "hat_U and hat_z",scene = list(xaxis = list(title = 'x1'),yaxis = list(title = 'x2'),zaxis = list(title = 'x3')))
+fig
+```
+
+To quantize the difference between the reference latent positions $`\boldsymbol{U}^*`$ and the point estimate $`\hat{\boldsymbol{U}}`$, we can check the mean absolute error (MAE) between the corresponding distance matrix:
+
+``` r
+mean(abs(dist(SS1_Scenario1_Directed_ZIPLPCM_Sup_ZIPLPCM_T12k_R1_hat_U)-dist(SS1_Scenario1_Directed_ZIPLPCM$U))) # Mean absolute error between dist(hat_U) and dist(U*)
+# 0.3758013
+```
+
+Here we obtain 0.3758013 which is small compared to the scale of the latent positions where $`\boldsymbol{U}^*\in \{[-4.320755,4.936899]\times[-4.051712,4.469993]\times[-4.85909,4.419671]\}^N`$.
+
