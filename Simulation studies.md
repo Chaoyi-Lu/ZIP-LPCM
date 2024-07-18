@@ -635,7 +635,7 @@ mean(abs(dist(SS1_Scenario1_Directed_ZIPLPCM_Sup_ZIPLPCM_T12k_R1_hat_U)-dist(SS1
 
 Here we obtain the MAE being 0.3758013 which is small if we consider the scale of the latent positions where $`\boldsymbol{U}^*\in \{[-4.320755,4.936899]\times[-4.051712,4.469993]\times[-4.85909,4.419671]\}^N`$.
 
-we obtain summarized $\hat{\beta}$ by posterior mean, that is,
+we obtain summarized $`\hat{\beta}`$ by posterior mean, that is,
 
 ``` r
 ## Summarize beta
