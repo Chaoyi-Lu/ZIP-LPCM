@@ -126,7 +126,7 @@ fig <- plot_ly() %>% # plot the reference clustering and U
               y = SS1_Scenario1_Directed_ZIPLPCM$U[,2],
               z = SS1_Scenario1_Directed_ZIPLPCM$U[,3],
               text=paste("Node:",1:nrow(SS1_Scenario1_Directed_ZIPLPCM$Y),"<br>z*:",SS1_Scenario1_Directed_ZIPLPCM$z),
-              size=VertexSize,sizes=c(100,300),
+              size=VertexSize,sizes=c(200,400),
               color=as.factor(SS1_Scenario1_Directed_ZIPLPCM$z),colors=My_colors[6:10]
   )
 Edges <- get.edgelist(g_obs)
@@ -163,7 +163,7 @@ fig1 <- plot_ly(scene ="scene1") %>%
               y = SS1_Scenario1_Directed_ZIPLPCM$U[,2],
               z = SS1_Scenario1_Directed_ZIPLPCM$U[,3],
               text=paste("Node:",1:nrow(SS1_Scenario1_Directed_ZIPLPCM$Y),"<br>z*:",SS1_Scenario1_Directed_ZIPLPCM$z),
-              size=VertexSize,sizes=c(100,300),showlegend = TRUE,
+              size=VertexSize,sizes=c(200,400),showlegend = TRUE,
               color=as.factor(SS1_Scenario1_Directed_ZIPLPCM$z),colors=My_colors[6:10]
   )
 Edges <- get.edgelist(g_obs)
@@ -181,7 +181,7 @@ fig2 <- plot_ly(scene ="scene2") %>%
               y = SS1_Scenario1_Directed_ZIPLPCM$U[,2],
               z = SS1_Scenario1_Directed_ZIPLPCM$U[,3],
               text=paste("Node:",1:nrow(SS1_Scenario1_Directed_ZIPLPCM$Y),"<br>z*:",SS1_Scenario1_Directed_ZIPLPCM$z),
-              size=VertexSize,sizes=c(100,300),showlegend = FALSE,
+              size=VertexSize,sizes=c(200,400),showlegend = FALSE,
               color=as.factor(SS1_Scenario1_Directed_ZIPLPCM$z),colors=My_colors[6:10]
   )
 Edges <- get.edgelist(g_obs)
@@ -195,7 +195,7 @@ for (i in 1:nrow(Edges)){
 }
 # Combine two plots in one and set the default visualizing angles
 fig <- subplot(fig1, fig2) 
-fig <- fig %>% layout(title = "", margin = list(l = 0,r = 0,b = 0,t = 0,pad = 0),
+fig <- fig %>% layout(title = "", margin = list(l = 0,r = 0,b = 0,t = 0,pad = 0),legend = list(font = list(size = 20), y = 0.9),
                       scene = list(domain=list(x=c(0,1/2),y=c(0,1)),
                                    xaxis = list(title = ''),yaxis = list(title = ''),zaxis = list(title = ''),
                                    camera = list(eye = list(x = 1.25, y = 1.25, z = 1.25)), # set the default visualizing angle
@@ -311,7 +311,7 @@ fig <- plot_ly() %>% # plot the reference clustering and U
               y = SS1_Scenario2_Directed_PoisLPCM$U[,2],
               z = SS1_Scenario2_Directed_PoisLPCM$U[,3],
               text=paste("Node:",1:nrow(SS1_Scenario2_Directed_PoisLPCM$Y),"<br>z*:",SS1_Scenario2_Directed_PoisLPCM$z),
-              size=VertexSize,sizes=c(100,300),
+              size=VertexSize,sizes=c(200,400),
               color=as.factor(SS1_Scenario2_Directed_PoisLPCM$z),colors=My_colors[6:10]
   )
 Edges <- get.edgelist(g_obs)
@@ -321,7 +321,7 @@ for (i in 1:nrow(Edges)){
               y = SS1_Scenario2_Directed_PoisLPCM$U[Edges[i,],2],
               z = SS1_Scenario2_Directed_PoisLPCM$U[Edges[i,],3],
               text=paste("Weight:",E(g_obs)$weight[i],"<br>UpperDiag?:",Edges[i,1]<Edges[i,2]),
-              type = "scatter3d", mode = "lines", showlegend = FALSE,line = list(color = E(g_obs)$color[i], width = 0.25*E(g_obs)$weight[i]))
+              type = "scatter3d", mode = "lines", showlegend = FALSE,line = list(color = E(g_obs)$color[i], width = 0.35*E(g_obs)$weight[i]))
 }
 fig <- fig %>% layout(title = "Pois-LPCM U* and z*",scene = list(xaxis = list(title = 'x1'),yaxis = list(title = 'x2'),zaxis = list(title = 'x3')))
 fig
@@ -609,7 +609,7 @@ fig <- plot_ly() %>%
               y = SS1_Scenario1_Directed_ZIPLPCM_Sup_ZIPLPCM_T12k_R1_hat_U[,2],
               z = SS1_Scenario1_Directed_ZIPLPCM_Sup_ZIPLPCM_T12k_R1_hat_U[,3],
               text=paste("Node:",1:nrow(SS1_Scenario1_Directed_ZIPLPCM$Y),"<br>z_ref:",SS1_Scenario1_Directed_ZIPLPCM$z),
-              size=VertexSize,sizes=c(100,300),
+              size=VertexSize,sizes=c(200,400),
               color=as.factor(SS1_Scenario1_Directed_ZIPLPCM_Sup_ZIPLPCM_T12k_R1_hat_z),
               colors=My_colors[6:10]
   )
