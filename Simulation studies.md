@@ -549,7 +549,8 @@ output$EPL # check minEVI posterior loss: 0.009159308
 SS1_Scenario1_Directed_ZIPLPCM_Sup_ZIPLPCM_T12k_R1_hat_z <- output$decision # Save output as the summarized z
 ```
 
-where the `output$EPL` code above returns the statistic $`\mathbb{E}_{\boldsymbol{z}}[\text{VI}(\hat{\boldsymbol{z}},\boldsymbol{z}) \mid \boldsymbol{Y}]`$ shown in the 4th column of **Table 1** of the **ZIP-LPCM-MFM** paper for the **ZIP-LPCM Sup Beta(1,9)** case in **scenario 1**.
+It's shown that the summarized $\hat{\boldsymbol{z}}$ we obtained above is exactly the same as the reference clustering $`\boldsymbol{z}^*`$.
+The `output$EPL` code above returns the statistic $`\mathbb{E}_{\boldsymbol{z}}[\text{VI}(\hat{\boldsymbol{z}},\boldsymbol{z}) \mid \boldsymbol{Y}]`$ shown in the 4th column of **Table 1** of the **ZIP-LPCM-MFM** paper for the **ZIP-LPCM Sup Beta(1,9)** case in **scenario 1**.
 The $\hat{K}$ of $`\hat{\boldsymbol{z}}`$ shown in the 2nd column can be extracted by:
 
 ``` r
@@ -562,3 +563,5 @@ And the VI distance between the $`\hat{\boldsymbol{z}}`$ and $`\boldsymbol{z}^*`
 vi.dist(SS1_Scenario1_Directed_ZIPLPCM_Sup_ZIPLPCM_T12k_R1_hat_z,SS1_Scenario1_Directed_ZIPLPCM$z) # evaluate the VI distance between the summarized clustering and the reference clustering
 # 0
 ```
+
+The code for obtaining the marginal posterior mode of the posterior clustering can also help us obtain $\hat{\boldsymbol{U}}$
