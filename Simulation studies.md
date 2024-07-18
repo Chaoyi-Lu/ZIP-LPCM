@@ -635,7 +635,7 @@ mean(abs(dist(SS1_Scenario1_Directed_ZIPLPCM_Sup_ZIPLPCM_T12k_R1_hat_U)-dist(SS1
 
 Here we obtain the MAE being 0.3758013 which is small if we consider the scale of the latent positions where $`\boldsymbol{U}^*\in \{[-4.320755,4.936899]\times[-4.051712,4.469993]\times[-4.85909,4.419671]\}^N`$.
 
-we obtain summarized $`\hat{\beta}`$ by posterior mean, that is,
+We obtain summarized $`\hat{\beta}`$ by posterior mean, that is,
 
 ``` r
 ## Summarize beta
@@ -644,5 +644,29 @@ SS1_Scenario1_Directed_ZIPLPCM_Sup_ZIPLPCM_T12k_R1_hat_beta <-
 SS1_Scenario1_Directed_ZIPLPCM_Sup_ZIPLPCM_T12k_R1_hat_beta # 3.024843
 ```
 
-the value of which is eactly the one we show in **Table 1** of the **ZIP-LPCM-MFM** paper for the **ZIP-LPCM Sup Beta(1,9)** case in **scenario 1**.
+the value of which is eactly the one we show in the 6th column of **Table 1** of the **ZIP-LPCM-MFM** paper for the **ZIP-LPCM Sup Beta(1,9)** case in **scenario 1**.
+
+Then we move to obtain the individual-level unusual probability $\boldsymbol{p}$ whose entry is $p_{z_iz_j}$ for each posterior sample of $\boldsymbol{P}$, and to evaluate the posterior mean for each entry $p_{z_iz_j}$, ending up with $\hat{\boldsymbol{p}}$:
+
+``` r
+# Obtain the individual-level unusual zero probability for each iteration
+SS1_Scenario1_Directed_ZIPLPCM_Sup_ZIPLPCM_T12k_R1_p <- list()
+for (t in 1:nrow(SS1_Scenario1_Directed_ZIPLPCM_Sup_ZIPLPCM_T12k_R1$z)){
+  Z <- t(t(matrix(SS1_Scenario1_Directed_ZIPLPCM_Sup_ZIPLPCM_T12k_R1_LSz[t,],75,SS1_Scenario1_Directed_ZIPLPCM_Sup_ZIPLPCM_T12k_R1$K[t]))==(1:SS1_Scenario1_Directed_ZIPLPCM_Sup_ZIPLPCM_T12k_R1$K[t]))*1
+  SS1_Scenario1_Directed_ZIPLPCM_Sup_ZIPLPCM_T12k_R1_p[[t]] <- Z%*%SS1_Scenario1_Directed_ZIPLPCM_Sup_ZIPLPCM_T12k_R1_LSP[[t]]%*%t(Z)
+  if ((t%%1000) == 0){cat("t=",t,"\n")}
+}
+# Obtain the \hat{p} which is the posterior mean of each entry of the individual-level unusual zero probability
+SS1_Scenario1_Directed_ZIPLPCM_Sup_ZIPLPCM_T12k_R1_hat_p <- Reduce("+",SS1_Scenario1_Directed_ZIPLPCM_Sup_ZIPLPCM_T12k_R1_p[iteration_after_burn_in])/length(iteration_after_burn_in)
+```
+
+Comparing the $\hat{\boldsymbol{p}}$ with the reference $`\boldsymbol{p}^*`$ gives the statistic $`\mathbb{E}(\{|\hat{p}_{z_iz_j}-p^*_{z_iz_j}|\}){\scriptsize [\text{sd}]}`$ shown in the 7th column of **Table 1** of the **ZIP-LPCM-MFM** paper for the **ZIP-LPCM Sup Beta(1,9)** case in **scenario 1**:
+
+``` r
+# Compare \hat{p} and the reference p* via the mean and sd of the absolute value of the error obtained for each entry
+mean(abs(SS1_Scenario1_Directed_ZIPLPCM_Sup_ZIPLPCM_T12k_R1_hat_p-SS1_Scenario1_Directed_ZIPLPCM_p))
+# 0.03288737
+sd(abs(SS1_Scenario1_Directed_ZIPLPCM_Sup_ZIPLPCM_T12k_R1_hat_p-SS1_Scenario1_Directed_ZIPLPCM_p))
+# 0.03387241
+```
 
