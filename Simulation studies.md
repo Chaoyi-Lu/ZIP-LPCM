@@ -1,10 +1,10 @@
 # Simulation Studies for ZIP-LPCM-MFM
 
-This tutorial includes the coding for the two simulation studies illusrated in the paper "A Zero-Inflated Latent Position Cluster Model with Mixture of Finite Mixtures" (ZIP-LPCM-MFM).
+This tutorial includes the coding for the two simulation studies illusrated in the paper **"A Zero-Inflated Latent Position Cluster Model with Mixture of Finite Mixtures" (ZIP-LPCM-MFM)**.
 
 Recall here that we have two different scenarios within each simulation study.
-The **scenario 1** in the **first simulation study (SS1)** focuses on a network randomly generated from a zero-inflated Poisson latent position cluster model (ZIP-LPCM) while the **scenario 2** works on a network randomly generated from a Poisson latent position cluster model (Pois-LPCM).
-In our **second simulation study (SS2)**, we mainly focus on the networks randomly generated from the zero-inflated Poisson stochastic block model (ZIP-SBM), which is the one we newly proposed in [Lu, C., Durante, D., and Friel, N. [2024+], "Zero-inflated stochastic block modeling of efficiency-security tradeoffs in weighted criminal networks"]().
+The **scenario 1** in the **first simulation study (SS1)** focuses on a network randomly generated from a **zero-inflated Poisson latent position cluster model (ZIP-LPCM)** while the **scenario 2** works on a network randomly generated from a **Poisson latent position cluster model (Pois-LPCM)**.
+In our **second simulation study (SS2)**, we mainly focus on the networks randomly generated from the **zero-inflated Poisson stochastic block model (ZIP-SBM)**, which is the one we newly proposed in [Lu, C., Durante, D., and Friel, N. [2024+], "Zero-inflated stochastic block modeling of efficiency-security tradeoffs in weighted criminal networks"]().
 The synthetic network in **scenario 2** of **SS2** is equipped with a hub while the one in **scenario 1** is not.
 
 The source code of all the functions required for the experiments in our paper is included in the [`Functions.R`] file of this repository.
@@ -21,7 +21,7 @@ Here we refer to that file for more details.
 
 ## Simulation study 1 simulations
 
-The **scenario 1** network of this first simulation study is randomly generated from a ZIP-LPCM with the following code.
+The **scenario 1** network of this first simulation study is randomly generated from a **ZIP-LPCM** with the following code.
 
 ``` r
 SS1_Scenario1_Directed_ZIPLPCM <-
@@ -34,8 +34,8 @@ SS1_Scenario1_Directed_ZIPLPCM <-
 
 where (i) "beta" corresponds to the intercept parameter $\beta$ of the model, (ii) "P" corresponds to the $\boldsymbol{P}$ which is a group-level $K \times K$ matrix indicating the probability of unusual zero for the interactions between each pair of groups, (iii) "mu" and "tau" correspond to the $\boldsymbol{\mu}$ and $\boldsymbol{\tau}$ which are, respectively, the group centres and the group precisions of the corresponding multivariate normal distributions, (iv) "z" corresponds to the latent clutering or membership variable $\boldsymbol{z}$ which is an $1\times N$ vector storing the pre-specified clustering. Here, $K$ is the number of non-empty clusters that can be easily extracted from $\boldsymbol{z}$.
 
-The corresponding model parameters and latent variables are in line with those introduced in the ZIP-LPCM-MFM paper.
-The above simulation function brings the following contents for a ZIP-LPCM network.
+The corresponding model parameters and latent variables are in line with those introduced in the **ZIP-LPCM-MFM** paper.
+The above simulation function brings the following contents for a **ZIP-LPCM** network.
 
 ``` r
 SS1_Scenario1_Directed_ZIPLPCM$Y
@@ -148,7 +148,7 @@ The above code for the interactive 3-d plot also attached some texts or notes fo
 If the readers put the mouse pointer on each node of the interactive plot, there will be a comment bracket showing (i) the coordinate of the node, (ii) the node number (e.g. node 1, node 2, ...), (iii) the reference clustering of the node.
 If the mouse pointer is put on each non-zero interaction, the bracket will show (i) either the start coordinate or the end coordinate of the interaction vector, (ii) the interaction weight, (iii) an indicator of whether the interaction is from node $i$ to node $j$ where $i\< j$, i.e., whether the corresponding $y_{ij}$ is the upper-diagonal entry of the $\boldsymbol{Y}$.
 
-The Figure 1 in the ZIP-LPCM-MFM paper can be recovered following the code below where the functions `subplot()` and `orca()` are leveraged to aggregate multiple interactive plots from different specific angles in one figure and to output a high-quality screenshot, respectively.
+The **Figure 1** in the **ZIP-LPCM-MFM** paper can be recovered following the code below where the functions `subplot()` and `orca()` are leveraged to aggregate multiple interactive plots from different specific angles in one figure and to output a high-quality screenshot, respectively.
 
 ``` r
 g_obs <- graph_from_adjacency_matrix(SS1_Scenario1_Directed_ZIPLPCM$Y,mode = "directed",weighted = TRUE)
@@ -217,7 +217,7 @@ However, before running the `orca()` function in the package `plotly`, the reade
 orca(fig, "SS1_Sce1_Obs.pdf",scale=1,width=1800,height=850)
 ```
 
-The above code will output exactly the same figure as the Figure 1 of the ZIP-LPCM-MFM paper.
+The above code will output exactly the same figure as the **Figure 1** of the **ZIP-LPCM-MFM** paper.
 
 The following code provides some extra statistics about the interaction weights of the **scenario 1** network.
 
@@ -238,7 +238,7 @@ hist(SS1_Scenario1_Directed_ZIPLPCM$Y[!is.nan((SS1_Scenario1_Directed_ZIPLPCM$Y+
 ```
 
 We follow the similar simulation process above to simulate the **scenario 2** network.
-The **scenario 2** network is randomly generated from a Pois-LPCM with the following code.
+The **scenario 2** network is randomly generated from a **Pois-LPCM** with the following code.
 
 ``` r
 SS1_Scenario2_Directed_PoisLPCM <-
@@ -246,7 +246,7 @@ SS1_Scenario2_Directed_PoisLPCM <-
 tau=c(1/0.25,1/0.5,1/0.75,1/1,1/1.25),d=3,z=c(rep(1,5),rep(2,10),rep(3,15),rep(4,20),rep(5,25)),seed=NULL)
 ```
 
-This brings the following contents for a Pois-LPCM network.
+This brings the following contents for a **Pois-LPCM** network.
 
 ``` r
 SS1_Scenario1_Directed_PoisLPCM$Y
@@ -272,8 +272,8 @@ write.csv(SS1_Scenario2_Directed_PoisLPCM$U,"Datasets/SS1_Scenario2_Directed_Poi
 write.csv(SS1_Scenario2_Directed_PoisLPCM_A,"Datasets/SS1_Scenario2_Directed_PoisLPCM_A.csv", row.names = FALSE)
 ```
 
-where we follow the similar manner as the scenario 1 to contaminate the true clustering to obtain the exogenous node attributes below.
-The practitioners can also consider using the same node attributes as the scenario 1 here.
+where we follow the similar manner as the **scenario 1** to contaminate the true clustering to obtain the exogenous node attributes below.
+The practitioners can also consider using the same node attributes as the **scenario 1** here.
 
 ``` r
 SS1_Scenario2_Directed_PoisLPCM_A <- SS1_Scenario2_Directed_PoisLPCM$z
@@ -327,7 +327,7 @@ fig <- fig %>% layout(title = "Pois-LPCM U* and z*",scene = list(xaxis = list(ti
 fig
 ```
 
-The adjacency matrices heatmap plots shown in Figure 2 of the ZIP-LPCM-MFM paper can be reproduced following the code:
+The adjacency matrices heatmap plots shown in **Figure 2** of the **ZIP-LPCM-MFM** paper can be reproduced following the code:
 
 ``` r
 library("RColorBrewer")
@@ -375,7 +375,7 @@ Fig
 
 ## Simulation study 1 implementations and post-processing
 
-The supervised undirected partially collapsed Metropolis-within-Gibbs algorithm for ZIP-LPCM can be implemented on the **scenario 1** network following the code:
+The supervised undirected partially collapsed Metropolis-within-Gibbs algorithm for **ZIP-LPCM** can be implemented on the **scenario 1** network following the code:
 
 ``` r
 # Supervised ZIP-LPCM-MFM implementations with T=12000 Beta(1,9) Round 1
@@ -392,7 +392,7 @@ SS1_Scenario1_Directed_ZIPLPCM_Sup_ZIPLPCM_T12k_R1_time
 ```
 
 where we focus on 3-dimensional latent positions here and the algorithm is implemented for 12,000 iterations.
-The prior parameters are set to be $(\omega=0.01,\alpha_1=1,\alpha_2=0.103,\alpha=3)$ which are all in agreement with those stated in the ZIP-LPCM-MFM paper.
+The prior parameters are set to be $(\omega=0.01,\alpha_1=1,\alpha_2=0.103,\alpha=3)$ which are all in agreement with those stated in the **ZIP-LPCM-MFM** paper.
 The unusual zero probability prior is set to be $\text{Beta}(1,9)$ above, corresponding to the **ZIP-LPCM Sup Beta(1,9)** case we show in the paper.
 We also attached a reference running time of the code above and it took 24.18005 mins for the above algorithm to finish on a laptop equipped with eight 1.80GHz processors.
 The proposal variances of the Metropolis-Hastings (M-H) steps of $\beta$ and $\boldsymbol{U}$ are, respectively, tuned to be $\sigma^2_{\beta}=0.06$ and $\sigma^2_{\boldsymbol{U}}=0.06$ as shown above.
@@ -493,7 +493,7 @@ We can then obtain the summarized $\hat{\boldsymbol{D}}$ with each entry being $
 SS1_Scenario1_Directed_ZIPLPCM_Sup_ZIPLPCM_T12k_R1_hat_D <- Reduce("+",SS1_Scenario1_Directed_ZIPLPCM_Sup_ZIPLPCM_T12k_R1_D[iteration_after_burn_in])/length(iteration_after_burn_in)
 ```
 
-The statistic $`\mathbb{E}(\\{|\hat{d}_{ij}-d^*_{ij}|\\}){\scriptsize [\text{sd}]}`$ in the 5th column of the Table 1 in the ZIP-LPCM-MFM paper can be obtained for the "ZIP-LPCM Sup Beta(1,9)" case in scenario 1 following:
+The statistic $`\mathbb{E}(\\{|\hat{d}_{ij}-d^*_{ij}|\\}){\scriptsize [\text{sd}]}`$ in the 5th column of the **Table 1** in the **ZIP-LPCM-MFM** paper can be obtained for the **ZIP-LPCM Sup Beta(1,9)** case in **scenario 1** following:
 
 ``` r
 # Compare \hat{d}_{ij} and d^*_{ij} via the mean and sd of the |bias(d_{ij})|
@@ -538,7 +538,7 @@ for (t in 1:nrow(SS1_Scenario1_Directed_ZIPLPCM_Sup_ZIPLPCM_T12k_R1_LSz_States))
 SS1_Scenario1_Directed_ZIPLPCM_Sup_ZIPLPCM_T12k_R1_hat_z <- SS1_Scenario1_Directed_ZIPLPCM_Sup_ZIPLPCM_T12k_R1_LSz_States[which.max(SS1_Scenario1_Directed_ZIPLPCM_Sup_ZIPLPCM_T12k_R1_LSz_StatesFrequency),] # initialize the clustering state as the marginal posterior mode
 ```
 
-Then we apply the Rastelli and Friel (2018) greedy algorithm to obtain the $`\hat{\boldsymbol{z}}`$:
+Then we apply the **Rastelli and Friel (2018)** greedy algorithm to obtain the $`\hat{\boldsymbol{z}}`$:
 
 ``` r
 library(GreedyEPL) # obtain the summarized z by the greedy algorithm proposed by Rastelli and Friel (2018)
@@ -549,7 +549,7 @@ output$EPL # check minEVI posterior loss: 0.009159308
 SS1_Scenario1_Directed_ZIPLPCM_Sup_ZIPLPCM_T12k_R1_hat_z <- output$decision # Save output as the summarized z
 ```
 
-where the `output$EPL` code above returns the statistic $`\mathbb{E}_{\boldsymbol{z}}[\text{VI}(\hat{\boldsymbol{z}},\boldsymbol{z}) \mid \boldsymbol{Y}]`$ shown in the 4th column of Table 1 of the ZIP-LPCM-MFM paper for the **ZIP-LPCM Sup Beta(1,9)** case in **scenario 1**.
+where the `output$EPL` code above returns the statistic $`\mathbb{E}_{\boldsymbol{z}}[\text{VI}(\hat{\boldsymbol{z}},\boldsymbol{z}) \mid \boldsymbol{Y}]`$ shown in the 4th column of **Table 1** of the **ZIP-LPCM-MFM** paper for the **ZIP-LPCM Sup Beta(1,9)** case in **scenario 1**.
 The $\hat{K}$ of $`\hat{\boldsymbol{z}}`$ shown in the 2nd column can be extracted by:
 
 ``` r
