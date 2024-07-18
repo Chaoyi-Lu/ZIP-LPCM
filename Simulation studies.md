@@ -465,13 +465,25 @@ for (t in 1:nrow(SS1_Scenario1_Directed_ZIPLPCM_Sup_ZIPLPCM_T12k_R1$z)){
 plot(SS1_Scenario1_Directed_ZIPLPCM_Sup_ZIPLPCM_T12k_R1_LSz_Like,type = "l",xlab = "",ylab = "", main = "Likelihood",cex.axis = 0.8)
 ```
 
-where the traceplot of the complete likelihood above can illustrate the good mixing of the posterior samples we obtained.
+where the traceplot of the complete likelihood above can illustrate sufficient mixing of the posterior samples we obtained.
 We can also have a look at the traceplot of the posterior samples of $K$:
 
 ``` r
 # Check the trace plot of K
 plot(SS1_Scenario1_Directed_ZIPLPCM_Sup_ZIPLPCM_T12k_R1$K,type = "l",xlab = "",ylab = "", main = "K Trace Plot",cex.axis = 0.8)
 ```
+
+The aceptance rate of the M-H steps of $`{\boldsymbol{u_i}:i=1,2,\dots,N}`$ and $\beta$ can be obtained by:
+
+``` r
+## check U acceptance rate
+apply(SS1_Scenario1_Directed_ZIPLPCM_Sup_ZIPLPCM_T12k_R1$acceptance_count_U[iteration_after_burn_in-1,],2,mean)
+mean(apply(SS1_Scenario1_Directed_ZIPLPCM_Sup_ZIPLPCM_T12k_R1$acceptance_count_U[iteration_after_burn_in-1,],2,mean)) # 0.27826
+## check beta acceptance rate
+mean(SS1_Scenario1_Directed_ZIPLPCM_Sup_ZIPLPCM_T12k_R1$acceptance_count_beta[iteration_after_burn_in-1]) # 0.2919
+```
+
+Here we provide some reference values of the acceptance rates obtained in our experiments, where the mean acceptance rate of $\boldsymbol{U}$ M-H steps is shown above.
 
 Then we obtain a $N \times N$ distance matrix $\boldsymbol{D}$ whose lower-diagonal entries are $\\{d_{ij}:=||\boldsymbol{u_i}-\boldsymbol{u_j}||\\}_{i,j=1;i>j}^N$ for each iteration's latent positions:
 
@@ -621,5 +633,5 @@ mean(abs(dist(SS1_Scenario1_Directed_ZIPLPCM_Sup_ZIPLPCM_T12k_R1_hat_U)-dist(SS1
 # 0.3758013
 ```
 
-Here we obtain 0.3758013 which is small compared to the scale of the latent positions where $`\boldsymbol{U}^*\in \{[-4.320755,4.936899]\times[-4.051712,4.469993]\times[-4.85909,4.419671]\}^N`$.
+Here we obtain the MAE being 0.3758013 which is small if we consider the scale of the latent positions where $`\boldsymbol{U}^*\in \{[-4.320755,4.936899]\times[-4.051712,4.469993]\times[-4.85909,4.419671]\}^N`$.
 
