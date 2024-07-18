@@ -3,9 +3,9 @@
 This tutorial includes the coding for the two simulation studies illusrated in the paper "A Zero-Inflated Latent Position Cluster Model with Mixture of Finite Mixtures" (ZIP-LPCM-MFM).
 
 Recall here that we have two different scenarios within each simulation study.
-The scenario 1 in the first simulation study (SS1) focuses on a network randomly generated from a zero-inflated Poisson latent position cluster model (ZIP-LPCM) while the scenario 2 works on a network randomly generated from a Poisson latent position cluster model (Pois-LPCM).
-In our second simulation study (SS2), we mainly focus on the networks randomly generated from the zero-inflated Poisson stochastic block model (ZIP-SBM), which is the one we newly proposed in [Lu, C., Durante, D., and Friel, N. [2024+], "Zero-inflated stochastic block modeling of efficiency-security tradeoffs in weighted criminal networks"]().
-The synthetic network in scenario 2 of SS2 is equipped with a hub while the one in scenario 1 is not.
+The **scenario 1** in the **first simulation study (SS1)** focuses on a network randomly generated from a zero-inflated Poisson latent position cluster model (ZIP-LPCM) while the **scenario 2** works on a network randomly generated from a Poisson latent position cluster model (Pois-LPCM).
+In our **second simulation study (SS2)**, we mainly focus on the networks randomly generated from the zero-inflated Poisson stochastic block model (ZIP-SBM), which is the one we newly proposed in [Lu, C., Durante, D., and Friel, N. [2024+], "Zero-inflated stochastic block modeling of efficiency-security tradeoffs in weighted criminal networks"]().
+The synthetic network in **scenario 2** of **SS2** is equipped with a hub while the one in **scenario 1** is not.
 
 The source code of all the functions required for the experiments in our paper is included in the [`Functions.R`] file of this repository.
 We load the functions via the code below.
@@ -21,7 +21,7 @@ Here we refer to that file for more details.
 
 ## Simulation study 1 simulations
 
-The scenario 1 network of this first simulation study is randomly generated from a ZIP-LPCM with the following code.
+The **scenario 1** network of this first simulation study is randomly generated from a ZIP-LPCM with the following code.
 
 ``` r
 SS1_Scenario1_Directed_ZIPLPCM <-
@@ -219,7 +219,7 @@ orca(fig, "SS1_Sce1_Obs.pdf",scale=1,width=1800,height=850)
 
 The above code will output exactly the same figure as the Figure 1 of the ZIP-LPCM-MFM paper.
 
-The following code provides some extra statistics about the interaction weights of the scenario 1 network.
+The following code provides some extra statistics about the interaction weights of the **scenario 1** network.
 
 ``` r
 # Number/proportion of true 0
@@ -237,8 +237,8 @@ table(SS1_Scenario1_Directed_ZIPLPCM$Y[!is.nan((SS1_Scenario1_Directed_ZIPLPCM$Y
 hist(SS1_Scenario1_Directed_ZIPLPCM$Y[!is.nan((SS1_Scenario1_Directed_ZIPLPCM$Y+diag(NaN,75)))],200,xlab = "",ylab = "", main = "")
 ```
 
-We follow the similar simulation process above to simulate the scenario 2 network.
-The scenario 2 network is randomly generated from a Pois-LPCM with the following code.
+We follow the similar simulation process above to simulate the **scenario 2** network.
+The **scenario 2** network is randomly generated from a Pois-LPCM with the following code.
 
 ``` r
 SS1_Scenario2_Directed_PoisLPCM <-
@@ -375,7 +375,7 @@ Fig
 
 ## Simulation study 1 implementations and post-processing
 
-The supervised undirected partially collapsed Metropolis-within-Gibbs algorithm for ZIP-LPCM can be implemented on the scenario 1 network following the code:
+The supervised undirected partially collapsed Metropolis-within-Gibbs algorithm for ZIP-LPCM can be implemented on the **scenario 1** network following the code:
 
 ``` r
 # Supervised ZIP-LPCM-MFM implementations with T=12000 Beta(1,9) Round 1
@@ -393,7 +393,7 @@ SS1_Scenario1_Directed_ZIPLPCM_Sup_ZIPLPCM_T12k_R1_time
 
 where we focus on 3-dimensional latent positions here and the algorithm is implemented for 12,000 iterations.
 The prior parameters are set to be $(\omega=0.01,\alpha_1=1,\alpha_2=0.103,\alpha=3)$ which are all in agreement with those stated in the ZIP-LPCM-MFM paper.
-The unusual zero probability prior is set to be $\text{Beta}(1,9)$ above, corresponding to the "ZIP-LPCM Sup Beta(1,9)" case we show in the paper.
+The unusual zero probability prior is set to be $\text{Beta}(1,9)$ above, corresponding to the **ZIP-LPCM Sup Beta(1,9)** case we show in the paper.
 We also attached a reference running time of the code above and it took 24.18005 mins for the above algorithm to finish on a laptop equipped with eight 1.80GHz processors.
 The proposal variances of the Metropolis-Hastings (M-H) steps of $\beta$ and $\boldsymbol{U}$ are, respectively, tuned to be $\sigma^2_{\beta}=0.06$ and $\sigma^2_{\boldsymbol{U}}=0.06$ as shown above.
 Finally, the output can be saved via `save.image()` function.
@@ -549,7 +549,7 @@ output$EPL # check minEVI posterior loss: 0.009159308
 SS1_Scenario1_Directed_ZIPLPCM_Sup_ZIPLPCM_T12k_R1_hat_z <- output$decision # Save output as the summarized z
 ```
 
-where the `output$EPL` code above returns the statistic $`\mathbb{E}_{\boldsymbol{z}}[\text{VI}(\hat{\boldsymbol{z}},\boldsymbol{z}) \mid \boldsymbol{Y}]`$ shown in the 4th column of Table 1 of the ZIP-LPCM-MFM paper for the "ZIP-LPCM Sup Beta(1,9)" case in scenario 1.
+where the `output$EPL` code above returns the statistic $`\mathbb{E}_{\boldsymbol{z}}[\text{VI}(\hat{\boldsymbol{z}},\boldsymbol{z}) \mid \boldsymbol{Y}]`$ shown in the 4th column of Table 1 of the ZIP-LPCM-MFM paper for the **ZIP-LPCM Sup Beta(1,9)** case in **scenario 1**.
 The $\hat{K}$ of $`\hat{\boldsymbol{z}}`$ shown in the 2nd column can be extracted by:
 
 ``` r
