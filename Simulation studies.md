@@ -454,14 +454,14 @@ SS1_Scenario1_Directed_ZIPLPCM_Sup_ZIPLPCM_T12k_R1_LSz_Like <- c()
 for (t in 1:nrow(SS1_Scenario1_Directed_ZIPLPCM_Sup_ZIPLPCM_T12k_R1$z)){
   SS1_Scenario1_Directed_ZIPLPCM_Sup_ZIPLPCM_T12k_R1_LSz_Like <-
     c(SS1_Scenario1_Directed_ZIPLPCM_Sup_ZIPLPCM_T12k_R1_LSz_Like,
-      Directed_PoissonLPCM_MFM_CompleteLikelihood(X=SS1_Scenario1_Directed_ZIPLPCM_Sup_ZIPLPCM_T12k_R1$X[[t]],
-                                                  U=SS1_Scenario1_Directed_ZIPLPCM_Sup_ZIPLPCM_T12k_R1_PTU[[t]],
-                                                  beta=SS1_Scenario1_Directed_ZIPLPCM_Sup_ZIPLPCM_T12k_R1$beta[t],
-                                                  nu=SS1_Scenario1_Directed_ZIPLPCM_Sup_ZIPLPCM_T12k_R1$nu[[t]],
-                                                  P=SS1_Scenario1_Directed_ZIPLPCM_Sup_ZIPLPCM_T12k_R1_LSP[[t]],
-                                                  z=SS1_Scenario1_Directed_ZIPLPCM_Sup_ZIPLPCM_T12k_R1_LSz[t,],
-                                                  alpha1=1,alpha2=0.103,omega=0.01,  alpha=3,
-                                                  A=SS1_Scenario1_Directed_ZIPLPCM$A,omega_c=1))
+      Directed_ZIPLPCM_MFM_CompleteLikelihood(X=SS1_Scenario1_Directed_ZIPLPCM_Sup_ZIPLPCM_T12k_R1$X[[t]],
+                                              U=SS1_Scenario1_Directed_ZIPLPCM_Sup_ZIPLPCM_T12k_R1_PTU[[t]],
+                                              beta=SS1_Scenario1_Directed_ZIPLPCM_Sup_ZIPLPCM_T12k_R1$beta[t],
+                                              nu=SS1_Scenario1_Directed_ZIPLPCM_Sup_ZIPLPCM_T12k_R1$nu[[t]],
+                                              P=SS1_Scenario1_Directed_ZIPLPCM_Sup_ZIPLPCM_T12k_R1_LSP[[t]],
+                                              z=SS1_Scenario1_Directed_ZIPLPCM_Sup_ZIPLPCM_T12k_R1_LSz[t,],
+                                              alpha1=1,alpha2=0.103,omega=0.01,  alpha=3,
+                                              A=SS1_Scenario1_Directed_ZIPLPCM$A,omega_c=1))
   if ((t%%1000) == 0){
     cat("t=",t,"\n") # monitor the process
   }
@@ -757,18 +757,21 @@ The post processing code for unsupervised cases are almost identical to the supe
 After obtaining the label-switched $\boldsymbol{z}, \boldsymbol{P}$: `SS1_Scenario1_Directed_ZIPLPCM_unSup_ZIPLPCM_T12k_R1_LSz`,`SS1_Scenario1_Directed_ZIPLPCM_unSup_ZIPLPCM_T12k_R1_LSP` as well as the latent positions $\boldsymbol{U}$ after Procrustes transform: `SS1_Scenario1_Directed_ZIPLPCM_unSup_ZIPLPCM_T12k_R1_PTU`, we evaluate the complete likelihoods without providing the node attributes by:
 
 ``` r
+# Define the burn in
+iteration_after_burn_in <- 2002:12001
+burn_in <- 2001
 ## Evaluate the complete likelihood for each iteration
 SS1_Scenario1_Directed_ZIPLPCM_unSup_ZIPLPCM_T12k_R1_LSz_Like <- c()
 for (t in 1:nrow(SS1_Scenario1_Directed_ZIPLPCM_unSup_ZIPLPCM_T12k_R1$z)){
   SS1_Scenario1_Directed_ZIPLPCM_unSup_ZIPLPCM_T12k_R1_LSz_Like <-
     c(SS1_Scenario1_Directed_ZIPLPCM_unSup_ZIPLPCM_T12k_R1_LSz_Like,
-      Directed_ZIPLPCM_pgh_MFM_Likelihood(X=SS1_Scenario1_Directed_ZIPLPCM_unSup_ZIPLPCM_T12k_R1$X[[t]],
-                                          U=SS1_Scenario1_Directed_ZIPLPCM_unSup_ZIPLPCM_T12k_R1_PTU[[t]],
-                                          beta=SS1_Scenario1_Directed_ZIPLPCM_unSup_ZIPLPCM_T12k_R1$beta[t],
-                                          nu=SS1_Scenario1_Directed_ZIPLPCM_unSup_ZIPLPCM_T12k_R1$nu[[t]],
-                                          P=SS1_Scenario1_Directed_ZIPLPCM_unSup_ZIPLPCM_T12k_R1_LSP[[t]],
-                                          z=SS1_Scenario1_Directed_ZIPLPCM_unSup_ZIPLPCM_T12k_R1_LSz[t,],
-                                          alpha1=1,alpha2=0.103,omega=0.01,  alpha=3))
+      Directed_ZIPLPCM_MFM_CompleteLikelihood(X=SS1_Scenario1_Directed_ZIPLPCM_unSup_ZIPLPCM_T12k_R1$X[[t]],
+                                              U=SS1_Scenario1_Directed_ZIPLPCM_unSup_ZIPLPCM_T12k_R1_PTU[[t]],
+                                              beta=SS1_Scenario1_Directed_ZIPLPCM_unSup_ZIPLPCM_T12k_R1$beta[t],
+                                              nu=SS1_Scenario1_Directed_ZIPLPCM_unSup_ZIPLPCM_T12k_R1$nu[[t]],
+                                              P=SS1_Scenario1_Directed_ZIPLPCM_unSup_ZIPLPCM_T12k_R1_LSP[[t]],
+                                              z=SS1_Scenario1_Directed_ZIPLPCM_unSup_ZIPLPCM_T12k_R1_LSz[t,],
+                                              alpha1=1,alpha2=0.103,omega=0.01,  alpha=3))
   if ((t%%1000) == 0){cat("t=",t,"\n")}
 }
 plot(SS1_Scenario1_Directed_ZIPLPCM_unSup_ZIPLPCM_T12k_R1_LSz_Like,type = "l",xlab = "",ylab = "", main = "Likelihood",cex.axis = 0.8)
@@ -776,4 +779,85 @@ plot(SS1_Scenario1_Directed_ZIPLPCM_unSup_ZIPLPCM_T12k_R1_LSz_Like,type = "l",xl
 
 For all other code, the practitioners can simply replace all the `SS1_Scenario1_Directed_ZIPLPCM_Sup_ZIPLPCM_T12k_R1` in **ZIP-LPCM unSup Beta(1,9)** code with `SS1_Scenario1_Directed_ZIPLPCM_unSup_ZIPLPCM_T12k_R1`, and then the values of statistics shown in **Table 1** of the paper as well as the heatmap plot of the conditional unusual zero probability can be obtained.
 
-The code for Pois-LPCM
+The implementation code of supervised Pois-LPCM inference, i.e., the **Pois-LPCM Sup** case shown in the paper for **scenario 1**, are also similar, but we need to exclude the code for unusual zero probability part.
+The implementation starts from:
+
+``` r
+# SS1 Scenario 1 ZIP-LPCM network Supervised Pois-LPCM-MFM implementations with T=12000 Round 1
+start.time <- Sys.time()
+SS1_Scenario1_Directed_ZIPLPCM_Sup_PoisLPCM_T12k_R1 <- 
+  MwG_Directed_PoissonLPCM(Y = SS1_Scenario1_Directed_ZIPLPCM$Y,T = 12000,omega=0.01,alpha1=1,alpha2=0.103,alpha=3,
+                           sigma2prop_beta=0.06^2,sigma2prop_U=0.06,d=3,z=1:nrow(SS1_Scenario1_Directed_ZIPLPCM$Y),
+                           p_eject=0.5,A=SS1_Scenario1_Directed_ZIPLPCM$A,omega_c=1)
+end.time <- Sys.time()
+SS1_Scenario1_Directed_ZIPLPCM_Sup_PoisLPCM_T12k_R1_time <- end.time - start.time
+SS1_Scenario1_Directed_ZIPLPCM_Sup_PoisLPCM_T12k_R1_time
+```
+
+And once we obtained label-switched clustering `SS1_Scenario1_Directed_ZIPLPCM_Sup_PoisLPCM_T12k_R1_LSz` and Procrustes-transformed latent positions `SS1_Scenario1_Directed_ZIPLPCM_Sup_PoisLPCM_T12k_R1_PTU`, we evaluate the complete likelihood following:
+
+``` r
+# Define the burn in
+iteration_after_burn_in <- 2002:12001
+burn_in <- 2001
+## Evaluate the complete likelihood for each iteration
+SS1_Scenario1_Directed_ZIPLPCM_Sup_PoisLPCM_T12k_R1_LSz_Like <- c()
+for (t in 1:nrow(SS1_Scenario1_Directed_ZIPLPCM_Sup_PoisLPCM_T12k_R1$z)){
+  SS1_Scenario1_Directed_ZIPLPCM_Sup_PoisLPCM_T12k_R1_LSz_Like <-
+    c(SS1_Scenario1_Directed_ZIPLPCM_Sup_PoisLPCM_T12k_R1_LSz_Like,
+      Directed_PoissonLPCM_MFM_CompleteLikelihood(X=SS1_Scenario1_Directed_ZIPLPCM$Y,
+                                                  U=SS1_Scenario1_Directed_ZIPLPCM_Sup_PoisLPCM_T12k_R1_PTU[[t]],
+                                                  beta=SS1_Scenario1_Directed_ZIPLPCM_Sup_PoisLPCM_T12k_R1$beta[t],
+                                                  z=SS1_Scenario1_Directed_ZIPLPCM_Sup_PoisLPCM_T12k_R1_LSz[t,],
+                                                  alpha1=1,alpha2=0.103,omega=0.01,  alpha=3,
+                                                  A=SS1_Scenario1_Directed_ZIPLPCM$A,omega_c=1))
+  if ((t%%1000) == 0){
+    cat("t=",t,"\n")
+  }
+}
+plot(SS1_Scenario1_Directed_ZIPLPCM_Sup_PoisLPCM_T12k_R1_LSz_Like,type = "l",xlab = "",ylab = "", main = "Likelihood",cex.axis = 0.8) 
+```
+
+The rest code for obtaining the summarized distance matrix $\hat{\boldsymbol{D}}$, the summarized clustering $\hat{\boldsymbol{z}}$, the summarized latent positions $\hat{\boldsymbol{U}}$ and the summarized intercept parameter $\hat{\beta}$ are exactly the same as the **ZIP-LPCM Sup Beta(1,9)** code and the practitioners can simply replace all the `SS1_Scenario1_Directed_ZIPLPCM_Sup_ZIPLPCM_T12k_R1` by `SS1_Scenario1_Directed_ZIPLPCM_Sup_PoisLPCM_T12k_R1`.
+
+However, we no longer have the summarized individual-level unusual probability $\hat{\boldsymbol{p}}$ and the summarized conditional probability `P_m0` $\hat{\boldsymbol{\nu}}$.
+So the practitioners can simply remove the corresponding code of these two statistic for the **Pois-LPCM** implementations.
+
+The following code are the unsupervised **Pois-LPCM** inference for **scenario 1**:
+
+``` r
+# SS1 Scenario 1 ZIP-LPCM network unSupervised Pois-LPCM-MFM implementations with T=12000 Round 1
+start.time <- Sys.time()
+SS1_Scenario1_Directed_ZIPLPCM_unSup_PoisLPCM_T12k_R1 <- 
+  MwG_Directed_PoissonLPCM(Y = SS1_Scenario1_Directed_ZIPLPCM$Y,T = 12000,omega=0.01,alpha1=1,alpha2=0.103,alpha=3,
+                           sigma2prop_beta=0.06^2,sigma2prop_U=0.06,d=3,z=1:nrow(SS1_Scenario1_Directed_ZIPLPCM$Y),
+                           p_eject=0.5)
+end.time <- Sys.time()
+SS1_Scenario1_Directed_ZIPLPCM_unSup_PoisLPCM_T12k_R1_time <- end.time - start.time
+SS1_Scenario1_Directed_ZIPLPCM_unSup_PoisLPCM_T12k_R1_time
+```
+
+Once we obtained the `SS1_Scenario1_Directed_ZIPLPCM_unSup_PoisLPCM_T12k_R1_LSz` and `SS1_Scenario1_Directed_ZIPLPCM_unSup_PoisLPCM_T12k_R1_PTU`, the complete likelihoods can be checked by:
+
+``` r
+# Define the burn in
+iteration_after_burn_in <- 2002:12001
+burn_in <- 2001
+## Evaluate the complete likelihood for each iteration
+SS1_Scenario1_Directed_ZIPLPCM_unSup_PoisLPCM_T12k_R1_LSz_Like <- c()
+for (t in 1:nrow(SS1_Scenario1_Directed_ZIPLPCM_unSup_PoisLPCM_T12k_R1$z)){
+  SS1_Scenario1_Directed_ZIPLPCM_unSup_PoisLPCM_T12k_R1_LSz_Like <-
+    c(SS1_Scenario1_Directed_ZIPLPCM_unSup_PoisLPCM_T12k_R1_LSz_Like,
+      Directed_PoissonLPCM_MFM_CompleteLikelihood(X=SS1_Scenario1_Directed_ZIPLPCM$Y,
+                                                  U=SS1_Scenario1_Directed_ZIPLPCM_unSup_PoisLPCM_T12k_R1_PTU[[t]],
+                                                  beta=SS1_Scenario1_Directed_ZIPLPCM_unSup_PoisLPCM_T12k_R1$beta[t],
+                                                  z=SS1_Scenario1_Directed_ZIPLPCM_unSup_PoisLPCM_T12k_R1_LSz[t,],
+                                                  alpha1=1,alpha2=0.103,omega=0.01,  alpha=3))
+  if ((t%%1000) == 0){
+    cat("t=",t,"\n")
+  }
+}
+plot(SS1_Scenario1_Directed_ZIPLPCM_unSup_PoisLPCM_T12k_R1_LSz_Like,type = "l",xlab = "",ylab = "", main = "Likelihood",cex.axis = 0.8) 
+```
+
+The rest code are exactly the same as the **Pois-LPCM Sup** case except that all the `SS1_Scenario1_Directed_ZIPLPCM_Sup_PoisLPCM_T12k_R1` should be replaced by `SS1_Scenario1_Directed_ZIPLPCM_unSup_PoisLPCM_T12k_R1`.
