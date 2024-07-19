@@ -7,6 +7,10 @@ The **scenario 1** in the **first simulation study (SS1)** focuses on a network 
 In our **second simulation study (SS2)**, we mainly focus on the networks randomly generated from the **zero-inflated Poisson stochastic block model (ZIP-SBM)**, which is the one we newly proposed in [Lu, C., Durante, D., and Friel, N. [2024+], "Zero-inflated stochastic block modeling of efficiency-security tradeoffs in weighted criminal networks"]().
 The synthetic network in **scenario 2** of **SS2** is equipped with a hub while the one in **scenario 1** is not.
 
+We implement the supervised and unsupervised ZIP-LPCM and Pois-LPCM inference with default unusual zero probability prior setting, Beta(1,9), for each scenario following **Algorithm 1** of the **ZIP-LPCM-MFM** paper. 
+We also test four other different unusual zero probability prior settings for supervised ZIP-LPCM implementations, i.e., Beta(1,1), Beta(1,3), Beta(1,19) and Beta(1,99).
+These bring totally eight different implementations for each scenario of the two simulation studies that are illustrated in this tutorial.
+
 The source code of all the functions required for the experiments in our paper is included in the [`Functions.R`] file of this repository.
 We load the functions via the code below.
 
@@ -771,3 +775,5 @@ plot(SS1_Scenario1_Directed_ZIPLPCM_unSup_ZIPLPCM_T12k_R1_LSz_Like,type = "l",xl
 ```
 
 For all other code, the practitioners can simply replace all the `SS1_Scenario1_Directed_ZIPLPCM_Sup_ZIPLPCM_T12k_R1` in **ZIP-LPCM unSup Beta(1,9)** code with `SS1_Scenario1_Directed_ZIPLPCM_unSup_ZIPLPCM_T12k_R1`, and then the values of statistics shown in **Table 1** of the paper as well as the heatmap plot of the conditional unusual zero probability can be obtained.
+
+The code for Pois-LPCM
