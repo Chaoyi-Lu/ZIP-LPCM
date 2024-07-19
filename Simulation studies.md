@@ -678,7 +678,7 @@ SS1_Scenario1_Directed_ZIPLPCM_Sup_ZIPLPCM_T12k_R1_hat_nu <-
   Reduce("+",SS1_Scenario1_Directed_ZIPLPCM_Sup_ZIPLPCM_T12k_R1$nu[iteration_after_burn_in])/length(iteration_after_burn_in)
 ```
 
-The heatmap plot of $\hat{\boldsymbol{\nu}}$ along with the true clustering $`\boldsymbol{\nu}^*`$, i.e., the top-right plot of **Figure 3** in the paper can be recovered by:
+The heatmap plot of $\hat{\boldsymbol{\nu}}$ along with the true clustering $`\boldsymbol{z}^*`$, i.e., the top-right plot of **Figure 3** in the paper can be recovered by:
 
 ``` r
 # Heatmap plot of the \hat{nu} or the approximate P_m0
