@@ -743,14 +743,10 @@ We follow similar implementations shown above to apply the unsupervised version 
 
 ``` r
 # SS1 Scenario 1 ZIP-LPCM network unSupervised ZIP-LPCM-MFM implementations with T=12000 Beta(1,9) Round 1
-start.time <- Sys.time()
 SS1_Scenario1_Directed_ZIPLPCM_unSup_ZIPLPCM_T12k_R1 <- 
   MwG_Directed_ZIPLPCM(Y = SS1_Scenario1_Directed_ZIPLPCM$Y,T = 12000,omega=0.01,alpha1=1,alpha2=0.103,alpha=3,beta1=1,beta2=9,
                        sigma2prop_beta=0.06^2,sigma2prop_U=0.06,d=3,z=1:nrow(SS1_Scenario1_Directed_ZIPLPCM$Y),
                        p_eject=0.5)
-end.time <- Sys.time()
-SS1_Scenario1_Directed_ZIPLPCM_unSup_ZIPLPCM_T12k_R1_time <- end.time - start.time
-SS1_Scenario1_Directed_ZIPLPCM_unSup_ZIPLPCM_T12k_R1_time
 ```
 
 The post processing code for unsupervised cases are almost identical to the supervised case shown above except that the code for exogenous node attributes are excluded.
@@ -784,14 +780,10 @@ The implementation starts from:
 
 ``` r
 # SS1 Scenario 1 ZIP-LPCM network Supervised Pois-LPCM-MFM implementations with T=12000 Round 1
-start.time <- Sys.time()
 SS1_Scenario1_Directed_ZIPLPCM_Sup_PoisLPCM_T12k_R1 <- 
   MwG_Directed_PoissonLPCM(Y = SS1_Scenario1_Directed_ZIPLPCM$Y,T = 12000,omega=0.01,alpha1=1,alpha2=0.103,alpha=3,
                            sigma2prop_beta=0.06^2,sigma2prop_U=0.06,d=3,z=1:nrow(SS1_Scenario1_Directed_ZIPLPCM$Y),
                            p_eject=0.5,A=SS1_Scenario1_Directed_ZIPLPCM$A,omega_c=1)
-end.time <- Sys.time()
-SS1_Scenario1_Directed_ZIPLPCM_Sup_PoisLPCM_T12k_R1_time <- end.time - start.time
-SS1_Scenario1_Directed_ZIPLPCM_Sup_PoisLPCM_T12k_R1_time
 ```
 
 And once we obtained label-switched clustering `SS1_Scenario1_Directed_ZIPLPCM_Sup_PoisLPCM_T12k_R1_LSz` and Procrustes-transformed latent positions `SS1_Scenario1_Directed_ZIPLPCM_Sup_PoisLPCM_T12k_R1_PTU`, we evaluate the complete likelihood following:
@@ -827,14 +819,10 @@ The following code are the unsupervised **Pois-LPCM** inference for **scenario 1
 
 ``` r
 # SS1 Scenario 1 ZIP-LPCM network unSupervised Pois-LPCM-MFM implementations with T=12000 Round 1
-start.time <- Sys.time()
 SS1_Scenario1_Directed_ZIPLPCM_unSup_PoisLPCM_T12k_R1 <- 
   MwG_Directed_PoissonLPCM(Y = SS1_Scenario1_Directed_ZIPLPCM$Y,T = 12000,omega=0.01,alpha1=1,alpha2=0.103,alpha=3,
                            sigma2prop_beta=0.06^2,sigma2prop_U=0.06,d=3,z=1:nrow(SS1_Scenario1_Directed_ZIPLPCM$Y),
                            p_eject=0.5)
-end.time <- Sys.time()
-SS1_Scenario1_Directed_ZIPLPCM_unSup_PoisLPCM_T12k_R1_time <- end.time - start.time
-SS1_Scenario1_Directed_ZIPLPCM_unSup_PoisLPCM_T12k_R1_time
 ```
 
 Once we obtained the `SS1_Scenario1_Directed_ZIPLPCM_unSup_PoisLPCM_T12k_R1_LSz` and `SS1_Scenario1_Directed_ZIPLPCM_unSup_PoisLPCM_T12k_R1_PTU`, the complete likelihoods can be checked by:
@@ -861,3 +849,34 @@ plot(SS1_Scenario1_Directed_ZIPLPCM_unSup_PoisLPCM_T12k_R1_LSz_Like,type = "l",x
 ```
 
 The rest code are exactly the same as the **Pois-LPCM Sup** case except that all the `SS1_Scenario1_Directed_ZIPLPCM_Sup_PoisLPCM_T12k_R1` should be replaced by `SS1_Scenario1_Directed_ZIPLPCM_unSup_PoisLPCM_T12k_R1`.
+
+Up to this point, we have introduced all the implementation code required in the **SS1** experiments.
+We prefer not to put similar code for different implementations in this tutorial.
+For all the rest experiments shown in the paper, the practitioners can simply replace the variable names of the code shown above to obtain the corresponding results.
+Here we also provide the reference variable names and the corresponding implementation code to begin with for the rest four implementations for **scenario 1** shown in the paper, i.e., **ZIP-LPCM Sup Beta(1,1)**, **ZIP-LPCM Sup Beta(1,3)**, **ZIP-LPCM Sup Beta(1,19)** and **ZIP-LPCM Sup Beta(1,99)**:
+
+``` r
+# SS1 Scenario 1 ZIP-LPCM network Supervised ZIP-LPCM-MFM implementations with T=12000 Beta(1,1) Round 1
+SS1_Scenario1_Directed_ZIPLPCM_Sup_ZIPLPCM_T12k_Beta_1_1_R1 <- 
+  MwG_Directed_ZIPLPCM(Y = SS1_Scenario1_Directed_ZIPLPCM$Y,T = 12000,omega=0.01,alpha1=1,alpha2=0.103,alpha=3,beta1=1,beta2=1,
+                       sigma2prop_beta=0.06^2,sigma2prop_U=0.06,d=3,z=1:nrow(SS1_Scenario1_Directed_ZIPLPCM$Y),
+                       p_eject=0.5,A=SS1_Scenario1_Directed_ZIPLPCM$A,omega_c=1)
+
+# SS1 Scenario 1 ZIP-LPCM network Supervised ZIP-LPCM-MFM implementations with T=12000 Beta(1,3) Round 1
+SS1_Scenario1_Directed_ZIPLPCM_Sup_ZIPLPCM_T12k_Beta_1_3_R1 <- 
+  MwG_Directed_ZIPLPCM(Y = SS1_Scenario1_Directed_ZIPLPCM$Y,T = 12000,omega=0.01,alpha1=1,alpha2=0.103,alpha=3,beta1=1,beta2=3,
+                       sigma2prop_beta=0.06^2,sigma2prop_U=0.06,d=3,z=1:nrow(SS1_Scenario1_Directed_ZIPLPCM$Y),
+                       p_eject=0.5,A=SS1_Scenario1_Directed_ZIPLPCM$A,omega_c=1)
+
+# SS1 Scenario 1 ZIP-LPCM network Supervised ZIP-LPCM-MFM implementations with T=12000 Beta(1,19) Round 1
+SS1_Scenario1_Directed_ZIPLPCM_Sup_ZIPLPCM_T12k_Beta_1_19_R1 <- 
+  MwG_Directed_ZIPLPCM(Y = SS1_Scenario1_Directed_ZIPLPCM$Y,T = 12000,omega=0.01,alpha1=1,alpha2=0.103,alpha=3,beta1=1,beta2=19,
+                       sigma2prop_beta=0.06^2,sigma2prop_U=0.06,d=3,z=1:nrow(SS1_Scenario1_Directed_ZIPLPCM$Y),
+                       p_eject=0.5,A=SS1_Scenario1_Directed_ZIPLPCM$A,omega_c=1)
+
+# SS1 Scenario 1 ZIP-LPCM network Supervised ZIP-LPCM-MFM implementations with T=12000 Beta(1,99) Round 1
+SS1_Scenario1_Directed_ZIPLPCM_Sup_ZIPLPCM_T12k_Beta_1_99_R1 <- 
+  MwG_Directed_ZIPLPCM(Y = SS1_Scenario1_Directed_ZIPLPCM$Y,T = 12000,omega=0.01,alpha1=1,alpha2=0.103,alpha=3,beta1=1,beta2=99,
+                       sigma2prop_beta=0.06^2,sigma2prop_U=0.06,d=3,z=1:nrow(SS1_Scenario1_Directed_ZIPLPCM$Y),
+                       p_eject=0.5,A=SS1_Scenario1_Directed_ZIPLPCM$A,omega_c=1)
+```
