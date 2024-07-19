@@ -670,3 +670,65 @@ sd(abs(SS1_Scenario1_Directed_ZIPLPCM_Sup_ZIPLPCM_T12k_R1_hat_p-SS1_Scenario1_Di
 # 0.03387241
 ```
 
+Finally, we ontain the $\hat{\boldsymbol{\nu}}$, which approximates the conditional probability of unusual zero provided that the corresponding observed interaction is a zero, i.e., equation (22) of the **ZIP-LPCM-MFM** paper, by posterior mean of  $\boldsymbol{\nu}$:
+
+``` r
+## Obtain the posterior mean of nu, i.e. \hat{nu} or the approximate P_m0
+SS1_Scenario1_Directed_ZIPLPCM_Sup_ZIPLPCM_T12k_R1_hat_nu <-
+  Reduce("+",SS1_Scenario1_Directed_ZIPLPCM_Sup_ZIPLPCM_T12k_R1$nu[iteration_after_burn_in])/length(iteration_after_burn_in)
+```
+
+The heatmap plot of $\hat{\boldsymbol{\nu}}$ along with the true clustering $`\boldsymbol{\nu}^*`$, i.e., the top-right plot of **Figure 3** in the paper can be recovered by:
+
+``` r
+# Heatmap plot of the \hat{nu} or the approximate P_m0
+annotation_row_z_ref <- as.data.frame(as.factor(matrix(SS1_Scenario1_Directed_ZIPLPCM$z,length(SS1_Scenario1_Directed_ZIPLPCM$z),1)))
+colnames(annotation_row_z_ref) <- "z_ref"
+annotation_colors_z_ref <- My_colors[c(6:10)]
+names(annotation_colors_z_ref) <- sort(unique(annotation_row_z_ref$z_ref))
+
+SS1_Scenario1_Directed_ZIPLPCM_Sup_ZIPLPCM_T12k_R1_hat_nu_dataframe <- as.data.frame(SS1_Scenario1_Directed_ZIPLPCM_Sup_ZIPLPCM_T12k_R1_hat_nu)
+rownames(SS1_Scenario1_Directed_ZIPLPCM_Sup_ZIPLPCM_T12k_R1_hat_nu_dataframe) <- colnames(SS1_Scenario1_Directed_ZIPLPCM_Sup_ZIPLPCM_T12k_R1_hat_nu_dataframe) <- 1:nrow(SS1_Scenario1_Directed_ZIPLPCM$Y)
+
+SS1_Scenario1_Directed_ZIPLPCM_Sup_ZIPLPCM_T12k_R1_hat_P_m0_heatmap <-
+  pheatmap(SS1_Scenario1_Directed_ZIPLPCM_Sup_ZIPLPCM_T12k_R1_hat_nu_dataframe[order(SS1_Scenario1_Directed_ZIPLPCM_Sup_ZIPLPCM_T12k_R1_hat_z),order(SS1_Scenario1_Directed_ZIPLPCM_Sup_ZIPLPCM_T12k_R1_hat_z)],
+           color=colorRampPalette(brewer.pal(9,"YlOrRd"))(100),cluster_cols = FALSE,cluster_rows= FALSE,show_rownames=FALSE,show_colnames=FALSE,border_color=FALSE,legend=TRUE,
+           annotation_row = annotation_row_z_ref,annotation_col = annotation_row_z_ref,
+           annotation_colors=list(z_ref=annotation_colors_z_ref),annotation_names_row=FALSE,annotation_names_col=FALSE,annotation_legend=FALSE,
+           gaps_row=c(which(diff(sort(SS1_Scenario1_Directed_ZIPLPCM_Sup_ZIPLPCM_T12k_R1_hat_z))!=0)),gaps_col=c(which(diff(sort(SS1_Scenario1_Directed_ZIPLPCM_Sup_ZIPLPCM_T12k_R1_hat_z))!=0)))
+SS1_Scenario1_Directed_ZIPLPCM_Sup_ZIPLPCM_T12k_R1_hat_P_m0_heatmap_draw <- cowplot::ggdraw(SS1_Scenario1_Directed_ZIPLPCM_Sup_ZIPLPCM_T12k_R1_hat_P_m0_heatmap[[4]])
+print(SS1_Scenario1_Directed_ZIPLPCM_Sup_ZIPLPCM_T12k_R1_hat_P_m0_heatmap_draw)
+```
+
+where, once again, we use `P_m0` to denote the conditional unusual zero probability.
+Similarly, the heatmap plot of the reference conditional probability evaluated based on reference model parameters shown as the top-left plot of **Figure 3** can be recovered by:
+
+``` r
+# Heatmap plot of the reference P_m0
+SS1_Scenario1_Directed_ZIPLPCM_P_m0_dataframe <- as.data.frame(SS1_Scenario1_Directed_ZIPLPCM_P_m0)
+rownames(SS1_Scenario1_Directed_ZIPLPCM_P_m0_dataframe) <- colnames(SS1_Scenario1_Directed_ZIPLPCM_P_m0_dataframe) <- 1:nrow(SS1_Scenario1_Directed_ZIPLPCM$Y)
+
+SS1_Scenario1_Directed_ZIPLPCM_P_m0_heatmap <-
+  pheatmap(SS1_Scenario1_Directed_ZIPLPCM_P_m0_dataframe[order(SS1_Scenario1_Directed_ZIPLPCM$z),order(SS1_Scenario1_Directed_ZIPLPCM$z)],
+           color=colorRampPalette(brewer.pal(9,"YlOrRd"))(100),
+           cluster_cols = FALSE,cluster_rows= FALSE,show_rownames=FALSE,show_colnames=FALSE,border_color=FALSE,legend=TRUE,
+           annotation_row = annotation_row_z_ref,annotation_col = annotation_row_z_ref,
+           annotation_colors=list(z_ref=annotation_colors_z_ref),annotation_names_row=FALSE,annotation_names_col=FALSE,annotation_legend=FALSE,
+           gaps_row=c(which(diff(sort(SS1_Scenario1_Directed_ZIPLPCM$z))!=0)),gaps_col=c(which(diff(sort(SS1_Scenario1_Directed_ZIPLPCM$z))!=0)))
+SS1_Scenario1_Directed_ZIPLPCM_P_m0_heatmap_draw <- cowplot::ggdraw(SS1_Scenario1_Directed_ZIPLPCM_P_m0_heatmap[[4]])
+print(SS1_Scenario1_Directed_ZIPLPCM_P_m0_heatmap_draw)
+```
+
+To quantize the difference between the approximate `P_m0` and the reference `P_m0`, we check the element-level mean absolute error between them as well as the standard deviation:
+
+``` r
+# Mean and sd of the error between the approximate P_m0 and the reference P_m0 for each element
+mean(abs(SS1_Scenario1_Directed_ZIPLPCM_T12k_R1_hat_nu[(SS1_Scenario1_Directed_ZIPLPCM$Y+diag(1,nrow(SS1_Scenario1_Directed_ZIPLPCM$Y)))==0]-
+           SS1_Scenario1_Directed_ZIPLPCM_P_m0[(SS1_Scenario1_Directed_ZIPLPCM$Y+diag(1,nrow(SS1_Scenario1_Directed_ZIPLPCM$Y)))==0]))
+# 0.04304204
+sd(abs(SS1_Scenario1_Directed_ZIPLPCM_T12k_R1_hat_nu[(SS1_Scenario1_Directed_ZIPLPCM$Y+diag(1,nrow(SS1_Scenario1_Directed_ZIPLPCM$Y)))==0]-
+         SS1_Scenario1_Directed_ZIPLPCM_P_m0[(SS1_Scenario1_Directed_ZIPLPCM$Y+diag(1,nrow(SS1_Scenario1_Directed_ZIPLPCM$Y)))==0]))
+# 0.04453456
+```
+
+which are small and satisfactory considering that the reference conditional probability ranging from 0 to 1.
