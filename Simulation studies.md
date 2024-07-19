@@ -23,7 +23,7 @@ source("Functions.R")
 Within the [`Functions.R`] file, we also added some comments to explain the corresponding lines of the code.
 Here we refer to that file for more details.
 
-## Simulation study 1 simulations
+## 1. Simulation study 1 simulations
 
 The **scenario 1** network of this first simulation study is randomly generated from a **ZIP-LPCM** with the following code.
 
@@ -377,7 +377,7 @@ Fig <- cowplot::ggdraw(g)
 Fig
 ```
 
-## Simulation study 1 implementations and post-processing
+## 2. Simulation study 1 scenario 1 implementations and post-processing
 
 The supervised undirected partially collapsed Metropolis-within-Gibbs algorithm for **ZIP-LPCM** can be implemented on the **scenario 1** network following the code:
 
@@ -881,4 +881,121 @@ SS1_Scenario1_Directed_ZIPLPCM_Sup_ZIPLPCM_T12k_Beta_1_99_R1 <-
                        p_eject=0.5,A=SS1_Scenario1_Directed_ZIPLPCM$A,omega_c=1)
 ```
 
-For the rest code, by replacing all the `SS1_Scenario1_Directed_ZIPLPCM_Sup_PoisLPCM_T12k_R1` in the **ZIP-LPCM Sup Beta(1,9)** code by `SS1_Scenario1_Directed_ZIPLPCM_Sup_ZIPLPCM_T12k_Beta_1_1_R1` gives the post-processing of the **ZIP-LPCM Sup Beta(1,1)** case.
+For the rest code, by replacing all the `SS1_Scenario1_Directed_ZIPLPCM_Sup_PoisLPCM_T12k_R1` in the **ZIP-LPCM Sup Beta(1,9)** code with `SS1_Scenario1_Directed_ZIPLPCM_Sup_ZIPLPCM_T12k_Beta_1_1_R1` gives the post-processing of the **ZIP-LPCM Sup Beta(1,1)** case.
+
+Once we obtained the $\hat{\boldsymbol{\nu}}$ for all the eight implementations, we can build the corresponding data.frame type for the **ZIP-LPCM Sup Beta(1,3)**, **ZIP-LPCM Sup Beta(1,9)**, **ZIP-LPCM Sup Beta(1,19)**, **ZIP-LPCM Sup Beta(1,99)** cases as well as the reference one we have already obtained:
+
+``` r
+SS1_Scenario1_Directed_ZIPLPCM_P_m0_dataframe <- as.data.frame(SS1_Scenario1_Directed_ZIPLPCM_P_m0)
+rownames(SS1_Scenario1_Directed_ZIPLPCM_P_m0_dataframe) <- colnames(SS1_Scenario1_Directed_ZIPLPCM_P_m0_dataframe) <- 1:nrow(SS1_Scenario1_Directed_ZIPLPCM$Y)
+
+SS1_Scenario1_Directed_ZIPLPCM_Sup_ZIPLPCM_T12k_Beta_1_3_R1_hat_nu_dataframe <- as.data.frame(SS1_Scenario1_Directed_ZIPLPCM_Sup_ZIPLPCM_T12k_Beta_1_3_R1_hat_nu)
+rownames(SS1_Scenario1_Directed_ZIPLPCM_Sup_ZIPLPCM_T12k_Beta_1_3_R1_hat_nu_dataframe) <- colnames(SS1_Scenario1_Directed_ZIPLPCM_Sup_ZIPLPCM_T12k_Beta_1_3_R1_hat_nu_dataframe) <- 1:nrow(SS1_Scenario1_Directed_ZIPLPCM$Y)
+
+SS1_Scenario1_Directed_ZIPLPCM_Sup_ZIPLPCM_T12k_R1_hat_nu_dataframe <- as.data.frame(SS1_Scenario1_Directed_ZIPLPCM_Sup_ZIPLPCM_T12k_R1_hat_nu)
+rownames(SS1_Scenario1_Directed_ZIPLPCM_Sup_ZIPLPCM_T12k_R1_hat_nu_dataframe) <- colnames(SS1_Scenario1_Directed_ZIPLPCM_Sup_ZIPLPCM_T12k_R1_hat_nu_dataframe) <- 1:nrow(SS1_Scenario1_Directed_ZIPLPCM$Y)
+
+SS1_Scenario1_Directed_ZIPLPCM_Sup_ZIPLPCM_T12k_Beta_1_19_R1_hat_nu_dataframe <- as.data.frame(SS1_Scenario1_Directed_ZIPLPCM_Sup_ZIPLPCM_T12k_Beta_1_19_R1_hat_nu)
+rownames(SS1_Scenario1_Directed_ZIPLPCM_Sup_ZIPLPCM_T12k_Beta_1_19_R1_hat_nu_dataframe) <- colnames(SS1_Scenario1_Directed_ZIPLPCM_Sup_ZIPLPCM_T12k_Beta_1_19_R1_hat_nu_dataframe) <- 1:nrow(SS1_Scenario1_Directed_ZIPLPCM$Y)
+
+SS1_Scenario1_Directed_ZIPLPCM_Sup_ZIPLPCM_T12k_Beta_1_99_R1_hat_nu_dataframe <- as.data.frame(SS1_Scenario1_Directed_ZIPLPCM_Sup_ZIPLPCM_T12k_Beta_1_99_R1_hat_nu)
+rownames(SS1_Scenario1_Directed_ZIPLPCM_Sup_ZIPLPCM_T12k_Beta_1_99_R1_hat_nu_dataframe) <- colnames(SS1_Scenario1_Directed_ZIPLPCM_Sup_ZIPLPCM_T12k_Beta_1_99_R1_hat_nu_dataframe) <- 1:nrow(SS1_Scenario1_Directed_ZIPLPCM$Y)
+```
+
+Thus the **Figure 3** in the **ZIP-LPCM-MFM** paper can be recovered by:
+
+``` r
+My_colors <- c(brewer.pal(10,"RdBu")[c(4,7)],brewer.pal(10,"PRGn")[c(7,4)],brewer.pal(9,"YlOrBr")[4],
+               brewer.pal(10,"RdBu")[c(2,9)],brewer.pal(10,"PRGn")[c(9,2)],brewer.pal(9,"YlOrBr")[6],
+               brewer.pal(9,"Reds")[c(9,6)],brewer.pal(9,"RdPu")[5],brewer.pal(9,"Greys")[c(3,6,9)],brewer.pal(9,"GnBu")[5])
+
+annotation_row_z_ref <- as.data.frame(as.factor(matrix(SS1_Scenario1_Directed_ZIPLPCM$z,length(SS1_Scenario1_Directed_ZIPLPCM$z),1)))
+colnames(annotation_row_z_ref) <- "z_ref"
+annotation_colors_z_ref <- My_colors[c(6:10)]
+names(annotation_colors_z_ref) <- sort(unique(annotation_row_z_ref$z_ref))
+
+SS1_Scenario1_Directed_ZIPLPCM_P_m0_heatmap <-
+  pheatmap(SS1_Scenario1_Directed_ZIPLPCM_P_m0_dataframe[order(SS1_Scenario1_Directed_ZIPLPCM$z),order(SS1_Scenario1_Directed_ZIPLPCM$z)],
+           color=colorRampPalette(brewer.pal(9,"YlOrRd"))(100),cluster_cols = FALSE,cluster_rows= FALSE,show_rownames=FALSE,show_colnames=FALSE,border_color=FALSE,
+           legend=FALSE,annotation_row = annotation_row_z_ref,annotation_col = annotation_row_z_ref,
+           annotation_colors=list(z_ref=annotation_colors_z_ref),annotation_names_row=FALSE,annotation_names_col=FALSE,
+           annotation_legend=FALSE,gaps_row=c(which(diff(sort(SS1_Scenario1_Directed_ZIPLPCM$z))!=0)),
+           gaps_col=c(which(diff(sort(SS1_Scenario1_Directed_ZIPLPCM$z))!=0)),
+           main="Reference")
+
+SS1_Scenario1_Directed_ZIPLPCM_Sup_ZIPLPCM_T12k_R1_hat_P_m0_heatmap <-
+  pheatmap(SS1_Scenario1_Directed_ZIPLPCM_Sup_ZIPLPCM_T12k_R1_hat_nu_dataframe[order(SS1_Scenario1_Directed_ZIPLPCM_Sup_ZIPLPCM_T12k_R1_hat_z),order(SS1_Scenario1_Directed_ZIPLPCM_Sup_ZIPLPCM_T12k_R1_hat_z)],
+           color=colorRampPalette(brewer.pal(9,"YlOrRd"))(100),cluster_cols = FALSE,cluster_rows= FALSE,show_rownames=FALSE,show_colnames=FALSE,
+           border_color=FALSE,legend=FALSE,annotation_row = annotation_row_z_ref,annotation_col = annotation_row_z_ref,
+           annotation_colors=list(z_ref=annotation_colors_z_ref),annotation_names_row=FALSE,annotation_names_col=FALSE,annotation_legend=FALSE,
+           gaps_row=c(which(diff(sort(SS1_Scenario1_Directed_ZIPLPCM_Sup_ZIPLPCM_T12k_R1_hat_z))!=0)),
+           gaps_col=c(which(diff(sort(SS1_Scenario1_Directed_ZIPLPCM_Sup_ZIPLPCM_T12k_R1_hat_z))!=0)),
+           main="ZIP-LPCM Sup Beta(1,9)")
+
+SS1_Scenario1_Directed_ZIPLPCM_Sup_ZIPLPCM_T12k_Beta_1_3_R1_hat_P_m0_heatmap <-
+  pheatmap(SS1_Scenario1_Directed_ZIPLPCM_Sup_ZIPLPCM_T12k_Beta_1_3_R1_hat_nu_dataframe[order(SS1_Scenario1_Directed_ZIPLPCM_Sup_ZIPLPCM_T12k_Beta_1_3_R1_hat_z),order(SS1_Scenario1_Directed_ZIPLPCM_Sup_ZIPLPCM_T12k_Beta_1_3_R1_hat_z)],
+           color=colorRampPalette(brewer.pal(9,"YlOrRd"))(100),cluster_cols = FALSE,cluster_rows= FALSE,show_rownames=FALSE,show_colnames=FALSE,
+           border_color=FALSE,legend=FALSE,annotation_row = annotation_row_z_ref,annotation_col = annotation_row_z_ref,annotation_colors=list(z_ref=annotation_colors_z_ref),
+           annotation_names_row=FALSE,annotation_names_col=FALSE,annotation_legend=FALSE,gaps_row=c(which(diff(sort(SS1_Scenario1_Directed_ZIPLPCM_Sup_ZIPLPCM_T12k_Beta_1_3_R1_hat_z))!=0)),
+           gaps_col=c(which(diff(sort(SS1_Scenario1_Directed_ZIPLPCM_Sup_ZIPLPCM_T12k_Beta_1_3_R1_hat_z))!=0)),
+           main="ZIP-LPCM Sup Beta(1,3)")
+
+SS1_Scenario1_Directed_ZIPLPCM_Sup_ZIPLPCM_T12k_Beta_1_19_R1_hat_P_m0_heatmap <-
+  pheatmap(SS1_Scenario1_Directed_ZIPLPCM_Sup_ZIPLPCM_T12k_Beta_1_19_R1_hat_nu_dataframe[order(SS1_Scenario1_Directed_ZIPLPCM_Sup_ZIPLPCM_T12k_Beta_1_19_R1_hat_z),order(SS1_Scenario1_Directed_ZIPLPCM_Sup_ZIPLPCM_T12k_Beta_1_19_R1_hat_z)],
+           color=colorRampPalette(brewer.pal(9,"YlOrRd"))(100),cluster_cols = FALSE,cluster_rows= FALSE,show_rownames=FALSE,show_colnames=FALSE,
+           border_color=FALSE,legend=FALSE,annotation_row = annotation_row_z_ref,annotation_col = annotation_row_z_ref,annotation_colors=list(z_ref=annotation_colors_z_ref),
+           annotation_names_row=FALSE,annotation_names_col=FALSE,annotation_legend=FALSE,gaps_row=c(which(diff(sort(SS1_Scenario1_Directed_ZIPLPCM_Sup_ZIPLPCM_T12k_Beta_1_19_R1_hat_z))!=0)),
+           gaps_col=c(which(diff(sort(SS1_Scenario1_Directed_ZIPLPCM_Sup_ZIPLPCM_T12k_Beta_1_19_R1_hat_z))!=0)),
+           main="ZIP-LPCM Sup Beta(1,19)")
+
+SS1_Scenario1_Directed_ZIPLPCM_Sup_ZIPLPCM_T12k_Beta_1_99_R1_hat_P_m0_heatmap <-
+  pheatmap(SS1_Scenario1_Directed_ZIPLPCM_Sup_ZIPLPCM_T12k_Beta_1_99_R1_hat_nu_dataframe[order(SS1_Scenario1_Directed_ZIPLPCM_Sup_ZIPLPCM_T12k_Beta_1_99_R1_hat_z_2),order(SS1_Scenario1_Directed_ZIPLPCM_Sup_ZIPLPCM_T12k_Beta_1_99_R1_hat_z_2)],
+           color=colorRampPalette(brewer.pal(9,"YlOrRd"))(100),cluster_cols = FALSE,cluster_rows= FALSE,show_rownames=FALSE,show_colnames=FALSE,
+           border_color=FALSE,legend=FALSE,annotation_row = annotation_row_z_ref,annotation_col = annotation_row_z_ref,annotation_colors=list(z_ref=annotation_colors_z_ref),
+           annotation_names_row=FALSE,annotation_names_col=FALSE,annotation_legend=FALSE,gaps_row=c(which(diff(sort(SS1_Scenario1_Directed_ZIPLPCM_Sup_ZIPLPCM_T12k_Beta_1_99_R1_hat_z_2))!=0)),
+           gaps_col=c(which(diff(sort(SS1_Scenario1_Directed_ZIPLPCM_Sup_ZIPLPCM_T12k_Beta_1_99_R1_hat_z_2))!=0)),
+           main="ZIP-LPCM Sup Beta(1,99)")
+
+library("pROC")
+roc.ref <- roc(SS1_Scenario1_Directed_ZIPLPCM$nu[(SS1_Scenario1_Directed_ZIPLPCM$Y+diag(1,75))==0],SS1_Scenario1_Directed_ZIPLPCM_P_m0[(SS1_Scenario1_Directed_ZIPLPCM$Y+diag(1,75))==0])
+roc.1.1 <- roc(SS1_Scenario1_Directed_ZIPLPCM$nu[(SS1_Scenario1_Directed_ZIPLPCM$Y+diag(1,75))==0],SS1_Scenario1_Directed_ZIPLPCM_T12k_beta_1_1_R1_hat_nu[(SS1_Scenario1_Directed_ZIPLPCM$Y+diag(1,75))==0])
+roc.1.3 <- roc(SS1_Scenario1_Directed_ZIPLPCM$nu[(SS1_Scenario1_Directed_ZIPLPCM$Y+diag(1,75))==0],SS1_Scenario1_Directed_ZIPLPCM_Sup_ZIPLPCM_T12k_Beta_1_3_R1_hat_nu[(SS1_Scenario1_Directed_ZIPLPCM$Y+diag(1,75))==0])
+roc.1.9 <- roc(SS1_Scenario1_Directed_ZIPLPCM$nu[(SS1_Scenario1_Directed_ZIPLPCM$Y+diag(1,75))==0],SS1_Scenario1_Directed_ZIPLPCM_Sup_ZIPLPCM_T12k_R1_hat_nu[(SS1_Scenario1_Directed_ZIPLPCM$Y+diag(1,75))==0])
+roc.1.19 <- roc(SS1_Scenario1_Directed_ZIPLPCM$nu[(SS1_Scenario1_Directed_ZIPLPCM$Y+diag(1,75))==0],SS1_Scenario1_Directed_ZIPLPCM_Sup_ZIPLPCM_T12k_Beta_1_19_R1_hat_nu[(SS1_Scenario1_Directed_ZIPLPCM$Y+diag(1,75))==0])
+roc.1.99 <- roc(SS1_Scenario1_Directed_ZIPLPCM$nu[(SS1_Scenario1_Directed_ZIPLPCM$Y+diag(1,75))==0],SS1_Scenario1_Directed_ZIPLPCM_Sup_ZIPLPCM_T12k_Beta_1_99_R1_hat_nu[(SS1_Scenario1_Directed_ZIPLPCM$Y+diag(1,75))==0])
+
+g.roc <- ggroc(list(Reference=roc.ref, roc.1.1=roc.1.1, roc.1.3=roc.1.3, roc.1.9=roc.1.9, roc.1.19=roc.1.19, roc.1.99=roc.1.99), legacy.axes = TRUE, alpha = 0.75, linetype = 1, size = 1) + xlab("FPR") + ylab("TPR") + theme_bw() +
+  geom_segment(aes(x = 0, xend = 1, y = 0, yend = 1), color="darkgrey", linetype="dashed")+
+  theme(legend.position = c(0.725, 0.25),legend.background = element_rect(fill = "white", color = "black"))+ 
+  scale_color_manual(labels = c("Reference AUC:0.8402", "Beta(1,1) AUC:0.7856", 
+                                "Beta(1,3) AUC:0.8138", "Beta(1,9) AUC:0.8215", 
+                                "Beta(1,19) AUC:0.8214", "Beta(1,99) AUC:0.7947"),values = 1:6)+
+  ggtitle("ROC Curves")+theme(legend.key.size = unit(0.6, 'cm'),plot.title=element_text(face="bold",hjust = 0.5),legend.title=element_blank(), 
+                              legend.text = element_text(size = 9))
+
+library("grid")
+library("gridExtra")
+g <- grid.arrange(SS1_Scenario1_Directed_ZIPLPCM_P_m0_heatmap[[4]],
+                  SS1_Scenario1_Directed_ZIPLPCM_Sup_ZIPLPCM_T12k_Beta_1_3_R1_hat_P_m0_heatmap[[4]],
+                  SS1_Scenario1_Directed_ZIPLPCM_Sup_ZIPLPCM_T12k_R1_hat_P_m0_heatmap[[4]],
+                  SS1_Scenario1_Directed_ZIPLPCM_Sup_ZIPLPCM_T12k_Beta_1_19_R1_hat_P_m0_heatmap[[4]],
+                  SS1_Scenario1_Directed_ZIPLPCM_Sup_ZIPLPCM_T12k_Beta_1_99_R1_hat_P_m0_heatmap[[4]],
+                  g.roc,nrow=2,ncol=3,vp=viewport(width=1, height=1))
+Fig <- cowplot::ggdraw(g)
+Fig
+```
+
+where the Area under the curve (AUC) of the Receiver operating characteristic (ROC) curves can be obtained one by one following:
+
+``` r
+roc(SS1_Scenario1_Directed_ZIPLPCM$nu[(SS1_Scenario1_Directed_ZIPLPCM$Y+diag(1,75))==0],SS1_Scenario1_Directed_ZIPLPCM_P_m0[(SS1_Scenario1_Directed_ZIPLPCM$Y+diag(1,75))==0])
+roc(SS1_Scenario1_Directed_ZIPLPCM$nu[(SS1_Scenario1_Directed_ZIPLPCM$Y+diag(1,75))==0],SS1_Scenario1_Directed_ZIPLPCM_T12k_beta_1_1_R1_hat_nu[(SS1_Scenario1_Directed_ZIPLPCM$Y+diag(1,75))==0])
+roc(SS1_Scenario1_Directed_ZIPLPCM$nu[(SS1_Scenario1_Directed_ZIPLPCM$Y+diag(1,75))==0],SS1_Scenario1_Directed_ZIPLPCM_Sup_ZIPLPCM_T12k_Beta_1_3_R1_hat_nu[(SS1_Scenario1_Directed_ZIPLPCM$Y+diag(1,75))==0])
+roc(SS1_Scenario1_Directed_ZIPLPCM$nu[(SS1_Scenario1_Directed_ZIPLPCM$Y+diag(1,75))==0],SS1_Scenario1_Directed_ZIPLPCM_Sup_ZIPLPCM_T12k_R1_hat_nu[(SS1_Scenario1_Directed_ZIPLPCM$Y+diag(1,75))==0])
+roc(SS1_Scenario1_Directed_ZIPLPCM$nu[(SS1_Scenario1_Directed_ZIPLPCM$Y+diag(1,75))==0],SS1_Scenario1_Directed_ZIPLPCM_Sup_ZIPLPCM_T12k_Beta_1_19_R1_hat_nu[(SS1_Scenario1_Directed_ZIPLPCM$Y+diag(1,75))==0])
+roc(SS1_Scenario1_Directed_ZIPLPCM$nu[(SS1_Scenario1_Directed_ZIPLPCM$Y+diag(1,75))==0],SS1_Scenario1_Directed_ZIPLPCM_Sup_ZIPLPCM_T12k_Beta_1_99_R1_hat_nu[(SS1_Scenario1_Directed_ZIPLPCM$Y+diag(1,75))==0])
+```
+
+Here we end the **simulation study 1 scenario 1** implementations and post-processings.
+
+## 3. Simulation study 1 scenario 2 implementations and post-processing
