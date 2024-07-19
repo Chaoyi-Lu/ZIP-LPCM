@@ -450,14 +450,14 @@ SS1_Scenario1_Directed_ZIPLPCM_Sup_ZIPLPCM_T12k_R1_LSz_Like <- c()
 for (t in 1:nrow(SS1_Scenario1_Directed_ZIPLPCM_Sup_ZIPLPCM_T12k_R1$z)){
   SS1_Scenario1_Directed_ZIPLPCM_Sup_ZIPLPCM_T12k_R1_LSz_Like <-
     c(SS1_Scenario1_Directed_ZIPLPCM_Sup_ZIPLPCM_T12k_R1_LSz_Like,
-      Directed_ZIPLPCM_pgh_MFM_Likelihood(X=SS1_Scenario1_Directed_ZIPLPCM_Sup_ZIPLPCM_T12k_R1$X[[t]],
-                                          U=SS1_Scenario1_Directed_ZIPLPCM_Sup_ZIPLPCM_T12k_R1_PTU[[t]],
-                                          beta=SS1_Scenario1_Directed_ZIPLPCM_Sup_ZIPLPCM_T12k_R1$beta[t],
-                                          nu=SS1_Scenario1_Directed_ZIPLPCM_Sup_ZIPLPCM_T12k_R1$nu[[t]],
-                                          P=SS1_Scenario1_Directed_ZIPLPCM_Sup_ZIPLPCM_T12k_R1_LSP[[t]],
-                                          z=SS1_Scenario1_Directed_ZIPLPCM_Sup_ZIPLPCM_T12k_R1_LSz[t,],
-                                          alpha1=1,alpha2=0.103,omega=0.01,  alpha=3,
-                                          A=SS1_Scenario1_Directed_ZIPLPCM$A,omega_c=1))
+      Directed_PoissonLPCM_MFM_CompleteLikelihood(X=SS1_Scenario1_Directed_ZIPLPCM_Sup_ZIPLPCM_T12k_R1$X[[t]],
+                                                  U=SS1_Scenario1_Directed_ZIPLPCM_Sup_ZIPLPCM_T12k_R1_PTU[[t]],
+                                                  beta=SS1_Scenario1_Directed_ZIPLPCM_Sup_ZIPLPCM_T12k_R1$beta[t],
+                                                  nu=SS1_Scenario1_Directed_ZIPLPCM_Sup_ZIPLPCM_T12k_R1$nu[[t]],
+                                                  P=SS1_Scenario1_Directed_ZIPLPCM_Sup_ZIPLPCM_T12k_R1_LSP[[t]],
+                                                  z=SS1_Scenario1_Directed_ZIPLPCM_Sup_ZIPLPCM_T12k_R1_LSz[t,],
+                                                  alpha1=1,alpha2=0.103,omega=0.01,  alpha=3,
+                                                  A=SS1_Scenario1_Directed_ZIPLPCM$A,omega_c=1))
   if ((t%%1000) == 0){
     cat("t=",t,"\n") # monitor the process
   }
@@ -723,12 +723,51 @@ To quantize the difference between the approximate `P_m0` and the reference `P_m
 
 ``` r
 # Mean and sd of the error between the approximate P_m0 and the reference P_m0 for each element
-mean(abs(SS1_Scenario1_Directed_ZIPLPCM_T12k_R1_hat_nu[(SS1_Scenario1_Directed_ZIPLPCM$Y+diag(1,nrow(SS1_Scenario1_Directed_ZIPLPCM$Y)))==0]-
+mean(abs(SS1_Scenario1_Directed_ZIPLPCM_Sup_ZIPLPCM_T12k_R1_hat_nu[(SS1_Scenario1_Directed_ZIPLPCM$Y+diag(1,nrow(SS1_Scenario1_Directed_ZIPLPCM$Y)))==0]-
            SS1_Scenario1_Directed_ZIPLPCM_P_m0[(SS1_Scenario1_Directed_ZIPLPCM$Y+diag(1,nrow(SS1_Scenario1_Directed_ZIPLPCM$Y)))==0]))
 # 0.04304204
-sd(abs(SS1_Scenario1_Directed_ZIPLPCM_T12k_R1_hat_nu[(SS1_Scenario1_Directed_ZIPLPCM$Y+diag(1,nrow(SS1_Scenario1_Directed_ZIPLPCM$Y)))==0]-
+sd(abs(SS1_Scenario1_Directed_ZIPLPCM_Sup_ZIPLPCM_T12k_R1_hat_nu[(SS1_Scenario1_Directed_ZIPLPCM$Y+diag(1,nrow(SS1_Scenario1_Directed_ZIPLPCM$Y)))==0]-
          SS1_Scenario1_Directed_ZIPLPCM_P_m0[(SS1_Scenario1_Directed_ZIPLPCM$Y+diag(1,nrow(SS1_Scenario1_Directed_ZIPLPCM$Y)))==0]))
 # 0.04453456
 ```
 
 which are small and satisfactory considering that the reference conditional probability ranging from 0 to 1.
+
+Multiple implementations can be easily applied by changing all the `SS1_Scenario1_Directed_ZIPLPCM_Sup_ZIPLPCM_T12k_R1` above to `SS1_Scenario1_Directed_ZIPLPCM_Sup_ZIPLPCM_T12k_R2`,`SS1_Scenario1_Directed_ZIPLPCM_Sup_ZIPLPCM_T12k_R3`,etc. for more rounds of implementations.
+
+We follow similar implementations shown above to apply the unsupervised version bringing the **ZIP-LPCM unSup Beta(1,9)** case for **scenario 1** network shown in our ZIP-LPCM-MFM paper:
+
+``` r
+# SS1 Scenario 1 ZIP-LPCM network unSupervised ZIP-LPCM-MFM implementations with T=12000 Beta(1,9) Round 1
+start.time <- Sys.time()
+SS1_Scenario1_Directed_ZIPLPCM_unSup_ZIPLPCM_T12k_R1 <- 
+  MwG_Directed_ZIPLPCM(Y = SS1_Scenario1_Directed_ZIPLPCM$Y,T = 12000,omega=0.01,alpha1=1,alpha2=0.103,alpha=3,beta1=1,beta2=9,
+                       sigma2prop_beta=0.06^2,sigma2prop_U=0.06,d=3,z=1:nrow(SS1_Scenario1_Directed_ZIPLPCM$Y),
+                       p_eject=0.5)
+end.time <- Sys.time()
+SS1_Scenario1_Directed_ZIPLPCM_unSup_ZIPLPCM_T12k_R1_time <- end.time - start.time
+SS1_Scenario1_Directed_ZIPLPCM_unSup_ZIPLPCM_T12k_R1_time
+```
+
+The post processing code for unsupervised cases are almost identical to the supervised case shown above except that the code for exogenous node attributes are excluded.
+After obtaining the label-switched $\boldsymbol{z}, \boldsymbol{P}$: `SS1_Scenario1_Directed_ZIPLPCM_unSup_ZIPLPCM_T12k_R1_LSz`,`SS1_Scenario1_Directed_ZIPLPCM_unSup_ZIPLPCM_T12k_R1_LSP` as well as the latent positions $\boldsymbol{U}$ after Procrustes transform: `SS1_Scenario1_Directed_ZIPLPCM_unSup_ZIPLPCM_T12k_R1_PTU`, we evaluate the complete likelihoods without providing the node attributes by:
+
+``` r
+## Evaluate the complete likelihood for each iteration
+SS1_Scenario1_Directed_ZIPLPCM_unSup_ZIPLPCM_T12k_R1_LSz_Like <- c()
+for (t in 1:nrow(SS1_Scenario1_Directed_ZIPLPCM_unSup_ZIPLPCM_T12k_R1$z)){
+  SS1_Scenario1_Directed_ZIPLPCM_unSup_ZIPLPCM_T12k_R1_LSz_Like <-
+    c(SS1_Scenario1_Directed_ZIPLPCM_unSup_ZIPLPCM_T12k_R1_LSz_Like,
+      Directed_ZIPLPCM_pgh_MFM_Likelihood(X=SS1_Scenario1_Directed_ZIPLPCM_unSup_ZIPLPCM_T12k_R1$X[[t]],
+                                          U=SS1_Scenario1_Directed_ZIPLPCM_unSup_ZIPLPCM_T12k_R1_PTU[[t]],
+                                          beta=SS1_Scenario1_Directed_ZIPLPCM_unSup_ZIPLPCM_T12k_R1$beta[t],
+                                          nu=SS1_Scenario1_Directed_ZIPLPCM_unSup_ZIPLPCM_T12k_R1$nu[[t]],
+                                          P=SS1_Scenario1_Directed_ZIPLPCM_unSup_ZIPLPCM_T12k_R1_LSP[[t]],
+                                          z=SS1_Scenario1_Directed_ZIPLPCM_unSup_ZIPLPCM_T12k_R1_LSz[t,],
+                                          alpha1=1,alpha2=0.103,omega=0.01,  alpha=3))
+  if ((t%%1000) == 0){cat("t=",t,"\n")}
+}
+plot(SS1_Scenario1_Directed_ZIPLPCM_unSup_ZIPLPCM_T12k_R1_LSz_Like,type = "l",xlab = "",ylab = "", main = "Likelihood",cex.axis = 0.8)
+```
+
+For all other code, the practitioners can simply replace all the `SS1_Scenario1_Directed_ZIPLPCM_Sup_ZIPLPCM_T12k_R1` in **ZIP-LPCM unSup Beta(1,9)** code with `SS1_Scenario1_Directed_ZIPLPCM_unSup_ZIPLPCM_T12k_R1`, and then the values of statistics shown in **Table 1** of the paper as well as the heatmap plot of the conditional unusual zero probability can be obtained.
