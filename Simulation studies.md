@@ -820,7 +820,7 @@ plot(SS1_Scenario1_Directed_ZIPLPCM_Sup_PoisLPCM_T12k_R1_LSz_Like,type = "l",xla
 
 The rest code for obtaining the summarized distance matrix $\hat{\boldsymbol{D}}$, the summarized clustering $\hat{\boldsymbol{z}}$, the summarized latent positions $\hat{\boldsymbol{U}}$ and the summarized intercept parameter $\hat{\beta}$ are exactly the same as the **ZIP-LPCM Sup Beta(1,9)** code and the practitioners can simply replace all the `SS1_Scenario1_Directed_ZIPLPCM_Sup_ZIPLPCM_T12k_R1` by `SS1_Scenario1_Directed_ZIPLPCM_Sup_PoisLPCM_T12k_R1`.
 
-However, we no longer have the summarized individual-level unusual probability $\hat{\boldsymbol{p}}$ and the summarized conditional probability `P_m0` $\hat{\boldsymbol{\nu}}$.
+However, we no longer have the summarized individual-level unusual probability $\hat{\boldsymbol{p}}$ and the summarized conditional probability `P_m0`, i.e., $\hat{\boldsymbol{\nu}}$.
 So the practitioners can simply remove the corresponding code of these two statistic for the **Pois-LPCM** implementations.
 
 The following code are the unsupervised **Pois-LPCM** inference for **scenario 1**:
