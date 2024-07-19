@@ -880,3 +880,5 @@ SS1_Scenario1_Directed_ZIPLPCM_Sup_ZIPLPCM_T12k_Beta_1_99_R1 <-
                        sigma2prop_beta=0.06^2,sigma2prop_U=0.06,d=3,z=1:nrow(SS1_Scenario1_Directed_ZIPLPCM$Y),
                        p_eject=0.5,A=SS1_Scenario1_Directed_ZIPLPCM$A,omega_c=1)
 ```
+
+For the rest code, by replacing all the `SS1_Scenario1_Directed_ZIPLPCM_Sup_PoisLPCM_T12k_R1` in the **ZIP-LPCM Sup Beta(1,9)** code by `SS1_Scenario1_Directed_ZIPLPCM_Sup_ZIPLPCM_T12k_Beta_1_1_R1` gives the post-processing of the **ZIP-LPCM Sup Beta(1,1)** case.
