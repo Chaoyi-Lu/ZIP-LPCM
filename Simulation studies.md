@@ -1392,8 +1392,8 @@ orca(Fig1, "SS2_Sce1_Obs_hatU.pdf",scale=1,width=1800,height=850)
 
 
 
-g_obs <- graph_from_adjacency_matrix(SS2_Scenario1_Directed_ZIPSBM$Y,mode = "directed",weighted = TRUE)
-E(g_obs)$color <- colorRampPalette(brewer.pal(9,"Greys")[c(3,9)])(max(SS2_Scenario1_Directed_ZIPSBM$Y))[E(g_obs)$weight]
+g_obs <- graph_from_adjacency_matrix(SS2_Scenario2_Directed_ZIPSBM$Y,mode = "directed",weighted = TRUE)
+E(g_obs)$color <- colorRampPalette(brewer.pal(9,"Greys")[c(3,9)])(max(SS2_Scenario2_Directed_ZIPSBM$Y))[E(g_obs)$weight]
 betw <- betweenness(g_obs) # evaluate the betweeness of the network
 VertexSize <- sqrt(betw/1.5+mean(betw))*1 # set the vertex size
 # Plot the front angle of the latent positions Scenario 2
