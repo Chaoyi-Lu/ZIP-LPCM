@@ -1169,5 +1169,70 @@ SS2_Scenario2_Directed_ZIPSBM_P_m0 <- (SS2_Scenario2_Directed_ZIPSBM_p/(SS2_Scen
   ((SS2_Scenario2_Directed_ZIPSBM$Y+diag(1,nrow(SS2_Scenario2_Directed_ZIPSBM$Y)))==0)
 ```
 
+The heatmap plots of the adjacency matrices of both **scenario 1** and **scenario 2** networks shown in **Figure 4** of the paper can be recovered following:
+
+``` r
+library("RColorBrewer")
+library("pheatmap")
+library("ggplot2")
+
+My_colors <- c(brewer.pal(10,"RdBu")[c(4,7)],brewer.pal(10,"PRGn")[c(7,4)],brewer.pal(9,"YlOrBr")[4],
+               brewer.pal(10,"RdBu")[c(2,9)],brewer.pal(10,"PRGn")[c(9,2)],brewer.pal(9,"YlOrBr")[6],
+               brewer.pal(9,"Reds")[c(9,6)],brewer.pal(9,"RdPu")[5],brewer.pal(9,"Greys")[c(3,6,9)],brewer.pal(9,"GnBu")[5])
+
+SS2_Scenario1_Directed_ZIPSBM_Y_dataframe <- as.data.frame(SS2_Scenario1_Directed_ZIPSBM$Y)
+rownames(SS2_Scenario1_Directed_ZIPSBM_Y_dataframe) <- colnames(SS2_Scenario1_Directed_ZIPSBM_Y_dataframe) <- 1:nrow(SS2_Scenario1_Directed_ZIPSBM$Y)
+
+annotation_row_z_ref <- as.data.frame(as.factor(matrix(SS2_Scenario1_Directed_ZIPSBM$z,length(SS2_Scenario1_Directed_ZIPSBM$z),1)))
+colnames(annotation_row_z_ref) <- "z_ref"
+annotation_colors_z_ref <- My_colors[c(6:10)]
+names(annotation_colors_z_ref) <- sort(unique(annotation_row_z_ref$z_ref))
+
+SS2_Scenario1_Directed_ZIPSBM_Y_dataframe <- as.data.frame(SS2_Scenario1_Directed_ZIPSBM$Y)
+rownames(SS2_Scenario1_Directed_ZIPSBM_Y_dataframe) <- colnames(SS2_Scenario1_Directed_ZIPSBM_Y_dataframe) <- 1:nrow(SS2_Scenario1_Directed_ZIPSBM$Y)
+annotation_row_z_ref <- as.data.frame(as.factor(matrix(SS2_Scenario1_Directed_ZIPSBM$z,length(SS2_Scenario1_Directed_ZIPSBM$z),1)))
+colnames(annotation_row_z_ref) <- "z_ref"
+annotation_colors_z_ref <- My_colors[c(6:10)]
+names(annotation_colors_z_ref) <- sort(unique(annotation_row_z_ref$z_ref))
+SS2_Scenario1_Directed_ZIPSBM_Y_heatmap <-
+  pheatmap(SS2_Scenario1_Directed_ZIPSBM_Y_dataframe[order(SS2_Scenario1_Directed_ZIPSBM$z),order(SS2_Scenario1_Directed_ZIPSBM$z)],
+           color=colorRampPalette(brewer.pal(9,"YlOrRd"))(max(SS2_Scenario1_Directed_ZIPSBM$Y)+1),
+           cluster_cols = FALSE,cluster_rows= FALSE,show_rownames=FALSE,show_colnames=FALSE,border_color=FALSE,legend=TRUE,
+           annotation_row = annotation_row_z_ref,annotation_col = annotation_row_z_ref,
+           annotation_colors=list(z_ref=annotation_colors_z_ref),annotation_names_row=FALSE,annotation_names_col=FALSE,annotation_legend=FALSE,
+           gaps_row=c(which(diff(sort(SS2_Scenario1_Directed_ZIPSBM$z))!=0)),gaps_col=c(which(diff(sort(SS2_Scenario1_Directed_ZIPSBM$z))!=0)))
+
+
+SS2_Scenario2_Directed_ZIPSBM_Y_dataframe <- as.data.frame(SS2_Scenario2_Directed_ZIPSBM$Y)
+rownames(SS2_Scenario2_Directed_ZIPSBM_Y_dataframe) <- colnames(SS2_Scenario2_Directed_ZIPSBM_Y_dataframe) <- 1:nrow(SS2_Scenario2_Directed_ZIPSBM$Y)
+
+annotation_row_z_ref <- as.data.frame(as.factor(matrix(SS2_Scenario2_Directed_ZIPSBM$z,length(SS2_Scenario2_Directed_ZIPSBM$z),1)))
+colnames(annotation_row_z_ref) <- "z_ref"
+annotation_colors_z_ref <- My_colors[c(6:10)]
+names(annotation_colors_z_ref) <- sort(unique(annotation_row_z_ref$z_ref))
+
+SS2_Scenario2_Directed_ZIPSBM_Y_dataframe <- as.data.frame(SS2_Scenario2_Directed_ZIPSBM$Y)
+rownames(SS2_Scenario2_Directed_ZIPSBM_Y_dataframe) <- colnames(SS2_Scenario2_Directed_ZIPSBM_Y_dataframe) <- 1:nrow(SS2_Scenario2_Directed_ZIPSBM$Y)
+annotation_row_z_ref <- as.data.frame(as.factor(matrix(SS2_Scenario2_Directed_ZIPSBM$z,length(SS2_Scenario2_Directed_ZIPSBM$z),1)))
+colnames(annotation_row_z_ref) <- "z_ref"
+annotation_colors_z_ref <- My_colors[c(6:10)]
+names(annotation_colors_z_ref) <- sort(unique(annotation_row_z_ref$z_ref))
+SS2_Scenario2_Directed_ZIPSBM_Y_heatmap <-
+  pheatmap(SS2_Scenario2_Directed_ZIPSBM_Y_dataframe[order(SS2_Scenario2_Directed_ZIPSBM$z),order(SS2_Scenario2_Directed_ZIPSBM$z)],
+           color=colorRampPalette(brewer.pal(9,"YlOrRd"))(max(SS2_Scenario1_Directed_ZIPSBM$Y)+1)[1:(max(SS2_Scenario2_Directed_ZIPSBM$Y)+1)],
+           cluster_cols = FALSE,cluster_rows= FALSE,show_rownames=FALSE,show_colnames=FALSE,border_color=FALSE,legend=TRUE,
+           annotation_row = annotation_row_z_ref,annotation_col = annotation_row_z_ref,
+           annotation_colors=list(z_ref=annotation_colors_z_ref),annotation_names_row=FALSE,annotation_names_col=FALSE,annotation_legend=FALSE,
+           gaps_row=c(which(diff(sort(SS2_Scenario2_Directed_ZIPSBM$z))!=0)),gaps_col=c(which(diff(sort(SS2_Scenario2_Directed_ZIPSBM$z))!=0)))
+
+library("grid")
+library("gridExtra")
+g <- grid.arrange(SS2_Scenario1_Directed_ZIPSBM_Y_heatmap[[4]],
+                  SS2_Scenario2_Directed_ZIPSBM_Y_heatmap[[4]],
+                  nrow=1,ncol=2,vp=viewport(width=1, height=1))
+Fig <- cowplot::ggdraw(g)
+Fig
+```
+
 
 ## 4. Simulation study 2 implementations and post-processing
