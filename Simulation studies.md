@@ -1068,4 +1068,4 @@ SS1_Scenario2_Directed_ZIPLPCM_T12k_beta_1_99_R1 <-
                        p_eject=0.5,A=SS1_Scenario2_Directed_PoisLPCM$A,omega_c=1)
 ```
 
-The post-processing code for the above implementations are also the same as **scenario** cases and finally completes the **Table 1** of the **ZIP-LPCM-MFM** paper.
+The post-processing code for the above implementations are also the same as **scenario 1** cases and finally completes the **Table 1** of the **ZIP-LPCM-MFM** paper.
