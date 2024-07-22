@@ -383,7 +383,7 @@ Fig
 
 ## 2. Simulation study 1 implementations and post-processing
 
-### 2.1 SS1 scenario 1 ZIP-LPCM Sup Beta(1,9) case
+### 2.1 SS1 scenario 1 "ZIP-LPCM Sup Beta(1,9)" case
 
 The supervised undirected partially collapsed Metropolis-within-Gibbs algorithm for **ZIP-LPCM** can be implemented on the **scenario 1** network following the code:
 
@@ -745,7 +745,7 @@ which are small and satisfactory considering that the reference conditional prob
 
 Multiple implementations can be easily applied by changing all the `SS1_Scenario1_Directed_ZIPLPCM_Sup_ZIPLPCM_T12k_R1` above to `SS1_Scenario1_Directed_ZIPLPCM_Sup_ZIPLPCM_T12k_R2`,`SS1_Scenario1_Directed_ZIPLPCM_Sup_ZIPLPCM_T12k_R3`,etc. for more rounds of implementations.
 
-### 2.2 SS1 scenario 1 ZIP-LPCM unSup Beta(1,9) case
+### 2.2 SS1 scenario 1 "ZIP-LPCM unSup Beta(1,9)" case
 
 We follow similar implementations shown above to apply the unsupervised version bringing the **ZIP-LPCM unSup Beta(1,9)** case for **scenario 1** network shown in our ZIP-LPCM-MFM paper:
 
@@ -783,7 +783,7 @@ plot(SS1_Scenario1_Directed_ZIPLPCM_unSup_ZIPLPCM_T12k_R1_LSz_Like,type = "l",xl
 
 For all other code, the practitioners can simply replace all the `SS1_Scenario1_Directed_ZIPLPCM_Sup_ZIPLPCM_T12k_R1` in **ZIP-LPCM unSup Beta(1,9)** code with `SS1_Scenario1_Directed_ZIPLPCM_unSup_ZIPLPCM_T12k_R1`, and then the values of statistics shown in **Table 1** of the paper as well as the heatmap plot of the conditional unusual zero probability can be obtained.
 
-### 2.3 SS1 scenario 1 Pois-LPCM Sup case
+### 2.3 SS1 scenario 1 "Pois-LPCM Sup" case
 
 The implementation code of supervised Pois-LPCM inference, i.e., the **Pois-LPCM Sup** case shown in the paper for **scenario 1**, are also similar, but we need to exclude the code for unusual zero probability part.
 The implementation starts from:
@@ -825,6 +825,8 @@ The rest code for obtaining the summarized distance matrix $\hat{\boldsymbol{D}}
 However, we no longer have the summarized individual-level unusual probability $\hat{\boldsymbol{p}}$ and the summarized conditional probability `P_m0`, i.e., $\hat{\boldsymbol{\nu}}$.
 So the practitioners can simply remove the corresponding code of these two statistic for the **Pois-LPCM** implementations.
 
+### 2.4 SS1 scenario 1 "Pois-LPCM unSup" case
+
 The following code are the unsupervised **Pois-LPCM** inference for **scenario 1**:
 
 ``` r
@@ -860,7 +862,9 @@ plot(SS1_Scenario1_Directed_ZIPLPCM_unSup_PoisLPCM_T12k_R1_LSz_Like,type = "l",x
 
 The rest code are exactly the same as the **Pois-LPCM Sup** case except that all the `SS1_Scenario1_Directed_ZIPLPCM_Sup_PoisLPCM_T12k_R1` should be replaced by `SS1_Scenario1_Directed_ZIPLPCM_unSup_PoisLPCM_T12k_R1`.
 
-Up to this point, we have introduced all the implementation code required in the **SS1** experiments.
+### 2.5 SS1 scenario 1 "ZIP-LPCM Sup Beta(1,1)", "ZIP-LPCM Sup Beta(1,3)", "ZIP-LPCM Sup Beta(1,19)" and "ZIP-LPCM Sup Beta(1,9)" cases
+
+Up to this point, we have introduced all the implementation and post-processing code required in the **SS1** experiments.
 We prefer not to put similar code for different implementations in this tutorial.
 For all the rest experiments shown in the paper, the practitioners can simply replace the variable names of the code shown above to obtain the corresponding results.
 Here we also provide the reference variable names and the corresponding implementation code to begin with for the rest four implementations for **scenario 1** shown in the paper, i.e., **ZIP-LPCM Sup Beta(1,1)**, **ZIP-LPCM Sup Beta(1,3)**, **ZIP-LPCM Sup Beta(1,19)** and **ZIP-LPCM Sup Beta(1,99)**:
@@ -1008,4 +1012,58 @@ roc(SS1_Scenario1_Directed_ZIPLPCM$nu[(SS1_Scenario1_Directed_ZIPLPCM$Y+diag(1,7
 
 Here we end the **simulation study 1 scenario 1** implementations and post-processings.
 
-## 3. Simulation study 1 scenario 2 implementations and post-processing
+### 2.6. SS1 scenario 2 all the eight cases
+
+The implementation code of the cases: **ZIP-LPCM Sup Beta(1,1)**,**ZIP-LPCM Sup Beta(1,3)**, **ZIP-LPCM Sup Beta(1,9)**, **ZIP-LPCM unSup Beta(1,9)**, **ZIP-LPCM Sup Beta(1,19)**, **ZIP-LPCM Sup Beta(1,99)**, **Pois-LPCM Sup** and **Pois-LPCM unSup** for the **scenario 2** synthetic **Pois-LPCM** network are exactly the same as those implemented for the **scenario 1** network shown above.
+We only need to replace the names of the variables in the `R` code:
+
+``` r
+# SS1 Scenario 2 Pois-LPCM network Supervised ZIP-LPCM-MFM implementations with T=12000 Beta(1,9) Round 1
+SS1_Scenario2_Directed_PoisLPCM_Sup_ZIPLPCM_T12k_R1 <- 
+  MwG_Directed_ZIPLPCM(Y = SS1_Scenario2_Directed_PoisLPCM$Y,T = 12000,omega=0.01,alpha1=1,alpha2=0.103,alpha=3,beta1=1,beta2=9,
+                       sigma2prop_beta=0.06^2,sigma2prop_U=0.06,d=3,z=1:nrow(SS1_Scenario2_Directed_PoisLPCM$Y),
+                       p_eject=0.5,A=SS1_Scenario2_Directed_PoisLPCM$A,omega_c=1)
+
+# SS1 Scenario 2 Pois-LPCM network unSupervised ZIP-LPCM-MFM implementations with T=12000 Beta(1,9) Round 1
+SS1_Scenario2_Directed_PoisLPCM_unSup_ZIPLPCM_T12k_R1 <- 
+  MwG_Directed_ZIPLPCM(Y = SS1_Scenario2_Directed_PoisLPCM$Y,T = 12000,omega=0.01,alpha1=1,alpha2=0.103,alpha=3,beta1=1,beta2=9,
+                       sigma2prop_beta=0.06^2,sigma2prop_U=0.06,d=3,z=1:nrow(SS1_Scenario2_Directed_PoisLPCM$Y),
+                       p_eject=0.5)
+
+# SS1 Scenario 2 Pois-LPCM network Supervised Pois-LPCM-MFM implementations with T=12000 Round 1
+SS1_Scenario2_Directed_PoisLPCM_Sup_PoisLPCM_T12k_R1 <- 
+  MwG_Directed_PoissonLPCM(Y = SS1_Scenario2_Directed_PoisLPCM$Y,T = 12000,omega=0.01,alpha1=1,alpha2=0.103,alpha=3,
+                           sigma2prop_beta=0.06^2,sigma2prop_U=0.06,d=3,z=1:nrow(SS1_Scenario2_Directed_PoisLPCM$Y),
+                           p_eject=0.5,A=SS1_Scenario2_Directed_PoisLPCM$A,omega_c=1)
+
+# SS1 Scenario 2 Pois-LPCM network unSupervised Pois-LPCM-MFM implementations with T=12000 Round 1
+SS1_Scenario2_Directed_PoisLPCM_unSup_PoisLPCM_T12k_R1 <- 
+  MwG_Directed_PoissonLPCM(Y = SS1_Scenario2_Directed_PoisLPCM$Y,T = 12000,omega=0.01,alpha1=1,alpha2=0.103,alpha=3,
+                           sigma2prop_beta=0.06^2,sigma2prop_U=0.06,d=3,z=1:nrow(SS1_Scenario2_Directed_PoisLPCM$Y),
+                           p_eject=0.5)
+
+
+# SS1 Scenario 2 Pois-LPCM network Supervised ZIP-LPCM-MFM implementations with T=12000 Beta(1,1) Round 1
+SS1_Scenario2_Directed_ZIPLPCM_T12k_beta_1_1_R1 <- 
+  MwG_Directed_ZIPLPCM(Y = SS1_Scenario2_Directed_PoisLPCM$Y,T = 12000,omega=0.01,alpha1=1,alpha2=0.103,alpha=3,beta1=1,beta2=1,
+                       sigma2prop_beta=0.06^2,sigma2prop_U=0.06,d=3,z=1:nrow(SS1_Scenario2_Directed_PoisLPCM$Y),
+                       p_eject=0.5,A=SS1_Scenario2_Directed_PoisLPCM$A,omega_c=1)
+
+# SS1 Scenario 2 Pois-LPCM network Supervised ZIP-LPCM-MFM implementations with T=12000 Beta(1,3) Round 1
+SS1_Scenario2_Directed_ZIPLPCM_T12k_beta_1_3_R1 <- 
+  MwG_Directed_ZIPLPCM(Y = SS1_Scenario2_Directed_PoisLPCM$Y,T = 12000,omega=0.01,alpha1=1,alpha2=0.103,alpha=3,beta1=1,beta2=3,
+                       sigma2prop_beta=0.06^2,sigma2prop_U=0.06,d=3,z=1:nrow(SS1_Scenario2_Directed_PoisLPCM$Y),
+                       p_eject=0.5,A=SS1_Scenario2_Directed_PoisLPCM$A,omega_c=1)
+
+# SS1 Scenario 2 Pois-LPCM network Supervised ZIP-LPCM-MFM implementations with T=12000 Beta(1,19) Round 1
+SS1_Scenario2_Directed_ZIPLPCM_T12k_beta_1_19_R1 <- 
+  MwG_Directed_ZIPLPCM(Y = SS1_Scenario2_Directed_PoisLPCM$Y,T = 12000,omega=0.01,alpha1=1,alpha2=0.103,alpha=3,beta1=1,beta2=19,
+                       sigma2prop_beta=0.06^2,sigma2prop_U=0.06,d=3,z=1:nrow(SS1_Scenario2_Directed_PoisLPCM$Y),
+                       p_eject=0.5,A=SS1_Scenario2_Directed_PoisLPCM$A,omega_c=1)
+
+# SS1 Scenario 2 Pois-LPCM network Supervised ZIP-LPCM-MFM implementations with T=12000 Beta(1,99) Round 1
+SS1_Scenario2_Directed_ZIPLPCM_T12k_beta_1_99_R1 <- 
+  MwG_Directed_ZIPLPCM(Y = SS1_Scenario2_Directed_PoisLPCM$Y,T = 12000,omega=0.01,alpha1=1,alpha2=0.103,alpha=3,beta1=1,beta2=99,
+                       sigma2prop_beta=0.06^2,sigma2prop_U=0.06,d=3,z=1:nrow(SS1_Scenario2_Directed_PoisLPCM$Y),
+                       p_eject=0.5,A=SS1_Scenario2_Directed_PoisLPCM$A,omega_c=1)
+```
