@@ -1102,13 +1102,14 @@ SS2_Scenario1_Directed_ZIPSBM$Z
 Thus we can store and recover the simulated network via:
 
 ``` r
-# # Create contaminated version of the clustering for the exogenous node attributes
-# SS2_Scenario1_Directed_ZIPSBM_A <- SS2_Scenario1_Directed_ZIPSBM$z
-# SS2_Scenario1_Directed_ZIPSBM_A[sample(length(SS2_Scenario1_Directed_ZIPSBM$z),20)] <- sample(1:5,20,replace=TRUE)
+# Create contaminated version of the clustering for the exogenous node attributes
+SS2_Scenario1_Directed_ZIPSBM_A <- SS2_Scenario1_Directed_ZIPSBM$z
+SS2_Scenario1_Directed_ZIPSBM_A[sample(length(SS2_Scenario1_Directed_ZIPSBM$z),20)] <- sample(1:5,20,replace=TRUE)
 
 # write.csv(SS2_Scenario1_Directed_ZIPSBM$Y,"Datasets/SS2_Scenario1_Directed_ZIPSBM_Y.csv", row.names = FALSE)
 # write.csv(SS2_Scenario1_Directed_ZIPSBM$nu,"Datasets/SS2_Scenario1_Directed_ZIPSBM_nu.csv", row.names = FALSE)
 # write.csv(SS2_Scenario1_Directed_ZIPSBM$z,"Datasets/SS2_Scenario1_Directed_ZIPSBM_z.csv", row.names = FALSE)
+# write.csv(SS2_Scenario1_Directed_ZIPSBM_A,"Datasets/SS2_Scenario1_Directed_ZIPSBM_A.csv", row.names = FALSE)
 
 SS2_Scenario1_Directed_ZIPSBM <- list(Y = as.matrix(read.csv("Datasets/SS2_Scenario1_Directed_ZIPSBM_Y.csv",header = TRUE)),
                                       nu = as.matrix(read.csv("Datasets/SS2_Scenario1_Directed_ZIPSBM_nu.csv",header = TRUE)),
@@ -1136,6 +1137,37 @@ SS2_Scenario1_Directed_ZIPSBM_P_m0 <- (SS2_Scenario1_Directed_ZIPSBM_P_ij/(SS2_S
 where, similar to **SS1** simluations, the `SS2_Scenario1_Directed_ZIPSBM_p` is a $N \times N$ matrix which is the individual-level transformation of the group-level unusual zero probability $K \times K$ matrix $\boldsymbol{P}$ for **SS2 scenario 1**.
 Simiarly, the `SS2_Scenario1_Directed_ZIPSBM_lambda` above is also a $N \times N$ matrix, but is the individual-level transformation of the group-level Poisson rate $\boldsymbol{\lambda}$.
 Recall again here that the `SS2_Scenario1_Directed_ZIPSBM_P_m0` is the reference conditional probability of unusual zero provided that the corresponding interactions are observed as zeros.
+
+The simulation of the **SS2 scenario 2** network is similar to above but with different model parameter settings:
+
+``` r
+# Create contaminated version of the clustering for the exogenous node attributes
+SS2_Scenario2_Directed_ZIPSBM_A <- SS2_Scenario2_Directed_ZIPSBM$z
+SS2_Scenario2_Directed_ZIPSBM_A[sample(length(SS2_Scenario2_Directed_ZIPSBM$z),20)] <- sample(1:5,20,replace=TRUE)
+
+# write.csv(SS2_Scenario2_Directed_ZIPSBM$Y,"Datasets/SS2_Scenario2_Directed_ZIPSBM_Y.csv", row.names = FALSE)
+# write.csv(SS2_Scenario2_Directed_ZIPSBM$nu,"Datasets/SS2_Scenario2_Directed_ZIPSBM_nu.csv", row.names = FALSE)
+# write.csv(SS2_Scenario2_Directed_ZIPSBM$z,"Datasets/SS2_Scenario2_Directed_ZIPSBM_z.csv", row.names = FALSE)
+# write.csv(SS2_Scenario2_Directed_ZIPSBM_A,"Datasets/SS2_Scenario2_Directed_ZIPSBM_A.csv", row.names = FALSE)
+
+SS2_Scenario2_Directed_ZIPSBM <- list(Y = as.matrix(read.csv("Datasets/SS2_Scenario2_Directed_ZIPSBM_Y.csv",header = TRUE)),
+                                      nu = as.matrix(read.csv("Datasets/SS2_Scenario2_Directed_ZIPSBM_nu.csv",header = TRUE)),
+                                      z = c(as.matrix(read.csv("Datasets/SS2_Scenario2_Directed_ZIPSBM_z.csv",header = TRUE))),
+                                      A = c(as.matrix(read.csv("Datasets/SS2_Scenario2_Directed_ZIPSBM_A.csv",header = TRUE))))
+SS2_Scenario2_Directed_ZIPSBM$Z <- t(t(matrix(SS2_Scenario2_Directed_ZIPSBM$z,length(SS2_Scenario2_Directed_ZIPSBM$z),max(SS2_Scenario2_Directed_ZIPSBM$z)))==(1:max(SS2_Scenario2_Directed_ZIPSBM$z)))*1
+colnames(SS2_Scenario2_Directed_ZIPSBM$Y) <- c()
+colnames(SS2_Scenario2_Directed_ZIPSBM$nu) <- c()
+
+SS2_Scenario2_Directed_ZIPSBM_P <- matrix(c(0.4,0.2,0.6,0.2,0.6,  0.6,0.4,0.1,0.05,0.1,  0.2,0.05,0.4,0.1,0.05,
+                                            0.6,0.1,0.05,0.4,0.1,  0.2,0.05,0.1,0.05,0.4),5,5)
+SS2_Scenario2_Directed_ZIPSBM_Lambda <- matrix(c(7.0,2.0,2.0,2.0,2.0,  2.0,4.5,0.5,0.5,0.5,  2.0,0.5,3.5,0.5,0.5,
+                                                 2.0,0.5,0.5,2.0,0.5,  2.0,0.5,0.5,0.5,2.5),5,5)
+SS2_Scenario2_Directed_ZIPSBM_P_ij <- SS2_Scenario2_Directed_ZIPSBM$Z%*%SS2_Scenario2_Directed_ZIPSBM_P%*%t(SS2_Scenario2_Directed_ZIPSBM$Z)
+SS2_Scenario2_Directed_ZIPSBM_Lambda_ij <- SS2_Scenario2_Directed_ZIPSBM$Z%*%SS2_Scenario2_Directed_ZIPSBM_Lambda%*%t(SS2_Scenario2_Directed_ZIPSBM$Z)
+SS2_Scenario2_Directed_ZIPSBM_P_m0 <- (SS2_Scenario2_Directed_ZIPSBM_P_ij/(SS2_Scenario2_Directed_ZIPSBM_P_ij+(1-SS2_Scenario2_Directed_ZIPSBM_P_ij)*
+                                                                             dpois(0,SS2_Scenario2_Directed_ZIPSBM_Lambda_ij)))*
+  ((SS2_Scenario2_Directed_ZIPSBM$Y+diag(1,nrow(SS2_Scenario2_Directed_ZIPSBM$Y)))==0)
+```
 
 
 ## 4. Simulation study 2 implementations and post-processing
