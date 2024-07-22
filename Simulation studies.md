@@ -25,7 +25,7 @@ Here we refer to that file for more details.
 
 ## 1. Simulation study 1 simulations
 
-### 1.1. Simulation study 1 scenario 1
+### 1.1 Simulation study 1 scenario 1
 
 The **scenario 1** network of this first simulation study is randomly generated from a **ZIP-LPCM** with the following code.
 
@@ -243,7 +243,7 @@ table(SS1_Scenario1_Directed_ZIPLPCM$Y[!is.nan((SS1_Scenario1_Directed_ZIPLPCM$Y
 hist(SS1_Scenario1_Directed_ZIPLPCM$Y[!is.nan((SS1_Scenario1_Directed_ZIPLPCM$Y+diag(NaN,75)))],200,xlab = "",ylab = "", main = "")
 ```
 
-### 1.2. Simulation study 1 scenario 2
+### 1.2 Simulation study 1 scenario 2
 
 We follow the similar simulation process above to simulate the **scenario 2** network.
 The **scenario 2** network is randomly generated from a **Pois-LPCM** with the following code.
@@ -381,7 +381,9 @@ Fig <- cowplot::ggdraw(g)
 Fig
 ```
 
-## 2. Simulation study 1 scenario 1 implementations and post-processing
+## 2. Simulation study 1 implementations and post-processing
+
+### 2.1 SS1 scenario 1 ZIP-LPCM Sup Beta(1,9) case
 
 The supervised undirected partially collapsed Metropolis-within-Gibbs algorithm for **ZIP-LPCM** can be implemented on the **scenario 1** network following the code:
 
@@ -743,6 +745,8 @@ which are small and satisfactory considering that the reference conditional prob
 
 Multiple implementations can be easily applied by changing all the `SS1_Scenario1_Directed_ZIPLPCM_Sup_ZIPLPCM_T12k_R1` above to `SS1_Scenario1_Directed_ZIPLPCM_Sup_ZIPLPCM_T12k_R2`,`SS1_Scenario1_Directed_ZIPLPCM_Sup_ZIPLPCM_T12k_R3`,etc. for more rounds of implementations.
 
+### 2.2 SS1 scenario 1 ZIP-LPCM unSup Beta(1,9) case
+
 We follow similar implementations shown above to apply the unsupervised version bringing the **ZIP-LPCM unSup Beta(1,9)** case for **scenario 1** network shown in our ZIP-LPCM-MFM paper:
 
 ``` r
@@ -778,6 +782,8 @@ plot(SS1_Scenario1_Directed_ZIPLPCM_unSup_ZIPLPCM_T12k_R1_LSz_Like,type = "l",xl
 ```
 
 For all other code, the practitioners can simply replace all the `SS1_Scenario1_Directed_ZIPLPCM_Sup_ZIPLPCM_T12k_R1` in **ZIP-LPCM unSup Beta(1,9)** code with `SS1_Scenario1_Directed_ZIPLPCM_unSup_ZIPLPCM_T12k_R1`, and then the values of statistics shown in **Table 1** of the paper as well as the heatmap plot of the conditional unusual zero probability can be obtained.
+
+### 2.3 SS1 scenario 1 Pois-LPCM Sup case
 
 The implementation code of supervised Pois-LPCM inference, i.e., the **Pois-LPCM Sup** case shown in the paper for **scenario 1**, are also similar, but we need to exclude the code for unusual zero probability part.
 The implementation starts from:
