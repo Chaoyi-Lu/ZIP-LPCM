@@ -1337,7 +1337,6 @@ g_obs <- graph_from_adjacency_matrix(SS2_Scenario1_Directed_ZIPSBM$Y,mode = "dir
 E(g_obs)$color <- colorRampPalette(brewer.pal(9,"Greys")[c(3,9)])(max(SS2_Scenario1_Directed_ZIPSBM$Y))[E(g_obs)$weight]
 betw <- betweenness(g_obs) # evaluate the betweeness of the network
 VertexSize <- sqrt(betw/1.5+mean(betw))*1 # set the vertex size
-
 library("plotly")
 # Plot the front angle of the latent positions Scenario 1
 fig1 <- plot_ly(scene ="scene1") %>%
@@ -1391,6 +1390,12 @@ Fig1 <- Fig1 %>% layout(title = "", margin = list(l = 0,r = 0,b = 0,t = 0,pad = 
 # Fig1
 orca(Fig1, "SS2_Sce1_Obs_hatU.pdf",scale=1,width=1800,height=850)
 
+
+
+g_obs <- graph_from_adjacency_matrix(SS2_Scenario1_Directed_ZIPSBM$Y,mode = "directed",weighted = TRUE)
+E(g_obs)$color <- colorRampPalette(brewer.pal(9,"Greys")[c(3,9)])(max(SS2_Scenario1_Directed_ZIPSBM$Y))[E(g_obs)$weight]
+betw <- betweenness(g_obs) # evaluate the betweeness of the network
+VertexSize <- sqrt(betw/1.5+mean(betw))*1 # set the vertex size
 # Plot the front angle of the latent positions Scenario 2
 fig3 <- plot_ly(scene ="scene3") %>%
   add_markers(x = SS2_Scenario2_Directed_ZIPLPCM_T12k_R1_hat_U[,1],
