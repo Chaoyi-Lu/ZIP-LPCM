@@ -1133,8 +1133,9 @@ SS2_Scenario1_Directed_ZIPSBM_P_m0 <- (SS2_Scenario1_Directed_ZIPSBM_P_ij/(SS2_S
   ((SS2_Scenario1_Directed_ZIPSBM$Y+diag(1,nrow(SS2_Scenario1_Directed_ZIPSBM$Y)))==0)
 ```
 
-where, similar as **SS1** simluations, the `SS2_Scenario1_Directed_ZIPSBM_p` is a $N \times N$ matrix which is the individual-level transformation of the group-level unusual zero probability $K \times K$ matrix $\boldsymbol{P}$ for **SS2 scenario 1**.
+where, similar to **SS1** simluations, the `SS2_Scenario1_Directed_ZIPSBM_p` is a $N \times N$ matrix which is the individual-level transformation of the group-level unusual zero probability $K \times K$ matrix $\boldsymbol{P}$ for **SS2 scenario 1**.
 Simiarly, the `SS2_Scenario1_Directed_ZIPSBM_lambda` above is also a $N \times N$ matrix, but is the individual-level transformation of the group-level Poisson rate $\boldsymbol{\lambda}$.
+Recall again here that the `SS2_Scenario1_Directed_ZIPSBM_P_m0` is the reference conditional probability of unusual zero provided that the corresponding interactions are observed as zeros.
 
 
 ## 4. Simulation study 2 implementations and post-processing
