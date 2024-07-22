@@ -25,6 +25,8 @@ Here we refer to that file for more details.
 
 ## 1. Simulation study 1 simulations
 
+### 1.1. Simulation study 1 scenario 1
+
 The **scenario 1** network of this first simulation study is randomly generated from a **ZIP-LPCM** with the following code.
 
 ``` r
@@ -240,6 +242,8 @@ table(SS1_Scenario1_Directed_ZIPLPCM$Y[!is.nan((SS1_Scenario1_Directed_ZIPLPCM$Y
 # Plot the distribution of interaction weights
 hist(SS1_Scenario1_Directed_ZIPLPCM$Y[!is.nan((SS1_Scenario1_Directed_ZIPLPCM$Y+diag(NaN,75)))],200,xlab = "",ylab = "", main = "")
 ```
+
+### 1.2. Simulation study 1 scenario 2
 
 We follow the similar simulation process above to simulate the **scenario 2** network.
 The **scenario 2** network is randomly generated from a **Pois-LPCM** with the following code.
