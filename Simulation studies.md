@@ -1067,3 +1067,5 @@ SS1_Scenario2_Directed_ZIPLPCM_T12k_beta_1_99_R1 <-
                        sigma2prop_beta=0.06^2,sigma2prop_U=0.06,d=3,z=1:nrow(SS1_Scenario2_Directed_PoisLPCM$Y),
                        p_eject=0.5,A=SS1_Scenario2_Directed_PoisLPCM$A,omega_c=1)
 ```
+
+The post-processing code for the above implementations are also the same as **scenario** cases and finally completes the **Table 1** of the **ZIP-LPCM-MFM** paper.
