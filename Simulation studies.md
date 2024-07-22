@@ -1129,8 +1129,8 @@ SS2_Scenario1_Directed_ZIPSBM_Lambda <- matrix(c(7.0,0.5,0.5,0.5,0.5,  0.5,4.5,0
                                                  0.5,0.5,0.5,2.0,0.5,  0.5,0.5,0.5,0.5,2.5),5,5)
 SS2_Scenario1_Directed_ZIPSBM_p <- SS2_Scenario1_Directed_ZIPSBM$Z%*%SS2_Scenario1_Directed_ZIPSBM_P%*%t(SS2_Scenario1_Directed_ZIPSBM$Z)
 SS2_Scenario1_Directed_ZIPSBM_lambda <- SS2_Scenario1_Directed_ZIPSBM$Z%*%SS2_Scenario1_Directed_ZIPSBM_Lambda%*%t(SS2_Scenario1_Directed_ZIPSBM$Z)
-SS2_Scenario1_Directed_ZIPSBM_P_m0 <- (SS2_Scenario1_Directed_ZIPSBM_P_ij/(SS2_Scenario1_Directed_ZIPSBM_P_ij+(1-SS2_Scenario1_Directed_ZIPSBM_P_ij)*
-                                                                             dpois(0,SS2_Scenario1_Directed_ZIPSBM_Lambda_ij)))*
+SS2_Scenario1_Directed_ZIPSBM_P_m0 <- (SS2_Scenario1_Directed_ZIPSBM_p/(SS2_Scenario1_Directed_ZIPSBM_p+(1-SS2_Scenario1_Directed_ZIPSBM_p)*
+                                                                             dpois(0,SS2_Scenario1_Directed_ZIPSBM_lambda)))*
   ((SS2_Scenario1_Directed_ZIPSBM$Y+diag(1,nrow(SS2_Scenario1_Directed_ZIPSBM$Y)))==0)
 ```
 
@@ -1162,10 +1162,10 @@ SS2_Scenario2_Directed_ZIPSBM_P <- matrix(c(0.4,0.2,0.6,0.2,0.6,  0.6,0.4,0.1,0.
                                             0.6,0.1,0.05,0.4,0.1,  0.2,0.05,0.1,0.05,0.4),5,5)
 SS2_Scenario2_Directed_ZIPSBM_Lambda <- matrix(c(7.0,2.0,2.0,2.0,2.0,  2.0,4.5,0.5,0.5,0.5,  2.0,0.5,3.5,0.5,0.5,
                                                  2.0,0.5,0.5,2.0,0.5,  2.0,0.5,0.5,0.5,2.5),5,5)
-SS2_Scenario2_Directed_ZIPSBM_P_ij <- SS2_Scenario2_Directed_ZIPSBM$Z%*%SS2_Scenario2_Directed_ZIPSBM_P%*%t(SS2_Scenario2_Directed_ZIPSBM$Z)
-SS2_Scenario2_Directed_ZIPSBM_Lambda_ij <- SS2_Scenario2_Directed_ZIPSBM$Z%*%SS2_Scenario2_Directed_ZIPSBM_Lambda%*%t(SS2_Scenario2_Directed_ZIPSBM$Z)
-SS2_Scenario2_Directed_ZIPSBM_P_m0 <- (SS2_Scenario2_Directed_ZIPSBM_P_ij/(SS2_Scenario2_Directed_ZIPSBM_P_ij+(1-SS2_Scenario2_Directed_ZIPSBM_P_ij)*
-                                                                             dpois(0,SS2_Scenario2_Directed_ZIPSBM_Lambda_ij)))*
+SS2_Scenario2_Directed_ZIPSBM_p <- SS2_Scenario2_Directed_ZIPSBM$Z%*%SS2_Scenario2_Directed_ZIPSBM_P%*%t(SS2_Scenario2_Directed_ZIPSBM$Z)
+SS2_Scenario2_Directed_ZIPSBM_lambda <- SS2_Scenario2_Directed_ZIPSBM$Z%*%SS2_Scenario2_Directed_ZIPSBM_Lambda%*%t(SS2_Scenario2_Directed_ZIPSBM$Z)
+SS2_Scenario2_Directed_ZIPSBM_P_m0 <- (SS2_Scenario2_Directed_ZIPSBM_p/(SS2_Scenario2_Directed_ZIPSBM_p+(1-SS2_Scenario2_Directed_ZIPSBM_p)*
+                                                                             dpois(0,SS2_Scenario2_Directed_ZIPSBM_lambda)))*
   ((SS2_Scenario2_Directed_ZIPSBM$Y+diag(1,nrow(SS2_Scenario2_Directed_ZIPSBM$Y)))==0)
 ```
 
