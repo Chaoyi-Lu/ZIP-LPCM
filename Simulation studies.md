@@ -1545,6 +1545,11 @@ print(SS2_Scenario1_Directed_ZIPSBM_Sup_ZIPLPCM_T12k_R1_hat_P_m0_heatmap_draw)
 SS2_Scenario2_Directed_ZIPSBM_Sup_ZIPLPCM_T12k_R1_hat_nu <-
   Reduce("+",SS2_Scenario2_Directed_ZIPSBM_Sup_ZIPLPCM_T12k_R1$nu[iteration_after_burn_in])/length(iteration_after_burn_in)
 
+annotation_row_z_ref <- as.data.frame(as.factor(matrix(SS2_Scenario2_Directed_ZIPSBM$z,length(SS2_Scenario2_Directed_ZIPSBM$z),1)))
+colnames(annotation_row_z_ref) <- "z_ref"
+annotation_colors_z_ref <- My_colors[c(6:10)]
+names(annotation_colors_z_ref) <- sort(unique(annotation_row_z_ref$z_ref))
+
 # Plot the reference P_m0 | hat_z for SS2 scenario 2
 SS2_Scenario2_Directed_ZIPSBM_P_m0_dataframe <- as.data.frame(SS2_Scenario2_Directed_ZIPSBM_P_m0)
 rownames(SS2_Scenario2_Directed_ZIPSBM_P_m0_dataframe) <- colnames(SS2_Scenario2_Directed_ZIPSBM_P_m0_dataframe) <- 1:nrow(SS2_Scenario2_Directed_ZIPSBM$Y)
@@ -1685,4 +1690,72 @@ SS2_Scenario2_Directed_ZIPSBM_Sup_ZIPLPCM_T12k_beta_1_99_R1 <-
   MwG_Directed_ZIPLPCM(Y = SS2_Scenario2_Directed_ZIPSBM$Y,T = 12000,omega=0.01,alpha1=1,alpha2=0.103,alpha=3,beta1=1,beta2=99,
                        sigma2prop_beta=0.06^2,sigma2prop_U=0.06,d=3,z=1:nrow(SS2_Scenario2_Directed_ZIPSBM$Y),
                        p_eject=0.5,A=SS2_Scenario2_Directed_ZIPSBM$A,omega_c=1)
+```
+
+Once we obtained the $\hat{\boldsymbol{\nu}}$ for the **ZIP-LPCM Sup Beta(1,19)** case for boths scenarios, i.e., `SS2_Scenario1_Directed_ZIPSBM_Sup_ZIPLPCM_T12k_beta_1_19_R1_hat_nu` and `SS2_Scenario2_Directed_ZIPSBM_Sup_ZIPLPCM_T12k_beta_1_19_R1_hat_nu`, the 3rd column heatmap plots of **Figure 6** can be produced along with the corresponding mean and standard deviation of the absolute error between the reference and the summarized `P_m0` for each iteration following:
+
+``` r
+library("RColorBrewer")
+library("pheatmap")
+library("ggplot2")
+
+My_colors <- c(brewer.pal(10,"RdBu")[c(4,7)],brewer.pal(10,"PRGn")[c(7,4)],brewer.pal(9,"YlOrBr")[4],
+               brewer.pal(10,"RdBu")[c(2,9)],brewer.pal(10,"PRGn")[c(9,2)],brewer.pal(9,"YlOrBr")[6],
+               brewer.pal(9,"Reds")[c(9,6)],brewer.pal(9,"RdPu")[5],brewer.pal(9,"Greys")[c(3,6,9)],brewer.pal(9,"GnBu")[5])
+
+# Initialize the left and top bar of the reference clustering for SS2 scenario 1
+annotation_row_z_ref <- as.data.frame(as.factor(matrix(SS2_Scenario1_Directed_ZIPSBM$z,length(SS2_Scenario1_Directed_ZIPSBM$z),1)))
+colnames(annotation_row_z_ref) <- "z_ref"
+annotation_colors_z_ref <- My_colors[c(6:10)]
+names(annotation_colors_z_ref) <- sort(unique(annotation_row_z_ref$z_ref))
+
+# Plot the summarized P_m0 which is hat_nu | hat_z for SS2 scenario 1
+SS2_Scenario1_Directed_ZIPSBM_Sup_ZIPLPCM_T12k_beta_1_19_R1_hat_nu_dataframe <- as.data.frame(SS2_Scenario1_Directed_ZIPSBM_Sup_ZIPLPCM_T12k_beta_1_19_R1_hat_nu)
+rownames(SS2_Scenario1_Directed_ZIPSBM_Sup_ZIPLPCM_T12k_beta_1_19_R1_hat_nu_dataframe) <- colnames(SS2_Scenario1_Directed_ZIPSBM_Sup_ZIPLPCM_T12k_beta_1_19_R1_hat_nu_dataframe) <- 1:nrow(SS2_Scenario1_Directed_ZIPSBM$Y)
+
+SS2_Scenario1_Directed_ZIPSBM_Sup_ZIPLPCM_T12k_beta_1_19_R1_hat_P_m0_heatmap <-
+  pheatmap(SS2_Scenario1_Directed_ZIPSBM_Sup_ZIPLPCM_T12k_beta_1_19_R1_hat_nu_dataframe[order(SS2_Scenario1_Directed_ZIPSBM_Sup_ZIPLPCM_T12k_beta_1_19_R1_hat_z),order(SS2_Scenario1_Directed_ZIPSBM_Sup_ZIPLPCM_T12k_beta_1_19_R1_hat_z)],
+           color=colorRampPalette(brewer.pal(9,"YlOrRd"))(100),cluster_cols = FALSE,cluster_rows= FALSE,show_rownames=FALSE,show_colnames=FALSE,border_color=FALSE,legend=TRUE,
+           annotation_row = annotation_row_z_ref,annotation_col = annotation_row_z_ref,
+           annotation_colors=list(z_ref=annotation_colors_z_ref),annotation_names_row=FALSE,annotation_names_col=FALSE,annotation_legend=FALSE,
+           gaps_row=c(which(diff(sort(SS2_Scenario1_Directed_ZIPSBM_Sup_ZIPLPCM_T12k_beta_1_19_R1_hat_z))!=0)),gaps_col=c(which(diff(sort(SS2_Scenario1_Directed_ZIPSBM_Sup_ZIPLPCM_T12k_beta_1_19_R1_hat_z))!=0)))
+SS2_Scenario1_Directed_ZIPSBM_Sup_ZIPLPCM_T12k_beta_1_19_R1_hat_P_m0_heatmap_draw <- cowplot::ggdraw(SS2_Scenario1_Directed_ZIPSBM_Sup_ZIPLPCM_T12k_beta_1_19_R1_hat_P_m0_heatmap[[4]])+ theme(plot.background =element_rect(fill=brewer.pal(9,"Greys")[3]))
+print(SS2_Scenario1_Directed_ZIPSBM_Sup_ZIPLPCM_T12k_beta_1_19_R1_hat_P_m0_heatmap_draw)
+
+# Mean and sd of the absolute error between the summarized and reference P_m0 for SS2 scenario 1
+mean(SS2_Scenario1_Directed_ZIPSBM_Sup_ZIPLPCM_T12k_beta_1_19_R1_hat_nu[(SS2_Scenario1_Directed_ZIPSBM$Y+diag(1,nrow(SS2_Scenario1_Directed_ZIPSBM$Y)))==0]-
+       SS2_Scenario1_Directed_ZIPSBM_P_m0[(SS2_Scenario1_Directed_ZIPSBM$Y+diag(1,nrow(SS2_Scenario1_Directed_ZIPSBM$Y)))==0])
+# 0.05020571
+sd(SS2_Scenario1_Directed_ZIPSBM_Sup_ZIPLPCM_T12k_beta_1_19_R1_hat_nu[(SS2_Scenario1_Directed_ZIPSBM$Y+diag(1,nrow(SS2_Scenario1_Directed_ZIPSBM$Y)))==0]-
+     SS2_Scenario1_Directed_ZIPSBM_P_m0[(SS2_Scenario1_Directed_ZIPSBM$Y+diag(1,nrow(SS2_Scenario1_Directed_ZIPSBM$Y)))==0])
+# 0.03421558
+
+#---------------------------------------------------------------------------------------
+
+# Initialize the left and top bar of the reference clustering for SS2 scenario 2
+annotation_row_z_ref <- as.data.frame(as.factor(matrix(SS2_Scenario2_Directed_ZIPSBM$z,length(SS2_Scenario2_Directed_ZIPSBM$z),1)))
+colnames(annotation_row_z_ref) <- "z_ref"
+annotation_colors_z_ref <- My_colors[c(6:10)]
+names(annotation_colors_z_ref) <- sort(unique(annotation_row_z_ref$z_ref))
+
+# Plot the summarized P_m0 which is hat_nu | hat_z for SS2 scenario 2
+SS2_Scenario2_Directed_ZIPSBM_Sup_ZIPLPCM_T12k_beta_1_19_R1_hat_nu_dataframe <- as.data.frame(SS2_Scenario2_Directed_ZIPSBM_Sup_ZIPLPCM_T12k_beta_1_19_R1_hat_nu)
+rownames(SS2_Scenario2_Directed_ZIPSBM_Sup_ZIPLPCM_T12k_beta_1_19_R1_hat_nu_dataframe) <- colnames(SS2_Scenario2_Directed_ZIPSBM_Sup_ZIPLPCM_T12k_beta_1_19_R1_hat_nu_dataframe) <- 1:nrow(SS2_Scenario2_Directed_ZIPSBM$Y)
+
+SS2_Scenario2_Directed_ZIPSBM_Sup_ZIPLPCM_T12k_beta_1_19_R1_hat_P_m0_heatmap <-
+  pheatmap(SS2_Scenario2_Directed_ZIPSBM_Sup_ZIPLPCM_T12k_beta_1_19_R1_hat_nu_dataframe[order(SS2_Scenario2_Directed_ZIPSBM_Sup_ZIPLPCM_T12k_beta_1_19_R1_hat_z),order(SS2_Scenario2_Directed_ZIPSBM_Sup_ZIPLPCM_T12k_beta_1_19_R1_hat_z)],
+           color=colorRampPalette(brewer.pal(9,"YlOrRd"))(100),cluster_cols = FALSE,cluster_rows= FALSE,show_rownames=FALSE,show_colnames=FALSE,border_color=FALSE,legend=TRUE,
+           annotation_row = annotation_row_z_ref,annotation_col = annotation_row_z_ref,
+           annotation_colors=list(z_ref=annotation_colors_z_ref),annotation_names_row=FALSE,annotation_names_col=FALSE,annotation_legend=FALSE,
+           gaps_row=c(which(diff(sort(SS2_Scenario2_Directed_ZIPSBM_Sup_ZIPLPCM_T12k_beta_1_19_R1_hat_z))!=0)),gaps_col=c(which(diff(sort(SS2_Scenario2_Directed_ZIPSBM_Sup_ZIPLPCM_T12k_beta_1_19_R1_hat_z))!=0)))
+SS2_Scenario2_Directed_ZIPSBM_Sup_ZIPLPCM_T12k_beta_1_19_R1_hat_P_m0_heatmap_draw <- cowplot::ggdraw(SS2_Scenario2_Directed_ZIPSBM_Sup_ZIPLPCM_T12k_beta_1_19_R1_hat_P_m0_heatmap[[4]])+ theme(plot.background =element_rect(fill=brewer.pal(9,"Greys")[3]))
+print(SS2_Scenario2_Directed_ZIPSBM_Sup_ZIPLPCM_T12k_beta_1_19_R1_hat_P_m0_heatmap_draw)
+
+# Mean and sd of the absolute error between the summarized and reference P_m0 for SS2 scenario 2
+mean(SS2_Scenario2_Directed_ZIPSBM_Sup_ZIPLPCM_T12k_beta_1_19_R1_hat_nu[(SS2_Scenario2_Directed_ZIPSBM$Y+diag(1,nrow(SS2_Scenario2_Directed_ZIPSBM$Y)))==0]-
+       SS2_Scenario2_Directed_ZIPSBM_P_m0[(SS2_Scenario2_Directed_ZIPSBM$Y+diag(1,nrow(SS2_Scenario2_Directed_ZIPSBM$Y)))==0])
+# 0.08558987
+sd(SS2_Scenario2_Directed_ZIPSBM_Sup_ZIPLPCM_T12k_beta_1_19_R1_hat_nu[(SS2_Scenario2_Directed_ZIPSBM$Y+diag(1,nrow(SS2_Scenario2_Directed_ZIPSBM$Y)))==0]-
+     SS2_Scenario2_Directed_ZIPSBM_P_m0[(SS2_Scenario2_Directed_ZIPSBM$Y+diag(1,nrow(SS2_Scenario2_Directed_ZIPSBM$Y)))==0])
+# 0.1179308
 ```
