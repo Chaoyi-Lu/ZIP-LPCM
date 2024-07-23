@@ -1256,7 +1256,7 @@ SS2_Scenario2_Directed_ZIPSBM_Sup_ZIPLPCM_T12k_R1 <-
 Following the similar post-processing code as **SS1**, we can obtain the label-switched clustering; Procrustes-transformed latent positions; traceplot of the complete likelihoods; the point estimates of the clustering and the latent positions: $\hat{\boldsymbol{z}}$ and $\hat{\boldsymbol{U}}$; the summarized intercept $\hat{\beta}$; the approximated conditional unusual zero probability $\hat{\boldsymbol{\nu}}$ and so on.
 
 These post-processing results can help us complete the 2nd to 4th column of **Table 2** for the **ZIP-LPCM Sup Beta(1,9)** case in both scenarios.
-Based on the $\hat{\boldsymbol{z}}$ and $\hat{\boldsymbol{U}}$ we obtained for both scenarios, i.e., `SS2_Scenario2_Directed_ZIPSBM_Sup_ZIPLPCM_T12k_R1_hat_U`, `SS2_Scenario2_Directed_ZIPSBM_Sup_ZIPLPCM_T12k_R1_hat_z` and `SS2_Scenario1_Directed_ZIPSBM_Sup_ZIPLPCM_T12k_R1_hat_U`, `SS2_Scenario1_Directed_ZIPSBM_Sup_ZIPLPCM_T12k_R1_hat_z`, we can obtain the corresponding interactive 3-d plots following the code below.
+Based on the $\hat{\boldsymbol{z}}$ and $\hat{\boldsymbol{U}}$ we obtained for both scenarios, i.e., `SS2_Scenario1_Directed_ZIPSBM_Sup_ZIPLPCM_T12k_R1_hat_U`, `SS2_Scenario1_Directed_ZIPSBM_Sup_ZIPLPCM_T12k_R1_hat_z` and `SS2_Scenario2_Directed_ZIPSBM_Sup_ZIPLPCM_T12k_R1_hat_U`, `SS2_Scenario2_Directed_ZIPSBM_Sup_ZIPLPCM_T12k_R1_hat_z`, we can obtain the corresponding interactive 3-d plots following the code below.
 
 ``` r
 library("igraph")
