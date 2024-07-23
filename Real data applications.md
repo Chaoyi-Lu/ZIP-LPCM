@@ -210,6 +210,14 @@ RDA_criminalNet <- list(Y = as.matrix(read.csv("Datasets/CriminalNet_Y.csv",head
 colnames(RDA_criminalNet$Y) <- c()
 ```
 
+## 2. Implementations and post processing
+
+For each real network, the inference algorithm was implemented for 60,000 iterations with 30,000-iteration burn-in in order for sufficient mixing.
+All the **RDA** output shown in the **ZIP-LPCM-MFM** paper are reproducible by setting the random number generator (RNG) seed by `set.seed(1)`.
+However, the practitioners are free to apply the methods without a seed by setting `set.seed(NULL)`.
+
+### 2.1 Sampson Monks
+
 
 
 
