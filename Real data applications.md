@@ -9,6 +9,10 @@ gc()
 source("Functions.R")
 ```
 
+## 1. Loading real networks
+
+### 1.1 Sampson monks
+
 The 1st real network is the **Sampson Monks** network which is publicly available in the `latentnet` package following:
 
 ``` r
@@ -71,3 +75,32 @@ sampson_monks_group_cloisterville_NodeA
 
 which brings our exogenous node attributes we used in practice.
 
+### 2.2 Windsurfers and Train bombing
+
+Both of the **Windsurfers** and the **Train bombing** real networks are publicly avaiable at the website [http://konect.cc/networks/](http://konect.cc/networks/).
+We also upload the real data at [`Datasets/windsurfers.txt`] and [`Datasets/train_bombing.txt`] of this repository, and the networks can be directly extracted by:
+
+``` r
+Windsurfers <- read.table("Datasets/windsurfers.txt", skip=2, sep="")
+Train_bombing <- read.table("Datasets/train_bombing.txt", skip=2, sep="")
+```
+
+The corresponding adjacency matrices can be obtained following:
+
+``` r
+# Windsurfers Network Dataset, UnDirected
+library(igraph) 
+Windsurfers_graph <- graph_from_edgelist(as.matrix(Windsurfers[,1:2]))
+Windsurfers_graph <- set_edge_attr(graph=Windsurfers_graph, name="Weight", value=c(Windsurfers[,3]))
+Windsurfers_adj <- as.matrix(get.adjacency(Windsurfers_graph,attr = "Weight"))
+library(gdata)
+lowerTriangle(Windsurfers_adj,byrow=TRUE) <- upperTriangle(Windsurfers_adj)
+
+# Train bombing Network Dataset, UnDirected
+library(igraph) 
+Train_bombing_graph <- graph_from_edgelist(as.matrix(Train_bombing[,1:2]))
+Train_bombing_graph <- set_edge_attr(graph=Train_bombing_graph, name="Weight", value=c(Train_bombing[,3]))
+Train_bombing_adj <- as.matrix(get.adjacency(Train_bombing_graph,attr = "Weight"))
+library(gdata)
+lowerTriangle(Train_bombing_adj,byrow=TRUE) <- upperTriangle(Train_bombing_adj)
+```
