@@ -112,6 +112,7 @@ We refer to the [GitHub page](https://github.com/danieledurante/ESBM/blob/master
 
 ``` r
 A <- read.csv(file="Datasets/NDRANGHETAMAFIA_2M.csv",header=TRUE, stringsAsFactors = TRUE)
+# Correct the recorded data based on the judicial acts
 A[23,20] <- 1
 A[48,23] <- 1
 A[78,35] <- 1
