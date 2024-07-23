@@ -1273,20 +1273,20 @@ betw <- betweenness(g_obs)
 VertexSize <- sqrt(betw/1.5+mean(betw))*1
 library("plotly")
 fig <- plot_ly() %>% 
-  add_markers(x = SS2_Scenario1_Directed_ZIPLPCM_T12k_R1_hat_U[,1],
-              y = SS2_Scenario1_Directed_ZIPLPCM_T12k_R1_hat_U[,2],
-              z = SS2_Scenario1_Directed_ZIPLPCM_T12k_R1_hat_U[,3],
+  add_markers(x = SS2_Scenario1_Directed_ZIPSBM_Sup_ZIPLPCM_T12k_R1_hat_U[,1],
+              y = SS2_Scenario1_Directed_ZIPSBM_Sup_ZIPLPCM_T12k_R1_hat_U[,2],
+              z = SS2_Scenario1_Directed_ZIPSBM_Sup_ZIPLPCM_T12k_R1_hat_U[,3],
               text=paste("Node:",1:nrow(SS2_Scenario1_Directed_ZIPSBM$Y),"<br>z_ref:",SS2_Scenario1_Directed_ZIPSBM$z),
               size=VertexSize,sizes=c(200,400),
-              color=as.factor(SS2_Scenario1_Directed_ZIPLPCM_T12k_R1_hat_z),
+              color=as.factor(SS2_Scenario1_Directed_ZIPSBM_Sup_ZIPLPCM_T12k_R1_hat_z),
               colors=My_colors[6:10]
   )
 Edges <- get.edgelist(g_obs)
 for (i in 1:nrow(Edges)){
   fig <- fig %>%
-    add_trace(x = SS2_Scenario1_Directed_ZIPLPCM_T12k_R1_hat_U[Edges[i,],1],
-              y = SS2_Scenario1_Directed_ZIPLPCM_T12k_R1_hat_U[Edges[i,],2],
-              z = SS2_Scenario1_Directed_ZIPLPCM_T12k_R1_hat_U[Edges[i,],3],
+    add_trace(x = SS2_Scenario1_Directed_ZIPSBM_Sup_ZIPLPCM_T12k_R1_hat_U[Edges[i,],1],
+              y = SS2_Scenario1_Directed_ZIPSBM_Sup_ZIPLPCM_T12k_R1_hat_U[Edges[i,],2],
+              z = SS2_Scenario1_Directed_ZIPSBM_Sup_ZIPLPCM_T12k_R1_hat_U[Edges[i,],3],
               text=paste("Weight:",E(g_obs)$weight[i],"<br>UpperDiag?:",Edges[i,1]<Edges[i,2]),
               type = "scatter3d", mode = "lines", showlegend = FALSE,line = list(color = E(g_obs)$color[i], width = 0.25*E(g_obs)$weight[i]))
 }
@@ -1300,20 +1300,20 @@ betw <- betweenness(g_obs)
 VertexSize <- sqrt(betw/1.5+mean(betw))*1
 library("plotly")
 fig <- plot_ly() %>%
-  add_markers(x = SS2_Scenario2_Directed_ZIPLPCM_T12k_R1_hat_U[,1],
-              y = SS2_Scenario2_Directed_ZIPLPCM_T12k_R1_hat_U[,2],
-              z = SS2_Scenario2_Directed_ZIPLPCM_T12k_R1_hat_U[,3],
+  add_markers(x = SS2_Scenario2_Directed_ZIPSBM_Sup_ZIPLPCM_T12k_R1_hat_U[,1],
+              y = SS2_Scenario2_Directed_ZIPSBM_Sup_ZIPLPCM_T12k_R1_hat_U[,2],
+              z = SS2_Scenario2_Directed_ZIPSBM_Sup_ZIPLPCM_T12k_R1_hat_U[,3],
               text=paste("Node:",1:nrow(SS2_Scenario2_Directed_ZIPSBM$Y),"<br>z_ref:",SS2_Scenario2_Directed_ZIPSBM$z),
               size=VertexSize,sizes=c(200,400),
-              color=as.factor(SS2_Scenario2_Directed_ZIPLPCM_T12k_R1_hat_z),
+              color=as.factor(SS2_Scenario2_Directed_ZIPSBM_Sup_ZIPLPCM_T12k_R1_hat_z),
               colors=My_colors[6:10]
   )
 Edges <- get.edgelist(g_obs)
 for (i in 1:nrow(Edges)){
   fig <- fig %>%
-    add_trace(x = SS2_Scenario2_Directed_ZIPLPCM_T12k_R1_hat_U[Edges[i,],1],
-              y = SS2_Scenario2_Directed_ZIPLPCM_T12k_R1_hat_U[Edges[i,],2],
-              z = SS2_Scenario2_Directed_ZIPLPCM_T12k_R1_hat_U[Edges[i,],3],
+    add_trace(x = SS2_Scenario2_Directed_ZIPSBM_Sup_ZIPLPCM_T12k_R1_hat_U[Edges[i,],1],
+              y = SS2_Scenario2_Directed_ZIPSBM_Sup_ZIPLPCM_T12k_R1_hat_U[Edges[i,],2],
+              z = SS2_Scenario2_Directed_ZIPSBM_Sup_ZIPLPCM_T12k_R1_hat_U[Edges[i,],3],
               text=paste("Weight:",E(g_obs)$weight[i],"<br>UpperDiag?:",Edges[i,1]<Edges[i,2]),
               type = "scatter3d", mode = "lines", showlegend = FALSE,line = list(color = E(g_obs)$color[i], width = 0.25*E(g_obs)$weight[i]))
 }
@@ -1337,22 +1337,23 @@ g_obs <- graph_from_adjacency_matrix(SS2_Scenario1_Directed_ZIPSBM$Y,mode = "dir
 E(g_obs)$color <- colorRampPalette(brewer.pal(9,"Greys")[c(3,9)])(max(SS2_Scenario1_Directed_ZIPSBM$Y))[E(g_obs)$weight]
 betw <- betweenness(g_obs) # evaluate the betweeness of the network
 VertexSize <- sqrt(betw/1.5+mean(betw))*1 # set the vertex size
+
 library("plotly")
 # Plot the front angle of the latent positions Scenario 1
 fig1 <- plot_ly(scene ="scene1") %>%
-  add_markers(x = SS2_Scenario1_Directed_ZIPLPCM_T12k_R1_hat_U[,1],
-              y = SS2_Scenario1_Directed_ZIPLPCM_T12k_R1_hat_U[,2],
-              z = SS2_Scenario1_Directed_ZIPLPCM_T12k_R1_hat_U[,3],
+  add_markers(x = SS2_Scenario1_Directed_ZIPSBM_Sup_ZIPLPCM_T12k_R1_hat_U[,1],
+              y = SS2_Scenario1_Directed_ZIPSBM_Sup_ZIPLPCM_T12k_R1_hat_U[,2],
+              z = SS2_Scenario1_Directed_ZIPSBM_Sup_ZIPLPCM_T12k_R1_hat_U[,3],
               text=paste("Node:",1:nrow(SS2_Scenario1_Directed_ZIPSBM$Y),"<br>z*:",SS2_Scenario1_Directed_ZIPSBM$z),
               size=VertexSize,sizes=c(200,400),showlegend = TRUE,
-              color=as.factor(SS2_Scenario1_Directed_ZIPLPCM_T12k_R1_hat_z),colors=My_colors[6:10]
+              color=as.factor(SS2_Scenario1_Directed_ZIPSBM_Sup_ZIPLPCM_T12k_R1_hat_z),colors=My_colors[6:10]
   )
 Edges <- get.edgelist(g_obs)
 for (i in 1:nrow(Edges)){
   fig1 <- fig1 %>%
-    add_trace(x = SS2_Scenario1_Directed_ZIPLPCM_T12k_R1_hat_U[Edges[i,],1],
-              y = SS2_Scenario1_Directed_ZIPLPCM_T12k_R1_hat_U[Edges[i,],2],
-              z = SS2_Scenario1_Directed_ZIPLPCM_T12k_R1_hat_U[Edges[i,],3],
+    add_trace(x = SS2_Scenario1_Directed_ZIPSBM_Sup_ZIPLPCM_T12k_R1_hat_U[Edges[i,],1],
+              y = SS2_Scenario1_Directed_ZIPSBM_Sup_ZIPLPCM_T12k_R1_hat_U[Edges[i,],2],
+              z = SS2_Scenario1_Directed_ZIPSBM_Sup_ZIPLPCM_T12k_R1_hat_U[Edges[i,],3],
               text=paste("Weight:",E(g_obs)$weight[i],"<br>UpperDiag?:",Edges[i,1]<Edges[i,2]),
               type = "scatter3d", mode = "lines", showlegend = FALSE,line = list(color = E(g_obs)$color[i], width = 0.25*E(g_obs)$weight[i]))
 }
@@ -1360,19 +1361,19 @@ for (i in 1:nrow(Edges)){
 
 # Plot the right angle of the latent positions Scenario 1
 fig2 <- plot_ly(scene ="scene2") %>%
-  add_markers(x = SS2_Scenario1_Directed_ZIPLPCM_T12k_R1_hat_U[,1],
-              y = SS2_Scenario1_Directed_ZIPLPCM_T12k_R1_hat_U[,2],
-              z = SS2_Scenario1_Directed_ZIPLPCM_T12k_R1_hat_U[,3],
+  add_markers(x = SS2_Scenario1_Directed_ZIPSBM_Sup_ZIPLPCM_T12k_R1_hat_U[,1],
+              y = SS2_Scenario1_Directed_ZIPSBM_Sup_ZIPLPCM_T12k_R1_hat_U[,2],
+              z = SS2_Scenario1_Directed_ZIPSBM_Sup_ZIPLPCM_T12k_R1_hat_U[,3],
               text=paste("Node:",1:nrow(SS2_Scenario1_Directed_ZIPSBM$Y),"<br>z*:",SS2_Scenario1_Directed_ZIPSBM$z),
               size=VertexSize,sizes=c(200,400),showlegend = FALSE,
-              color=as.factor(SS2_Scenario1_Directed_ZIPLPCM_T12k_R1_hat_z),colors=My_colors[6:10]
+              color=as.factor(SS2_Scenario1_Directed_ZIPSBM_Sup_ZIPLPCM_T12k_R1_hat_z),colors=My_colors[6:10]
   )
 Edges <- get.edgelist(g_obs)
 for (i in 1:nrow(Edges)){
   fig2 <- fig2 %>%
-    add_trace(x = SS2_Scenario1_Directed_ZIPLPCM_T12k_R1_hat_U[Edges[i,],1],
-              y = SS2_Scenario1_Directed_ZIPLPCM_T12k_R1_hat_U[Edges[i,],2],
-              z = SS2_Scenario1_Directed_ZIPLPCM_T12k_R1_hat_U[Edges[i,],3],
+    add_trace(x = SS2_Scenario1_Directed_ZIPSBM_Sup_ZIPLPCM_T12k_R1_hat_U[Edges[i,],1],
+              y = SS2_Scenario1_Directed_ZIPSBM_Sup_ZIPLPCM_T12k_R1_hat_U[Edges[i,],2],
+              z = SS2_Scenario1_Directed_ZIPSBM_Sup_ZIPLPCM_T12k_R1_hat_U[Edges[i,],3],
               text=paste("Weight:",E(g_obs)$weight[i],"<br>UpperDiag?:",Edges[i,1]<Edges[i,2]),
               type = "scatter3d", mode = "lines", showlegend = FALSE,line = list(color = E(g_obs)$color[i], width = 0.25*E(g_obs)$weight[i]))
 }
@@ -1391,26 +1392,25 @@ Fig1 <- Fig1 %>% layout(title = "", margin = list(l = 0,r = 0,b = 0,t = 0,pad = 
 orca(Fig1, "SS2_Sce1_Obs_hatU.pdf",scale=1,width=1800,height=850)
 
 
-
 g_obs <- graph_from_adjacency_matrix(SS2_Scenario2_Directed_ZIPSBM$Y,mode = "directed",weighted = TRUE)
 E(g_obs)$color <- colorRampPalette(brewer.pal(9,"Greys")[c(3,9)])(max(SS2_Scenario2_Directed_ZIPSBM$Y))[E(g_obs)$weight]
 betw <- betweenness(g_obs) # evaluate the betweeness of the network
 VertexSize <- sqrt(betw/1.5+mean(betw))*1 # set the vertex size
 # Plot the front angle of the latent positions Scenario 2
 fig3 <- plot_ly(scene ="scene3") %>%
-  add_markers(x = SS2_Scenario2_Directed_ZIPLPCM_T12k_R1_hat_U[,1],
-              y = SS2_Scenario2_Directed_ZIPLPCM_T12k_R1_hat_U[,2],
-              z = SS2_Scenario2_Directed_ZIPLPCM_T12k_R1_hat_U[,3],
+  add_markers(x = SS2_Scenario2_Directed_ZIPSBM_Sup_ZIPLPCM_T12k_R1_hat_U[,1],
+              y = SS2_Scenario2_Directed_ZIPSBM_Sup_ZIPLPCM_T12k_R1_hat_U[,2],
+              z = SS2_Scenario2_Directed_ZIPSBM_Sup_ZIPLPCM_T12k_R1_hat_U[,3],
               text=paste("Node:",1:nrow(SS2_Scenario2_Directed_ZIPSBM$Y),"<br>z*:",SS2_Scenario2_Directed_ZIPSBM$z),
               size=VertexSize,sizes=c(200,400),showlegend = FALSE,
-              color=as.factor(SS2_Scenario2_Directed_ZIPLPCM_T12k_R1_hat_z),colors=My_colors[6:10]
+              color=as.factor(SS2_Scenario2_Directed_ZIPSBM_Sup_ZIPLPCM_T12k_R1_hat_z),colors=My_colors[6:10]
   )
 Edges <- get.edgelist(g_obs)
 for (i in 1:nrow(Edges)){
   fig3 <- fig3 %>%
-    add_trace(x = SS2_Scenario2_Directed_ZIPLPCM_T12k_R1_hat_U[Edges[i,],1],
-              y = SS2_Scenario2_Directed_ZIPLPCM_T12k_R1_hat_U[Edges[i,],2],
-              z = SS2_Scenario2_Directed_ZIPLPCM_T12k_R1_hat_U[Edges[i,],3],
+    add_trace(x = SS2_Scenario2_Directed_ZIPSBM_Sup_ZIPLPCM_T12k_R1_hat_U[Edges[i,],1],
+              y = SS2_Scenario2_Directed_ZIPSBM_Sup_ZIPLPCM_T12k_R1_hat_U[Edges[i,],2],
+              z = SS2_Scenario2_Directed_ZIPSBM_Sup_ZIPLPCM_T12k_R1_hat_U[Edges[i,],3],
               text=paste("Weight:",E(g_obs)$weight[i],"<br>UpperDiag?:",Edges[i,1]<Edges[i,2]),
               type = "scatter3d", mode = "lines", showlegend = FALSE,line = list(color = E(g_obs)$color[i], width = 0.25*E(g_obs)$weight[i]))
 }
@@ -1418,19 +1418,19 @@ for (i in 1:nrow(Edges)){
 
 # Plot the right angle of the latent positions Scenario 2
 fig4 <- plot_ly(scene ="scene4") %>%
-  add_markers(x = SS2_Scenario2_Directed_ZIPLPCM_T12k_R1_hat_U[,1],
-              y = SS2_Scenario2_Directed_ZIPLPCM_T12k_R1_hat_U[,2],
-              z = SS2_Scenario2_Directed_ZIPLPCM_T12k_R1_hat_U[,3],
+  add_markers(x = SS2_Scenario2_Directed_ZIPSBM_Sup_ZIPLPCM_T12k_R1_hat_U[,1],
+              y = SS2_Scenario2_Directed_ZIPSBM_Sup_ZIPLPCM_T12k_R1_hat_U[,2],
+              z = SS2_Scenario2_Directed_ZIPSBM_Sup_ZIPLPCM_T12k_R1_hat_U[,3],
               text=paste("Node:",1:nrow(SS2_Scenario2_Directed_ZIPSBM$Y),"<br>z*:",SS2_Scenario2_Directed_ZIPSBM$z),
               size=VertexSize,sizes=c(200,400),showlegend = FALSE,
-              color=as.factor(SS2_Scenario2_Directed_ZIPLPCM_T12k_R1_hat_z),colors=My_colors[6:10]
+              color=as.factor(SS2_Scenario2_Directed_ZIPSBM_Sup_ZIPLPCM_T12k_R1_hat_z),colors=My_colors[6:10]
   )
 Edges <- get.edgelist(g_obs)
 for (i in 1:nrow(Edges)){
   fig4 <- fig4 %>%
-    add_trace(x = SS2_Scenario2_Directed_ZIPLPCM_T12k_R1_hat_U[Edges[i,],1],
-              y = SS2_Scenario2_Directed_ZIPLPCM_T12k_R1_hat_U[Edges[i,],2],
-              z = SS2_Scenario2_Directed_ZIPLPCM_T12k_R1_hat_U[Edges[i,],3],
+    add_trace(x = SS2_Scenario2_Directed_ZIPSBM_Sup_ZIPLPCM_T12k_R1_hat_U[Edges[i,],1],
+              y = SS2_Scenario2_Directed_ZIPSBM_Sup_ZIPLPCM_T12k_R1_hat_U[Edges[i,],2],
+              z = SS2_Scenario2_Directed_ZIPSBM_Sup_ZIPLPCM_T12k_R1_hat_U[Edges[i,],3],
               text=paste("Weight:",E(g_obs)$weight[i],"<br>UpperDiag?:",Edges[i,1]<Edges[i,2]),
               type = "scatter3d", mode = "lines", showlegend = FALSE,line = list(color = E(g_obs)$color[i], width = 0.25*E(g_obs)$weight[i]))
 }
@@ -1451,5 +1451,43 @@ orca(Fig2, "SS2_Sce2_Obs_hatU.pdf",scale=1,width=1800,height=850)
 
 The statistic $`\mathbb{E}(\{|\hat{p}_{z_iz_j}-p^*_{z_iz_j}|\}){\scriptsize [\text{sd}]}`$ related to the summarized individual-level unusual zero probability shown in the 6th column of **Table 2** for the **ZIP-LPCM Sup Beta(1,9)** case can be obtained following the similar way as we used in **SS1**.
 This statistic can also be obtained together with another one regarding the summarized individual-level Poisson rate shown as the 7th column of **Table 2**.
-Recall here that the individual-level $\lambda_{ij}$ can be obtaine by $\lambda_{ij}=\text{exp}(\beta-||\boldsymbol{u_i}-\boldsymbol{u_j}||)$ for each pair of nodes $i,j$ and thus applying posterior mean on each $\lambda_{ij}$ based on the corresponding $\beta$ and $\boldsymbol{U}$ gives us the summarized statistic $`\{\hat{\lambda}_{ij}\}`$.
+Recall here that the individual-level $\lambda_{ij}$ can be obtained by $\lambda_{ij}=\text{exp}(\beta-||\boldsymbol{u_i}-\boldsymbol{u_j}||)$ for each pair of nodes $i,j$ and thus applying posterior mean on each $\lambda_{ij}$ based on the corresponding $\beta$ and $\boldsymbol{U}$ gives us the summarized statistic $`\{\hat{\lambda}_{ij}\}`$.
+
+Based on the posterior chains of label-switched clustering: `SS2_Scenario1_Directed_ZIPSBM_Sup_ZIPLPCM_T12k_R1_LSz`, the number of clusters: `SS2_Scenario1_Directed_ZIPSBM_Sup_ZIPLPCM_T12k_R1$K`, the label-switched group-level unusual probability:`SS2_Scenario1_Directed_ZIPSBM_Sup_ZIPLPCM_T12k_R1_LSP`, the Procrustes-transformed latent positions: `SS2_Scenario1_Directed_ZIPSBM_Sup_ZIPLPCM_T12k_R1_PTU` and the intercept: `SS2_Scenario1_Directed_ZIPSBM_Sup_ZIPLPCM_T12k_R1$beta`, the 6th and 7th column of **Table 2** for the **ZIP-LPCM Sup Beta(1,9)** case in **scenario 1** can be obtained following:
+
+``` r
+# Define the burn in
+iteration_after_burn_in <- 2002:12001
+burn_in <- 2001
+# Obtain the individual-level p and lambda for each iteration
+SS2_Scenario1_Directed_ZIPSBM_Sup_ZIPLPCM_T12k_R1_p <- list()
+SS2_Scenario1_Directed_ZIPSBM_Sup_ZIPLPCM_T12k_R1_lambda <- list()
+library(Rfast)
+for (t in 1:nrow(SS2_Scenario1_Directed_ZIPSBM_Sup_ZIPLPCM_T12k_R1$z)){
+  Z <- t(t(matrix(SS2_Scenario1_Directed_ZIPSBM_Sup_ZIPLPCM_T12k_R1_LSz[t,],length(SS2_Scenario1_Directed_ZIPSBM_Sup_ZIPLPCM_T12k_R1_LSz[t,]),SS2_Scenario1_Directed_ZIPSBM_Sup_ZIPLPCM_T12k_R1$K[t]))==(1:SS2_Scenario1_Directed_ZIPSBM_Sup_ZIPLPCM_T12k_R1$K[t]))*1
+  SS2_Scenario1_Directed_ZIPSBM_Sup_ZIPLPCM_T12k_R1_p[[t]] <- Z%*%SS2_Scenario1_Directed_ZIPSBM_Sup_ZIPLPCM_T12k_R1_LSP[[t]]%*%t(Z)
+  Dist_U <- Rfast::Dist(SS2_Scenario1_Directed_ZIPSBM_Sup_ZIPLPCM_T12k_R1_PTU[[t]])
+  SS2_Scenario1_Directed_ZIPSBM_Sup_ZIPLPCM_T12k_R1_lambda[[t]] <- exp(SS2_Scenario1_Directed_ZIPSBM_Sup_ZIPLPCM_T12k_R1$beta[t]-Dist_U)
+  if ((t%%1000) == 0){
+    cat("t=",t,"\n")
+  }
+}
+SS2_Scenario1_Directed_ZIPSBM_Sup_ZIPLPCM_T12k_R1_hat_p <- Reduce("+",SS2_Scenario1_Directed_ZIPSBM_Sup_ZIPLPCM_T12k_R1_p[iteration_after_burn_in])/length(iteration_after_burn_in)
+SS2_Scenario1_Directed_ZIPSBM_Sup_ZIPLPCM_T12k_R1_hat_lambda<- Reduce("+",SS2_Scenario1_Directed_ZIPSBM_Sup_ZIPLPCM_T12k_R1_lambda[iteration_after_burn_in])/length(iteration_after_burn_in)
+
+# Compare the summarized and reference p by mean and sd absolute error
+mean(abs(SS2_Scenario1_Directed_ZIPSBM_Sup_ZIPLPCM_T12k_R1_hat_p-SS2_Scenario1_Directed_ZIPSBM_p))
+# 0.05042062
+sd(abs(SS2_Scenario1_Directed_ZIPSBM_Sup_ZIPLPCM_T12k_R1_hat_p-SS2_Scenario1_Directed_ZIPSBM_p))
+# 0.04772049
+
+# Compare the summarized and reference lambda by mean and sd absolute error
+mean(abs(SS2_Scenario1_Directed_ZIPSBM_Sup_ZIPLPCM_T12k_R1_hat_lambda-SS2_Scenario1_Directed_ZIPSBM_lambda))
+# 0.1659931
+sd(abs(SS2_Scenario1_Directed_ZIPSBM_Sup_ZIPLPCM_T12k_R1_hat_lambda-SS2_Scenario1_Directed_ZIPSBM_lambda))
+# 0.312726
+```
+
+the values of which provided above are exactly those we show in **Table 2**.
+Following similar steps and replacing all the `SS2_Scenario1` with `SS2_Scenario2` above will bring the values of the corresponding statistics for the **ZIP-LPCM Sup Beta(1,9)** case in **scenario 2** instead.
 
