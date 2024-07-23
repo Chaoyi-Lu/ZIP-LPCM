@@ -1573,7 +1573,7 @@ SS2_Scenario2_Directed_ZIPSBM_Sup_ZIPLPCM_T12k_R1_hat_P_m0_heatmap_draw <- cowpl
 print(SS2_Scenario2_Directed_ZIPSBM_Sup_ZIPLPCM_T12k_R1_hat_P_m0_heatmap_draw)
 ```
 
-We can also check the mean and standard deviation of the error between the reference and summarized `P_m0` for each entry:
+We can also check the mean and standard deviation of the absolute error between the reference and summarized `P_m0` for each entry:
 
 ``` r
 # Mean and sd of the absolute error between the summarized and reference P_m0 for SS2 scenario 1
@@ -1592,4 +1592,97 @@ mean(abs(SS2_Scenario2_Directed_ZIPSBM_Sup_ZIPLPCM_T12k_R1_hat_nu[(SS2_Scenario2
 sd(abs(SS2_Scenario2_Directed_ZIPSBM_Sup_ZIPLPCM_T12k_R1_hat_nu[(SS2_Scenario2_Directed_ZIPSBM$Y+diag(1,nrow(SS2_Scenario2_Directed_ZIPSBM$Y)))==0]-
      SS2_Scenario2_Directed_ZIPSBM_P_m0[(SS2_Scenario2_Directed_ZIPSBM$Y+diag(1,nrow(SS2_Scenario2_Directed_ZIPSBM$Y)))==0]))
 # 0.105415
+```
+
+Similar steps as above can be applied for other seven cases: **ZIP-LPCM unSup Beta(1,9)**, **Pois-LPCM Sup**, **Pois-LPCM unSup**, **ZIP-LPCM Sup Beta(1,1)**, **ZIP-LPCM Sup Beta(1,3)**, **ZIP-LPCM Sup Beta(1,19)**, **ZIP-LPCM Sup Beta(1,99)** we focus on in this **SS2** for both scenarios.
+Here we provide the algorithm implementation code to begin with for all the rest cases:
+
+``` r
+# SS2 Scenario 1 ZIP-SBM network unSupervised ZIP-LPCM-MFM implementations with T=12000 Beta(1,9) Round 1
+SS2_Scenario1_Directed_ZIPSBM_unSup_ZIPLPCM_T12k_unSup_R1 <- 
+  MwG_Directed_ZIPLPCM(Y = SS2_Scenario1_Directed_ZIPSBM$Y,T = 12000,omega=0.01,alpha1=1,alpha2=0.103,alpha=3,beta1=1,beta2=9,
+                       sigma2prop_beta=0.06^2,sigma2prop_U=0.06,d=3,z=1:nrow(SS2_Scenario1_Directed_ZIPSBM$Y),
+                       p_eject=0.5)
+
+# SS2 Scenario 1 ZIP-SBM network Supervised Pois-LPCM-MFM implementations with T=12000 Round 1
+start.time <- Sys.time()
+SS2_Scenario1_Directed_ZIPSBM_Sup_PoisLPCM_T12k_R1 <- 
+  MwG_Directed_PoissonLPCM(Y = SS2_Scenario1_Directed_ZIPSBM$Y,T = 12000,omega=0.01,alpha1=1,alpha2=0.103,alpha=3,
+                           sigma2prop_beta=0.06^2,sigma2prop_U=0.06,d=3,z=1:nrow(SS2_Scenario1_Directed_ZIPSBM$Y),
+                           p_eject=0.5,A=SS2_Scenario1_Directed_ZIPSBM$A,omega_c=1)
+
+# SS2 Scenario 1 ZIP-SBM network unSupervised Pois-LPCM-MFM implementations with T=12000 Round 1
+SS2_Scenario1_Directed_ZIPSBM_unSup_PoisLPCM_T12k_R1 <- 
+  MwG_Directed_PoissonLPCM(Y = SS2_Scenario1_Directed_ZIPSBM$Y,T = 12000,omega=0.01,alpha1=1,alpha2=0.103,alpha=3,
+                           sigma2prop_beta=0.06^2,sigma2prop_U=0.06,d=3,z=1:nrow(SS2_Scenario1_Directed_ZIPSBM$Y),
+                           p_eject=0.5)
+
+# SS2 Scenario 1 ZIP-SBM network Supervised ZIP-LPCM-MFM implementations with T=12000 Beta(1,1) Round 1
+SS2_Scenario1_Directed_ZIPSBM_Sup_ZIPLPCM_T12k_beta_1_1_R1 <- 
+  MwG_Directed_ZIPLPCM(Y = SS2_Scenario1_Directed_ZIPSBM$Y,T = 12000,omega=0.01,alpha1=1,alpha2=0.103,alpha=3,beta1=1,beta2=1,
+                       sigma2prop_beta=0.06^2,sigma2prop_U=0.06,d=3,z=1:nrow(SS2_Scenario1_Directed_ZIPSBM$Y),
+                       p_eject=0.5,A=SS2_Scenario1_Directed_ZIPSBM$A,omega_c=1)
+
+# SS2 Scenario 1 ZIP-SBM network Supervised ZIP-LPCM-MFM implementations with T=12000 Beta(1,3) Round 1
+SS2_Scenario1_Directed_ZIPSBM_Sup_ZIPLPCM_T12k_beta_1_3_R1 <- 
+  MwG_Directed_ZIPLPCM(Y = SS2_Scenario1_Directed_ZIPSBM$Y,T = 12000,omega=0.01,alpha1=1,alpha2=0.103,alpha=3,beta1=1,beta2=3,
+                       sigma2prop_beta=0.06^2,sigma2prop_U=0.06,d=3,z=1:nrow(SS2_Scenario1_Directed_ZIPSBM$Y),
+                       p_eject=0.5,A=SS2_Scenario1_Directed_ZIPSBM$A,omega_c=1)
+
+# SS2 Scenario 1 ZIP-SBM network Supervised ZIP-LPCM-MFM implementations with T=12000 Beta(1,19) Round 1
+SS2_Scenario1_Directed_ZIPSBM_Sup_ZIPLPCM_T12k_beta_1_19_R1 <- 
+  MwG_Directed_ZIPLPCM(Y = SS2_Scenario1_Directed_ZIPSBM$Y,T = 12000,omega=0.01,alpha1=1,alpha2=0.103,alpha=3,beta1=1,beta2=19,
+                       sigma2prop_beta=0.06^2,sigma2prop_U=0.06,d=3,z=1:nrow(SS2_Scenario1_Directed_ZIPSBM$Y),
+                       p_eject=0.5,A=SS2_Scenario1_Directed_ZIPSBM$A,omega_c=1)
+
+# SS2 Scenario 1 ZIP-SBM network Supervised ZIP-LPCM-MFM implementations with T=12000 Beta(1,99) Round 1
+SS2_Scenario1_Directed_ZIPSBM_Sup_ZIPLPCM_T12k_beta_1_99_R1 <- 
+  MwG_Directed_ZIPLPCM(Y = SS2_Scenario1_Directed_ZIPSBM$Y,T = 12000,omega=0.01,alpha1=1,alpha2=0.103,alpha=3,beta1=1,beta2=99,
+                       sigma2prop_beta=0.06^2,sigma2prop_U=0.06,d=3,z=1:nrow(SS2_Scenario1_Directed_ZIPSBM$Y),
+                       p_eject=0.5,A=SS2_Scenario1_Directed_ZIPSBM$A,omega_c=1)
+
+#--------------------------------------------------------------------------------------------
+
+# SS2 Scenario 2 ZIP-SBM network unSupervised ZIP-LPCM-MFM implementations with T=12000 Beta(1,9) Round 1
+SS2_Scenario2_Directed_ZIPSBM_unSup_ZIPLPCM_T12k_unSup_R1 <- 
+  MwG_Directed_ZIPLPCM(Y = SS2_Scenario2_Directed_ZIPSBM$Y,T = 12000,omega=0.01,alpha1=1,alpha2=0.103,alpha=3,beta1=1,beta2=9,
+                       sigma2prop_beta=0.06^2,sigma2prop_U=0.06,d=3,z=1:nrow(SS2_Scenario2_Directed_ZIPSBM$Y),
+                       p_eject=0.5)
+
+# SS2 Scenario 2 ZIP-SBM network Supervised Pois-LPCM-MFM implementations with T=12000 Round 1
+start.time <- Sys.time()
+SS2_Scenario2_Directed_ZIPSBM_Sup_PoisLPCM_T12k_R1 <- 
+  MwG_Directed_PoissonLPCM(Y = SS2_Scenario2_Directed_ZIPSBM$Y,T = 12000,omega=0.01,alpha1=1,alpha2=0.103,alpha=3,
+                           sigma2prop_beta=0.06^2,sigma2prop_U=0.06,d=3,z=1:nrow(SS2_Scenario2_Directed_ZIPSBM$Y),
+                           p_eject=0.5,A=SS2_Scenario2_Directed_ZIPSBM$A,omega_c=1)
+
+# SS2 Scenario 2 ZIP-SBM network unSupervised Pois-LPCM-MFM implementations with T=12000 Round 1
+SS2_Scenario2_Directed_ZIPSBM_unSup_PoisLPCM_T12k_R1 <- 
+  MwG_Directed_PoissonLPCM(Y = SS2_Scenario2_Directed_ZIPSBM$Y,T = 12000,omega=0.01,alpha1=1,alpha2=0.103,alpha=3,
+                           sigma2prop_beta=0.06^2,sigma2prop_U=0.06,d=3,z=1:nrow(SS2_Scenario2_Directed_ZIPSBM$Y),
+                           p_eject=0.5)
+
+# SS2 Scenario 2 ZIP-SBM network Supervised ZIP-LPCM-MFM implementations with T=12000 Beta(1,1) Round 1
+SS2_Scenario2_Directed_ZIPSBM_Sup_ZIPLPCM_T12k_beta_1_1_R1 <- 
+  MwG_Directed_ZIPLPCM(Y = SS2_Scenario2_Directed_ZIPSBM$Y,T = 12000,omega=0.01,alpha1=1,alpha2=0.103,alpha=3,beta1=1,beta2=1,
+                       sigma2prop_beta=0.06^2,sigma2prop_U=0.06,d=3,z=1:nrow(SS2_Scenario2_Directed_ZIPSBM$Y),
+                       p_eject=0.5,A=SS2_Scenario2_Directed_ZIPSBM$A,omega_c=1)
+
+# SS2 Scenario 2 ZIP-SBM network Supervised ZIP-LPCM-MFM implementations with T=12000 Beta(1,3) Round 1
+SS2_Scenario2_Directed_ZIPSBM_Sup_ZIPLPCM_T12k_beta_1_3_R1 <- 
+  MwG_Directed_ZIPLPCM(Y = SS2_Scenario2_Directed_ZIPSBM$Y,T = 12000,omega=0.01,alpha1=1,alpha2=0.103,alpha=3,beta1=1,beta2=3,
+                       sigma2prop_beta=0.06^2,sigma2prop_U=0.06,d=3,z=1:nrow(SS2_Scenario2_Directed_ZIPSBM$Y),
+                       p_eject=0.5,A=SS2_Scenario2_Directed_ZIPSBM$A,omega_c=1)
+
+# SS2 Scenario 2 ZIP-SBM network Supervised ZIP-LPCM-MFM implementations with T=12000 Beta(1,19) Round 1
+SS2_Scenario2_Directed_ZIPSBM_Sup_ZIPLPCM_T12k_beta_1_19_R1 <- 
+  MwG_Directed_ZIPLPCM(Y = SS2_Scenario2_Directed_ZIPSBM$Y,T = 12000,omega=0.01,alpha1=1,alpha2=0.103,alpha=3,beta1=1,beta2=19,
+                       sigma2prop_beta=0.06^2,sigma2prop_U=0.06,d=3,z=1:nrow(SS2_Scenario2_Directed_ZIPSBM$Y),
+                       p_eject=0.5,A=SS2_Scenario2_Directed_ZIPSBM$A,omega_c=1)
+
+# SS2 Scenario 2 ZIP-SBM network Supervised ZIP-LPCM-MFM implementations with T=12000 Beta(1,99) Round 1
+SS2_Scenario2_Directed_ZIPSBM_Sup_ZIPLPCM_T12k_beta_1_99_R1 <- 
+  MwG_Directed_ZIPLPCM(Y = SS2_Scenario2_Directed_ZIPSBM$Y,T = 12000,omega=0.01,alpha1=1,alpha2=0.103,alpha=3,beta1=1,beta2=99,
+                       sigma2prop_beta=0.06^2,sigma2prop_U=0.06,d=3,z=1:nrow(SS2_Scenario2_Directed_ZIPSBM$Y),
+                       p_eject=0.5,A=SS2_Scenario2_Directed_ZIPSBM$A,omega_c=1)
 ```
