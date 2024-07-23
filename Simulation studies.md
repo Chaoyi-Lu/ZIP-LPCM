@@ -1759,3 +1759,5 @@ sd(SS2_Scenario2_Directed_ZIPSBM_Sup_ZIPLPCM_T12k_beta_1_19_R1_hat_nu[(SS2_Scena
      SS2_Scenario2_Directed_ZIPSBM_P_m0[(SS2_Scenario2_Directed_ZIPSBM$Y+diag(1,nrow(SS2_Scenario2_Directed_ZIPSBM$Y)))==0])
 # 0.1179308
 ```
+
+Here we complete the **simulation study 2** implementations and post-processings.
