@@ -411,7 +411,7 @@ The proposal variances of the Metropolis-Hastings (M-H) steps of $\beta$ and $\b
 Finally, the output can be saved via `save.image()` function.
 Here we don't set the `set.seed()` here because the output are generally shown to be robust to multiple implementations.
 
-Once we obtained the posterior chains of $\boldsymbol{z},\boldsymbol{U},\boldsymbol{\nu},K,\boldsymbol{X},\boldsymbol{P},\beta$ as well as the acceptance rates of the M-H steps, we first label-switch the posterior clustering and the corresponding clustering dependent model parameter $\boldsymbol{P}$ following the [Rastelli, R. and Friel, N. (2018)](https://pubmed.ncbi.nlm.nih.gov/30220822/) label-switching method, i.e., assigning the node 1 to group 1 by default, and then iteratively assign the next node either to a new empty group or an existing group:
+Once we obtained the posterior chains of $\boldsymbol{z},\boldsymbol{U},\boldsymbol{\nu},K,\boldsymbol{X},\boldsymbol{P},\beta$ as well as the acceptance rates of the M-H steps, we first label-switch the posterior clustering and the corresponding clustering dependent model parameter $\boldsymbol{P}$ following the [Rastelli, R. and Friel, N. (2018)](https://pubmed.ncbi.nlm.nih.gov/30220822/) label-switching method, i.e., assigning the node 1 to group 1 by default, and then iteratively assigning the next node either to a new empty group or an existing group:
 
 ``` r
 # Apply label switching on the post clustering z
