@@ -1,4 +1,4 @@
-# Real data applications for ZIP-LPCM-MFM
+# Real Data Applications for ZIP-LPCM-MFM
 
 This tutorial contains the **zero-inflated Poisson latent position cluster model (ZIP-LPCM)** implementation and post-processing code for all the four **real data applications (RDA)** we illustrate in the paper **"A Zero-Inflated Latent Position Cluster Model with Mixture of Finite Mixtures" (ZIP-LPCM-MFM)**.
 The functions required during the experiments are all included in the [`Functions.R`] file of this repository and can be loaded via:
@@ -9,9 +9,9 @@ gc()
 source("Functions.R")
 ```
 
-## 1. Loading real networks
+## 1. Loading Real Networks
 
-### 1.1 Sampson monks
+### 1.1 Sampson Monks Network
 
 The 1st real network is the **Sampson Monks** network which is publicly available in the `latentnet` package following:
 
@@ -75,7 +75,7 @@ sampson_monks_group_cloisterville_NodeA
 
 which brings our exogenous node attributes we used in practice.
 
-### 1.2 Windsurfers and Train bombing
+### 1.2 Windsurfers and Train Bombing Networks
 
 Both of the **Windsurfers** and the **Train bombing** real networks are publicly avaiable at the website [http://konect.cc/networks/](http://konect.cc/networks/).
 We also upload the real data at [`Datasets/windsurfers.txt`] and [`Datasets/train_bombing.txt`] of this repository, and the networks can be directly extracted by:
@@ -105,7 +105,7 @@ library(gdata)
 lowerTriangle(Train_bombing_adj,byrow=TRUE) <- upperTriangle(Train_bombing_adj)
 ```
 
-### 1.3 The 'Ndrangheta Mafia Network
+### 1.3 'Ndrangheta Mafia Network
 
 The original data is available at [https://sites.google.com/site/ucinetsoftware/datasets/covert-networks/ndrangheta-mafia-2](https://sites.google.com/site/ucinetsoftware/datasets/covert-networks/ndrangheta-mafia-2) and we follow the same pre-processing steps as [Legramanti et al. (2022)](https://projecteuclid.org/journals/annals-of-applied-statistics/volume-16/issue-4/Extended-stochastic-block-models-with-application-to-criminal-networks/10.1214/21-AOAS1595.short) to process the raw data and to focus on the processed data for implementations.
 We refer to the [GitHub page](https://github.com/danieledurante/ESBM/blob/master/Application/application.md) of the paper Legramanti et al. (2022) for more details, and the following pre-processing code are extracted from their GitHub page with some minor modifications on variable names.
@@ -211,16 +211,81 @@ RDA_criminalNet <- list(Y = as.matrix(read.csv("Datasets/CriminalNet_Y.csv",head
 colnames(RDA_criminalNet$Y) <- c()
 ```
 
-## 2. Implementations and post processing
+## 2. Implementations and Post-processing
 
 For each real network, the inference algorithm was implemented for 60,000 iterations with 30,000-iteration burn-in in order for sufficient mixing.
-All the **RDA** output shown in the **ZIP-LPCM-MFM** paper are reproducible by setting the random number generator (RNG) seed by `set.seed(1)`.
+All the **RDA** output shown in the **ZIP-LPCM-MFM** paper are reproducible by setting the seed of the random number generator (RNG) as `set.seed(1)`.
 Multiple implementations can be easily applied by setting different seeds for different rounds of implementations or by simply removing the seed via `set.seed(NULL)` if it's not required to reproduce the output.
 
-### 2.1 Sampson Monks
+### 2.1 Sampson Monks Network
 
+The **Sampson Monks** network is a directed network and the presumed exogenous node attributes are avaiable in **section 1.1** above.
+So **supervised ZIP-LPCM** is implemented in practice for such a real network following:
 
+``` r
+# Sampson monks directed real network supervised ZIP-LPCM T = 60000 round 1
+set.seed(1)
+start.time <- Sys.time()
+RDA_SampsonMonks_Directed_ZIPLPCM_Sup_T60k_R1 <- 
+  MwG_Directed_ZIPLPCM(Y = SampsonMonks_Directed_adj,T = 60000,omega=0.01,alpha1=1,alpha2=0.103,alpha=3,beta1=1,beta2=9,
+                       sigma2prop_beta=0.4^2,sigma2prop_U=0.2,d=3,z=1:nrow(SampsonMonks_Directed_adj),
+                       p_eject=0.5,A=sampson_monks_group_cloisterville_NodeA,omega_c=1)
+end.time <- Sys.time()
+RDA_SampsonMonks_Directed_ZIPLPCM_Sup_T60k_R1_time <- end.time - start.time
+RDA_SampsonMonks_Directed_ZIPLPCM_Sup_T60k_R1_time
+# Time difference of 34.79106 mins
+```
 
+where a reference running time is provided above for a laptop with with eight 1.80GHz processors.
+The prior parameters are similar to those implemented in the simulation studies, and the proposal variances are tuned so that the acceptance rates of the Metropolis-Hastings steps of $\boldsymbol{U}$ and $\beta$ are:
+
+``` r
+# Define the burn in
+iteration_after_burn_in <- 30002:60001
+burn_in <- 30001
+
+## Check U acceptance rate
+apply(RDA_SampsonMonks_Directed_ZIPLPCM_Sup_T60k_R1$acceptance_count_U[iteration_after_burn_in-1,],2,mean)
+## Check the mean of U acceptance rate
+mean(apply(RDA_SampsonMonks_Directed_ZIPLPCM_Sup_T60k_R1$acceptance_count_U[iteration_after_burn_in-1,],2,mean)) # 0.18595
+## Check beta acceptance rate
+mean(RDA_SampsonMonks_Directed_ZIPLPCM_Sup_T60k_R1$acceptance_count_beta[iteration_after_burn_in-1]) # 0.2164333
+```
+
+The post-processing steps begin with applying label-switching on the posterior clustering and posterior unusual zero probability:
+
+``` r
+# Apply label switching on the post clustering z and post unusual zero probability P
+RDA_SampsonMonks_Directed_ZIPLPCM_Sup_T60k_R1_LSz <- matrix(NA,nrow=nrow(RDA_SampsonMonks_Directed_ZIPLPCM_Sup_T60k_R1$z),ncol=ncol(RDA_SampsonMonks_Directed_ZIPLPCM_Sup_T60k_R1$z))
+RDA_SampsonMonks_Directed_ZIPLPCM_Sup_T60k_R1_LSP <- list()
+for (t in 1:nrow(RDA_SampsonMonks_Directed_ZIPLPCM_Sup_T60k_R1$z)){
+  LS_temp <- LabelSwitching_SG2003(z = RDA_SampsonMonks_Directed_ZIPLPCM_Sup_T60k_R1$z[t,],
+                                   matrix_KbyK = RDA_SampsonMonks_Directed_ZIPLPCM_Sup_T60k_R1$P[[t]])
+  RDA_SampsonMonks_Directed_ZIPLPCM_Sup_T60k_R1_LSz[t,] <- LS_temp$z
+  RDA_SampsonMonks_Directed_ZIPLPCM_Sup_T60k_R1_LSP[[t]] <- LS_temp$matrix_KbyK
+  if ((t%%1000) == 0){cat("t=",t,"\n")}
+}
+```
+
+and with applying Procrustes transform on posterior latent positions with respect to the last posterior sample of the latent positions:
+
+``` r
+# Apply Procrustes Transform on posterior latent positions U
+library("IMIFA")
+RDA_SampsonMonks_Directed_ZIPLPCM_Sup_T60k_R1_PTU <- list()
+for (t in 1:nrow(RDA_SampsonMonks_Directed_ZIPLPCM_Sup_T60k_R1$z)){
+  RDA_SampsonMonks_Directed_ZIPLPCM_Sup_T60k_R1_PTU[[t]] <-
+    Procrustes(RDA_SampsonMonks_Directed_ZIPLPCM_Sup_T60k_R1$U[[t]],
+               RDA_SampsonMonks_Directed_ZIPLPCM_Sup_T60k_R1$U[[60001]], translate = TRUE ,dilate = FALSE)$X.new
+  if ((t%%1000) == 0){cat("t=",t,"\n")}
+}
+```
+
+### 2.2 Windsurfers Network
+
+### 2.3 Train Bombing Network
+
+### 2.4 'Ndrangheta Mafia Network
 
 
 
