@@ -63,6 +63,7 @@ SS1_Scenario1_Directed_ZIPLPCM_beta <- 3
 SS1_Scenario1_Directed_ZIPLPCM_P <- matrix(c(0.4,0.1,0.05,0.1,0.05,  0.05,0.4,0.1,0.05,0.1,  0.1,0.05,0.4,0.1,0.05,  
                                              0.05,0.1,0.05,0.4,0.1,  0.1,0.05,0.1,0.05,0.4),5,5)
 SS1_Scenario1_Directed_ZIPLPCM_p <- SS1_Scenario1_Directed_ZIPLPCM$Z%*%SS1_Scenario1_Directed_ZIPLPCM_P%*%t(SS1_Scenario1_Directed_ZIPLPCM$Z)
+diag(SS1_Scenario1_Directed_ZIPLPCM_p) <- 0
 library(Rfast) # for Rfast::Dist()
 SS1_Scenario1_Directed_ZIPLPCM_P_m0 <- (SS1_Scenario1_Directed_ZIPLPCM_p/(SS1_Scenario1_Directed_ZIPLPCM_p+(1-SS1_Scenario1_Directed_ZIPLPCM_p)*dpois(0,exp(SS1_Scenario1_Directed_ZIPLPCM_beta-Rfast::Dist(SS1_Scenario1_Directed_ZIPLPCM$U)))))*
   ((SS1_Scenario1_Directed_ZIPLPCM$Y+diag(1,nrow(SS1_Scenario1_Directed_ZIPLPCM$Y)))==0)
@@ -670,16 +671,17 @@ for (t in 1:nrow(SS1_Scenario1_Directed_ZIPLPCM_Sup_ZIPLPCM_T12k_R1$z)){
 }
 # Obtain the \hat{p} which is the posterior mean of each entry of the individual-level unusual zero probability
 SS1_Scenario1_Directed_ZIPLPCM_Sup_ZIPLPCM_T12k_R1_hat_p <- Reduce("+",SS1_Scenario1_Directed_ZIPLPCM_Sup_ZIPLPCM_T12k_R1_p[iteration_after_burn_in])/length(iteration_after_burn_in)
+diag(SS1_Scenario1_Directed_ZIPLPCM_Sup_ZIPLPCM_T12k_R1_hat_p) <- 0
 ```
 
 Comparing the $\hat{\boldsymbol{p}}$ with the reference $`\boldsymbol{p}^*`$ gives the statistic $`\mathbb{E}(\{|\hat{p}_{z_iz_j}-p^*_{z_iz_j}|\}){\scriptsize [\text{sd}]}`$ shown in the 7th column of **Table 1** of the **ZIP-LPCM-MFM** paper for the **ZIP-LPCM Sup Beta(1,9)** case in **scenario 1**:
 
 ``` r
 # Compare \hat{p} and the reference p* via the mean and sd of the absolute value of the error obtained for each entry
-mean(abs(SS1_Scenario1_Directed_ZIPLPCM_Sup_ZIPLPCM_T12k_R1_hat_p-SS1_Scenario1_Directed_ZIPLPCM_p))
-# 0.03288737
-sd(abs(SS1_Scenario1_Directed_ZIPLPCM_Sup_ZIPLPCM_T12k_R1_hat_p-SS1_Scenario1_Directed_ZIPLPCM_p))
-# 0.03387241
+mean(abs((SS1_Scenario1_Directed_ZIPLPCM_Sup_ZIPLPCM_T12k_R1_hat_p-SS1_Scenario1_Directed_ZIPLPCM_p)[diag(nrow(SS1_Scenario1_Directed_ZIPLPCM_Sup_ZIPLPCM_T12k_R1_hat_p))==0]))
+# 0.03297825
+sd(abs((SS1_Scenario1_Directed_ZIPLPCM_Sup_ZIPLPCM_T12k_R1_hat_p-SS1_Scenario1_Directed_ZIPLPCM_p)[diag(nrow(SS1_Scenario1_Directed_ZIPLPCM_Sup_ZIPLPCM_T12k_R1_hat_p))==0]))
+# 0.03396754
 ```
 
 Finally, we ontain the $\hat{\boldsymbol{\nu}}$, which approximates the conditional probability of unusual zero provided that the corresponding observed interaction is a zero, i.e., equation (22) of the **ZIP-LPCM-MFM** paper, by posterior mean of  $\boldsymbol{\nu}$:
@@ -1129,6 +1131,8 @@ SS2_Scenario1_Directed_ZIPSBM_Lambda <- matrix(c(7.0,0.5,0.5,0.5,0.5,  0.5,4.5,0
                                                  0.5,0.5,0.5,2.0,0.5,  0.5,0.5,0.5,0.5,2.5),5,5)
 SS2_Scenario1_Directed_ZIPSBM_p <- SS2_Scenario1_Directed_ZIPSBM$Z%*%SS2_Scenario1_Directed_ZIPSBM_P%*%t(SS2_Scenario1_Directed_ZIPSBM$Z)
 SS2_Scenario1_Directed_ZIPSBM_lambda <- SS2_Scenario1_Directed_ZIPSBM$Z%*%SS2_Scenario1_Directed_ZIPSBM_Lambda%*%t(SS2_Scenario1_Directed_ZIPSBM$Z)
+diag(SS2_Scenario1_Directed_ZIPSBM_p) <- 0
+diag(SS2_Scenario1_Directed_ZIPSBM_lambda) <- 0
 SS2_Scenario1_Directed_ZIPSBM_P_m0 <- (SS2_Scenario1_Directed_ZIPSBM_p/(SS2_Scenario1_Directed_ZIPSBM_p+(1-SS2_Scenario1_Directed_ZIPSBM_p)*
                                                                              dpois(0,SS2_Scenario1_Directed_ZIPSBM_lambda)))*
   ((SS2_Scenario1_Directed_ZIPSBM$Y+diag(1,nrow(SS2_Scenario1_Directed_ZIPSBM$Y)))==0)
@@ -1163,7 +1167,10 @@ SS2_Scenario2_Directed_ZIPSBM_P <- matrix(c(0.4,0.2,0.6,0.2,0.6,  0.6,0.4,0.1,0.
 SS2_Scenario2_Directed_ZIPSBM_Lambda <- matrix(c(7.0,2.0,2.0,2.0,2.0,  2.0,4.5,0.5,0.5,0.5,  2.0,0.5,3.5,0.5,0.5,
                                                  2.0,0.5,0.5,2.0,0.5,  2.0,0.5,0.5,0.5,2.5),5,5)
 SS2_Scenario2_Directed_ZIPSBM_p <- SS2_Scenario2_Directed_ZIPSBM$Z%*%SS2_Scenario2_Directed_ZIPSBM_P%*%t(SS2_Scenario2_Directed_ZIPSBM$Z)
-SS2_Scenario2_Directed_ZIPSBM_lambda <- SS2_Scenario2_Directed_ZIPSBM$Z%*%SS2_Scenario2_Directed_ZIPSBM_Lambda%*%t(SS2_Scenario2_Directed_ZIPSBM$Z)
+SS2_Scenario2_Directed_ZIPSBM_lambda <-
+SS2_Scenario2_Directed_ZIPSBM$Z%*%SS2_Scenario2_Directed_ZIPSBM_Lambda%*%t(SS2_Scenario2_Directed_ZIPSBM$Z)
+diag(SS2_Scenario2_Directed_ZIPSBM_p) <- 0
+diag(SS2_Scenario2_Directed_ZIPSBM_lambda) <- 0
 SS2_Scenario2_Directed_ZIPSBM_P_m0 <- (SS2_Scenario2_Directed_ZIPSBM_p/(SS2_Scenario2_Directed_ZIPSBM_p+(1-SS2_Scenario2_Directed_ZIPSBM_p)*
                                                                              dpois(0,SS2_Scenario2_Directed_ZIPSBM_lambda)))*
   ((SS2_Scenario2_Directed_ZIPSBM$Y+diag(1,nrow(SS2_Scenario2_Directed_ZIPSBM$Y)))==0)
@@ -1474,18 +1481,20 @@ for (t in 1:nrow(SS2_Scenario1_Directed_ZIPSBM_Sup_ZIPLPCM_T12k_R1$z)){
 }
 SS2_Scenario1_Directed_ZIPSBM_Sup_ZIPLPCM_T12k_R1_hat_p <- Reduce("+",SS2_Scenario1_Directed_ZIPSBM_Sup_ZIPLPCM_T12k_R1_p[iteration_after_burn_in])/length(iteration_after_burn_in)
 SS2_Scenario1_Directed_ZIPSBM_Sup_ZIPLPCM_T12k_R1_hat_lambda<- Reduce("+",SS2_Scenario1_Directed_ZIPSBM_Sup_ZIPLPCM_T12k_R1_lambda[iteration_after_burn_in])/length(iteration_after_burn_in)
+diag(SS2_Scenario1_Directed_ZIPSBM_Sup_ZIPLPCM_T12k_R1_hat_p) <- 0
+diag(SS2_Scenario1_Directed_ZIPSBM_Sup_ZIPLPCM_T12k_R1_hat_lambda) <- 0
 
 # Compare the summarized and reference p by mean and sd absolute error
-mean(abs(SS2_Scenario1_Directed_ZIPSBM_Sup_ZIPLPCM_T12k_R1_hat_p-SS2_Scenario1_Directed_ZIPSBM_p))
-# 0.05042062
-sd(abs(SS2_Scenario1_Directed_ZIPSBM_Sup_ZIPLPCM_T12k_R1_hat_p-SS2_Scenario1_Directed_ZIPSBM_p))
-# 0.04772049
+mean(abs((SS2_Scenario1_Directed_ZIPSBM_Sup_ZIPLPCM_T12k_R1_hat_p-SS2_Scenario1_Directed_ZIPSBM_p)[diag(nrow(SS2_Scenario1_Directed_ZIPSBM$Y))==0]))
+# 0.05057059
+sd(abs((SS2_Scenario1_Directed_ZIPSBM_Sup_ZIPLPCM_T12k_R1_hat_p-SS2_Scenario1_Directed_ZIPSBM_p)[diag(nrow(SS2_Scenario1_Directed_ZIPSBM$Y))==0]))
+# 0.0479078
 
 # Compare the summarized and reference lambda by mean and sd absolute error
-mean(abs(SS2_Scenario1_Directed_ZIPSBM_Sup_ZIPLPCM_T12k_R1_hat_lambda-SS2_Scenario1_Directed_ZIPSBM_lambda))
-# 0.1659931
-sd(abs(SS2_Scenario1_Directed_ZIPSBM_Sup_ZIPLPCM_T12k_R1_hat_lambda-SS2_Scenario1_Directed_ZIPSBM_lambda))
-# 0.312726
+mean(abs((SS2_Scenario1_Directed_ZIPSBM_Sup_ZIPLPCM_T12k_R1_hat_lambda-SS2_Scenario1_Directed_ZIPSBM_lambda)[diag(nrow(SS2_Scenario1_Directed_ZIPSBM$Y))==0]))
+# 0.1489447
+sd(abs((SS2_Scenario1_Directed_ZIPSBM_Sup_ZIPLPCM_T12k_R1_hat_lambda-SS2_Scenario1_Directed_ZIPSBM_lambda)[diag(nrow(SS2_Scenario1_Directed_ZIPSBM$Y))==0]))
+# 0.2645124
 ```
 
 the values of which provided above are exactly those we show in **Table 2**.
