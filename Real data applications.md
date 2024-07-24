@@ -416,19 +416,19 @@ However, the readers need to first download the "orca" app following [https://pl
 library("plotly")
 # Plot the 1st viewing angle of the latent positions
 fig1 <- plot_ly(scene ="scene1") %>% # plot the summarized clustering and hat_U
-  add_markers(x = RDA_SampsonMonks_Directed_ZIPLPCM_Sup_Beta_1_9_T60k_R1_hat_U[,1],
-              y = RDA_SampsonMonks_Directed_ZIPLPCM_Sup_Beta_1_9_T60k_R1_hat_U[,2],
-              z = RDA_SampsonMonks_Directed_ZIPLPCM_Sup_Beta_1_9_T60k_R1_hat_U[,3],
+  add_markers(x = RDA_SampsonMonks_Directed_ZIPLPCM_Sup_T60k_R1_hat_U[,1],
+              y = RDA_SampsonMonks_Directed_ZIPLPCM_Sup_T60k_R1_hat_U[,2],
+              z = RDA_SampsonMonks_Directed_ZIPLPCM_Sup_T60k_R1_hat_U[,3],
               text=paste("Node:",1:nrow(SampsonMonks_Directed_adj),"<br>c:",sampson_monks_group_cloisterville),
               size=VertexSize,sizes=c(300,600),showlegend = FALSE,
-              color=as.factor(RDA_SampsonMonks_Directed_ZIPLPCM_Sup_Beta_1_9_T60k_R1_hat_z),colors=My_colors[6:8]
+              color=as.factor(RDA_SampsonMonks_Directed_ZIPLPCM_Sup_T60k_R1_hat_z),colors=My_colors[6:8]
   )
 Edges <- get.edgelist(g_obs)
 for (i in 1:nrow(Edges)){
   fig1 <- fig1 %>%
-    add_trace(x = RDA_SampsonMonks_Directed_ZIPLPCM_Sup_Beta_1_9_T60k_R1_hat_U[Edges[i,],1],
-              y = RDA_SampsonMonks_Directed_ZIPLPCM_Sup_Beta_1_9_T60k_R1_hat_U[Edges[i,],2],
-              z = RDA_SampsonMonks_Directed_ZIPLPCM_Sup_Beta_1_9_T60k_R1_hat_U[Edges[i,],3],
+    add_trace(x = RDA_SampsonMonks_Directed_ZIPLPCM_Sup_T60k_R1_hat_U[Edges[i,],1],
+              y = RDA_SampsonMonks_Directed_ZIPLPCM_Sup_T60k_R1_hat_U[Edges[i,],2],
+              z = RDA_SampsonMonks_Directed_ZIPLPCM_Sup_T60k_R1_hat_U[Edges[i,],3],
               text=paste("Weight:",E(g_obs)$weight[i],"<br>UpperDiag?:",Edges[i,1]<Edges[i,2]),
               type = "scatter3d", mode = "lines", showlegend = FALSE,line = list(color = E(g_obs)$color[i], width = 0.75*E(g_obs)$weight[i]))
 }
@@ -436,19 +436,19 @@ for (i in 1:nrow(Edges)){
 
 # Plot the 2nd viewing angle of the latent positions
 fig2 <- plot_ly(scene ="scene2") %>% # plot the summarized clustering and hat_U
-  add_markers(x = RDA_SampsonMonks_Directed_ZIPLPCM_Sup_Beta_1_9_T60k_R1_hat_U[,1],
-              y = RDA_SampsonMonks_Directed_ZIPLPCM_Sup_Beta_1_9_T60k_R1_hat_U[,2],
-              z = RDA_SampsonMonks_Directed_ZIPLPCM_Sup_Beta_1_9_T60k_R1_hat_U[,3],
+  add_markers(x = RDA_SampsonMonks_Directed_ZIPLPCM_Sup_T60k_R1_hat_U[,1],
+              y = RDA_SampsonMonks_Directed_ZIPLPCM_Sup_T60k_R1_hat_U[,2],
+              z = RDA_SampsonMonks_Directed_ZIPLPCM_Sup_T60k_R1_hat_U[,3],
               text=paste("Node:",1:nrow(SampsonMonks_Directed_adj),"<br>c:",sampson_monks_group_cloisterville),
               size=VertexSize,sizes=c(300,600),showlegend = FALSE,
-              color=as.factor(RDA_SampsonMonks_Directed_ZIPLPCM_Sup_Beta_1_9_T60k_R1_hat_z),colors=My_colors[6:8]
+              color=as.factor(RDA_SampsonMonks_Directed_ZIPLPCM_Sup_T60k_R1_hat_z),colors=My_colors[6:8]
   )
 Edges <- get.edgelist(g_obs)
 for (i in 1:nrow(Edges)){
   fig2 <- fig2 %>%
-    add_trace(x = RDA_SampsonMonks_Directed_ZIPLPCM_Sup_Beta_1_9_T60k_R1_hat_U[Edges[i,],1],
-              y = RDA_SampsonMonks_Directed_ZIPLPCM_Sup_Beta_1_9_T60k_R1_hat_U[Edges[i,],2],
-              z = RDA_SampsonMonks_Directed_ZIPLPCM_Sup_Beta_1_9_T60k_R1_hat_U[Edges[i,],3],
+    add_trace(x = RDA_SampsonMonks_Directed_ZIPLPCM_Sup_T60k_R1_hat_U[Edges[i,],1],
+              y = RDA_SampsonMonks_Directed_ZIPLPCM_Sup_T60k_R1_hat_U[Edges[i,],2],
+              z = RDA_SampsonMonks_Directed_ZIPLPCM_Sup_T60k_R1_hat_U[Edges[i,],3],
               text=paste("Weight:",E(g_obs)$weight[i],"<br>UpperDiag?:",Edges[i,1]<Edges[i,2]),
               type = "scatter3d", mode = "lines", showlegend = FALSE,line = list(color = E(g_obs)$color[i], width = 0.75*E(g_obs)$weight[i]))
 }
@@ -479,6 +479,135 @@ RDA_SampsonMonks_Directed_ZIPLPCM_Sup_T60k_R1_hat_beta #  1.008339
 
 As no corresponding reference to compare with, we propose not to show the $\hat{\beta}$ in the paper.
 But we provide above the $\hat{\beta}$ value we obtained.
+
+Recall here that the posterior mean of the unusual zero indicator $\boldsymbol{\nu}$ approximates the conditional probability of unusual zeros provided that the corresponding observed interactions are zeros, i.e., the equation (22) of the **ZIP-LPCM-MFM** paper.
+We can obtain such a statistic by:
+
+``` r
+## Obtain posterior mean of nu, i.e. approximate P_m0
+RDA_SampsonMonks_Directed_ZIPLPCM_Sup_T60k_R1_hat_nu <-
+  Reduce("+",RDA_SampsonMonks_Directed_ZIPLPCM_Sup_T60k_R1$nu[iteration_after_burn_in])/length(iteration_after_burn_in)
+```
+
+Here we use `P_m0` in the code to denote such a conditional probability.
+
+Similar to the simulation studies shown in the [`Simulation studies.md`] file of this repository, we can also obtain for each posterior state the individual-level unusual zero probability $\boldsymbol{p}$ which is a $N \times N$ matrix with each entry $i,j$ being $p_{z_iz_j}$ for $i,j = 1,2,\dots,N$ following the code below.
+And we can thus obtain the posterior mean of the posterior samples of $\boldsymbol{p}$ to obtain the corresponding summary statistic accounting for the uncertainty of the posterior clustering.
+
+``` r
+# Obtain the individual-level unusual zero probability p for each iteration
+RDA_SampsonMonks_Directed_ZIPLPCM_Sup_T60k_R1_p <- list()
+library(Rfast) # for Rfast::Dist()
+for (t in 1:nrow(RDA_SampsonMonks_Directed_ZIPLPCM_Sup_T60k_R1$z)){
+  Z <- t(t(matrix(RDA_SampsonMonks_Directed_ZIPLPCM_Sup_T60k_R1_LSz[t,],length(RDA_SampsonMonks_Directed_ZIPLPCM_Sup_T60k_R1_LSz[t,]),
+                  RDA_SampsonMonks_Directed_ZIPLPCM_Sup_T60k_R1$K[t]))==(1:RDA_SampsonMonks_Directed_ZIPLPCM_Sup_T60k_R1$K[t]))*1
+  RDA_SampsonMonks_Directed_ZIPLPCM_Sup_T60k_R1_p[[t]] <- Z%*%RDA_SampsonMonks_Directed_ZIPLPCM_Sup_T60k_R1_LSP[[t]]%*%t(Z)
+  if ((t%%1000) == 0){cat("t=",t,"\n")}
+}
+RDA_SampsonMonks_Directed_ZIPLPCM_Sup_T60k_R1_hat_p <- Reduce("+",RDA_SampsonMonks_Directed_ZIPLPCM_Sup_T60k_R1_p[iteration_after_burn_in])/length(iteration_after_burn_in)
+diag(RDA_SampsonMonks_Directed_ZIPLPCM_Sup_T60k_R1_hat_p) <- 0
+```
+
+Similarly, the individual-level Poisson rate matrix with each entry being $\lambda_{ij}=\text{exp}(\beta-||\boldsymbol{u_i}-\boldsymbol{u_j}||)$ can also be obtained for each posterior state, and the corresponding posterior mean summary statistic can thus be obtained:
+
+``` r
+# Obtain the individual-level Poisson rate lambda for each iteration
+RDA_SampsonMonks_Directed_ZIPLPCM_Sup_T60k_R1_lambda <- list()
+library(Rfast) # for Rfast::Dist()
+for (t in 1:nrow(RDA_SampsonMonks_Directed_ZIPLPCM_Sup_T60k_R1$z)){
+  Z <- t(t(matrix(RDA_SampsonMonks_Directed_ZIPLPCM_Sup_T60k_R1_LSz[t,],length(RDA_SampsonMonks_Directed_ZIPLPCM_Sup_T60k_R1_LSz[t,]),RDA_SampsonMonks_Directed_ZIPLPCM_Sup_T60k_R1$K[t]))==(1:RDA_SampsonMonks_Directed_ZIPLPCM_Sup_T60k_R1$K[t]))*1
+  Dist_U <- Rfast::Dist(RDA_SampsonMonks_Directed_ZIPLPCM_Sup_T60k_R1_PTU[[t]])
+  RDA_SampsonMonks_Directed_ZIPLPCM_Sup_T60k_R1_lambda[[t]] <- exp(RDA_SampsonMonks_Directed_ZIPLPCM_Sup_T60k_R1$beta[t]-Dist_U)
+  if ((t%%1000) == 0){cat("t=",t,"\n") }
+}
+RDA_SampsonMonks_Directed_ZIPLPCM_Sup_T60k_R1_hat_Lambdaij <- Reduce("+",RDA_SampsonMonks_Directed_ZIPLPCM_Sup_T60k_R1_lambda[iteration_after_burn_in])/length(iteration_after_burn_in)
+diag(RDA_SampsonMonks_Directed_ZIPLPCM_Sup_T60k_R1_hat_Lambdaij) <- 0
+```
+
+Based on the above individual-level statistics, the heatmap plots shown in **Figure 8** of the **ZIP-LPCM-MFM** paper can be recovered by:
+
+``` r
+library("RColorBrewer")
+library("pheatmap")
+library("ggplot2")
+
+My_colors <- c(brewer.pal(10,"RdBu")[c(4,7)],brewer.pal(10,"PRGn")[c(7,4)],brewer.pal(9,"YlOrBr")[4],
+               brewer.pal(10,"RdBu")[c(2,9)],brewer.pal(10,"PRGn")[c(9,2)],brewer.pal(9,"YlOrBr")[6],
+               brewer.pal(9,"Reds")[c(9,6)],brewer.pal(9,"RdPu")[5],brewer.pal(9,"Greys")[c(3,6,9)],brewer.pal(9,"GnBu")[5])
+
+SampsonMonks_Directed_adj_dataframe <- as.data.frame(SampsonMonks_Directed_adj)
+rownames(SampsonMonks_Directed_adj_dataframe) <- colnames(SampsonMonks_Directed_adj_dataframe) <- 1:nrow(SampsonMonks_Directed_adj)
+
+RDA_SampsonMonks_Directed_ZIPLPCM_Sup_T60k_R1_hat_nu_dataframe <- as.data.frame(RDA_SampsonMonks_Directed_ZIPLPCM_Sup_T60k_R1_hat_nu)
+rownames(RDA_SampsonMonks_Directed_ZIPLPCM_Sup_T60k_R1_hat_nu_dataframe) <- colnames(RDA_SampsonMonks_Directed_ZIPLPCM_Sup_T60k_R1_hat_nu_dataframe) <- 1:nrow(SampsonMonks_Directed_adj)
+
+# Plot of the adj, adj|hat_z and hat_nu*(1-dpois(0,hat_lambda))|hat_z
+annotation_row_z_ref <- as.data.frame(as.factor(matrix(RDA_SampsonMonks_Directed_ZIPLPCM_Sup_T60k_R1_hat_z,length(RDA_SampsonMonks_Directed_ZIPLPCM_Sup_T60k_R1_hat_z),1)))
+colnames(annotation_row_z_ref) <- "z_ref"
+annotation_colors_z_ref <- My_colors[6:8]
+names(annotation_colors_z_ref) <- sort(unique(annotation_row_z_ref$z_ref))
+annotation_colors_blank <- rep(brewer.pal(9,"Greys")[1],3)
+names(annotation_colors_blank) <- sort(unique(annotation_row_z_ref$z_ref))
+
+RDA_SampsonMonks_Directed_Y_heatmap <-
+  pheatmap(SampsonMonks_Directed_adj_dataframe,
+           color=c(brewer.pal(9,"Greys")[3],colorRampPalette(brewer.pal(9,"YlOrRd"))(max(SampsonMonks_Directed_adj))),
+           cluster_cols = FALSE,cluster_rows= FALSE,show_rownames=FALSE,show_colnames=FALSE,border_color=FALSE,legend=TRUE,
+           annotation_row = annotation_row_z_ref,annotation_col = annotation_row_z_ref,
+           annotation_colors=list(z_ref=annotation_colors_blank),
+           annotation_names_row=FALSE,annotation_names_col=FALSE,annotation_legend=FALSE)
+
+RDA_SampsonMonks_Directed_ZIPLPCM_Sup_T60k_R1_Y_hat_z_heatmap <-
+  pheatmap(SampsonMonks_Directed_adj_dataframe[order(RDA_SampsonMonks_Directed_ZIPLPCM_Sup_T60k_R1_hat_z),order(RDA_SampsonMonks_Directed_ZIPLPCM_Sup_T60k_R1_hat_z)],
+           color=c(brewer.pal(9,"Greys")[3],colorRampPalette(brewer.pal(9,"YlOrRd"))(max(SampsonMonks_Directed_adj))),
+           cluster_cols = FALSE,cluster_rows= FALSE,show_rownames=FALSE,show_colnames=FALSE,border_color=FALSE,legend=TRUE,
+           annotation_row = annotation_row_z_ref,annotation_col = annotation_row_z_ref,
+           annotation_colors=list(z_ref=annotation_colors_z_ref),annotation_names_row=FALSE,annotation_names_col=FALSE,annotation_legend=FALSE,
+           gaps_row=c(which(diff(sort(RDA_SampsonMonks_Directed_ZIPLPCM_Sup_T60k_R1_hat_z))!=0)),gaps_col=c(which(diff(sort(RDA_SampsonMonks_Directed_ZIPLPCM_Sup_T60k_R1_hat_z))!=0)))
+
+RDA_SampsonMonks_Directed_ZIPLPCM_Sup_T60k_R1_hat_P_m0_Non0_heatmap <-
+  pheatmap((RDA_SampsonMonks_Directed_ZIPLPCM_Sup_T60k_R1_hat_nu_dataframe*(1-dpois(0,RDA_SampsonMonks_Directed_ZIPLPCM_Sup_T60k_R1_hat_lambda)))[order(RDA_SampsonMonks_Directed_ZIPLPCM_Sup_T60k_R1_hat_z),order(RDA_SampsonMonks_Directed_ZIPLPCM_Sup_T60k_R1_hat_z)],
+           color=c(brewer.pal(9,"Greys")[3],colorRampPalette(brewer.pal(9,"YlOrRd")[1:4])(100)),cluster_cols = FALSE,cluster_rows= FALSE,show_rownames=FALSE,show_colnames=FALSE,border_color=FALSE,legend=TRUE,
+           annotation_row = annotation_row_z_ref,annotation_col = annotation_row_z_ref,
+           annotation_colors=list(z_ref=annotation_colors_z_ref),annotation_names_row=FALSE,annotation_names_col=FALSE,annotation_legend=FALSE,
+           gaps_row=c(which(diff(sort(RDA_SampsonMonks_Directed_ZIPLPCM_Sup_T60k_R1_hat_z))!=0)),gaps_col=c(which(diff(sort(RDA_SampsonMonks_Directed_ZIPLPCM_Sup_T60k_R1_hat_z))!=0)))
+
+library("grid")
+library("gridExtra")
+g <- grid.arrange(RDA_SampsonMonks_Directed_Y_heatmap[[4]],
+                  RDA_SampsonMonks_Directed_ZIPLPCM_Sup_T60k_R1_Y_hat_z_heatmap[[4]],
+                  RDA_SampsonMonks_Directed_ZIPLPCM_Sup_T60k_R1_hat_P_m0_Non0_heatmap[[4]],
+                  nrow=1,ncol=3,vp=viewport(width=1, height=1))
+Fig <- cowplot::ggdraw(g)+ theme(plot.background =element_rect(fill=brewer.pal(9,"Greys")[1]))+theme(plot.background = element_rect(colour = "white", linewidth = 0))
+Fig
+```
+
+And the heatmap plots of the individual-level unusual zero probability $\hat{\boldsymbol{p}}$ and the approximate `P_m0`, i.e., the $\hat{\boldsymbol{\nu}}$ which are not illustrated in the paper can also be obtained here:
+
+``` r
+# Heatmap plot of the hat_nu which approximates the P_m0
+RDA_SampsonMonks_Directed_ZIPLPCM_Sup_T60k_R1_hat_P_m0_heatmap <-
+  pheatmap(RDA_SampsonMonks_Directed_ZIPLPCM_Sup_T60k_R1_hat_nu_dataframe[order(RDA_SampsonMonks_Directed_ZIPLPCM_Sup_T60k_R1_hat_z),order(RDA_SampsonMonks_Directed_ZIPLPCM_Sup_T60k_R1_hat_z)],
+           color=c(brewer.pal(9,"Greys")[3],colorRampPalette(brewer.pal(9,"YlOrRd")[1:5])(100)),cluster_cols = FALSE,cluster_rows= FALSE,show_rownames=FALSE,show_colnames=FALSE,border_color=FALSE,legend=TRUE,
+           annotation_row = annotation_row_z_ref,annotation_col = annotation_row_z_ref,
+           annotation_colors=list(z_ref=annotation_colors_z_ref),annotation_names_row=FALSE,annotation_names_col=FALSE,annotation_legend=FALSE,
+           gaps_row=c(which(diff(sort(RDA_SampsonMonks_Directed_ZIPLPCM_Sup_T60k_R1_hat_z))!=0)),gaps_col=c(which(diff(sort(RDA_SampsonMonks_Directed_ZIPLPCM_Sup_T60k_R1_hat_z))!=0)))
+RDA_SampsonMonks_Directed_ZIPLPCM_Sup_T60k_R1_hat_P_m0_heatmap_draw <- cowplot::ggdraw(RDA_SampsonMonks_Directed_ZIPLPCM_Sup_T60k_R1_hat_P_m0_heatmap[[4]])+ theme(plot.background =element_rect(fill=brewer.pal(9,"Greys")[1]))
+print(RDA_SampsonMonks_Directed_ZIPLPCM_Sup_T60k_R1_hat_P_m0_heatmap_draw)
+
+# Heatmap plot of the individual-level hat_p
+RDA_SampsonMonks_Directed_ZIPLPCM_Sup_T60k_R1_hat_p_dataframe <- as.data.frame(RDA_SampsonMonks_Directed_ZIPLPCM_Sup_T60k_R1_hat_p)
+rownames(RDA_SampsonMonks_Directed_ZIPLPCM_Sup_T60k_R1_hat_p_dataframe) <- colnames(RDA_SampsonMonks_Directed_ZIPLPCM_Sup_T60k_R1_hat_p_dataframe) <- 1:nrow(SampsonMonks_Directed_adj)
+
+RDA_SampsonMonks_Directed_ZIPLPCM_Sup_T60k_R1_hat_p_heatmap <-
+  pheatmap(RDA_SampsonMonks_Directed_ZIPLPCM_Sup_T60k_R1_hat_p_dataframe[order(RDA_SampsonMonks_Directed_ZIPLPCM_Sup_Beta_1_9_T60k_R1_hat_z),order(RDA_SampsonMonks_Directed_ZIPLPCM_Sup_Beta_1_9_T60k_R1_hat_z)],
+           color=c(brewer.pal(9,"Greys")[3],colorRampPalette(brewer.pal(9,"YlOrRd")[1:3])(100)),cluster_cols = FALSE,cluster_rows= FALSE,show_rownames=FALSE,show_colnames=FALSE,border_color=FALSE,legend=TRUE,
+           annotation_row = annotation_row_z_ref,annotation_col = annotation_row_z_ref,
+           annotation_colors=list(z_ref=annotation_colors_z_ref),annotation_names_row=FALSE,annotation_names_col=FALSE,annotation_legend=FALSE,
+           gaps_row=c(which(diff(sort(RDA_SampsonMonks_Directed_ZIPLPCM_Sup_Beta_1_9_T60k_R1_hat_z))!=0)),gaps_col=c(which(diff(sort(RDA_SampsonMonks_Directed_ZIPLPCM_Sup_Beta_1_9_T60k_R1_hat_z))!=0)))
+RDA_SampsonMonks_Directed_ZIPLPCM_Sup_T60k_R1_hat_p_heatmap_draw <- cowplot::ggdraw(RDA_SampsonMonks_Directed_ZIPLPCM_Sup_T60k_R1_hat_p_heatmap[[4]])+ theme(plot.background =element_rect(fill=brewer.pal(9,"Greys")[1]))
+print(RDA_SampsonMonks_Directed_ZIPLPCM_Sup_T60k_R1_hat_p_heatmap_draw)
+```
 
 ### 2.2 Windsurfers Network
 
