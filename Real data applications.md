@@ -281,6 +281,205 @@ for (t in 1:nrow(RDA_SampsonMonks_Directed_ZIPLPCM_Sup_T60k_R1$z)){
 }
 ```
 
+Then we can first check the sufficient mixing of posterior samples via the traceplot of the complete likelihoods and the number of clusters:
+
+``` r
+## Check complete likelihood for each iteration
+RDA_SampsonMonks_Directed_ZIPLPCM_Sup_T60k_R1_LSz_Like <- c()
+for (t in 1:nrow(RDA_SampsonMonks_Directed_ZIPLPCM_Sup_T60k_R1$z)){
+  RDA_SampsonMonks_Directed_ZIPLPCM_Sup_T60k_R1_LSz_Like <-
+    c(RDA_SampsonMonks_Directed_ZIPLPCM_Sup_T60k_R1_LSz_Like,
+      Directed_ZIPLPCM_MFM_CompleteLikelihood(X=RDA_SampsonMonks_Directed_ZIPLPCM_Sup_T60k_R1$X[[t]],
+                                              U=RDA_SampsonMonks_Directed_ZIPLPCM_Sup_T60k_R1_PTU[[t]],
+                                              beta=RDA_SampsonMonks_Directed_ZIPLPCM_Sup_T60k_R1$beta[t],
+                                              nu=RDA_SampsonMonks_Directed_ZIPLPCM_Sup_T60k_R1$nu[[t]],
+                                              P=RDA_SampsonMonks_Directed_ZIPLPCM_Sup_T60k_R1_LSP[[t]],
+                                              z=RDA_SampsonMonks_Directed_ZIPLPCM_Sup_T60k_R1_LSz[t,],
+                                              alpha1=1,alpha2=0.103,omega=0.01,  alpha=3,
+                                              A=sampson_monks_group_cloisterville_NodeA,omega_c=1))
+  if ((t%%1000) == 0){cat("t=",t,"\n")}
+}
+plot(RDA_SampsonMonks_Directed_ZIPLPCM_Sup_T60k_R1_LSz_Like,type = "l",xlab = "",ylab = "", main = "Likelihood",cex.axis = 0.8)
+
+# Check the trace plot of K
+plot(RDA_SampsonMonks_Directed_ZIPLPCM_Sup_T60k_R1$K,type = "l",xlab = "",ylab = "", main = "K Trace Plot",cex.axis = 0.8)
+```
+
+To obtain a point estimate of the posterior clustering, we follow equation (29) of the **ZIP-LPCM-MFM** paper and leverage the greedy algorithm proposed by [Rastelli, R. and Friel, N. (2018)](https://pubmed.ncbi.nlm.nih.gov/30220822/).
+However, we start from obtaining the marginal posterior mode of the posterior clustering and treat it as the initial state of the Rastelli, R. and Friel, N. (2018) greedy method:
+
+``` r
+# Summarize posterior clustering z by the greedy algorithm proposed by Rastelli and Friel (2018)
+# We start from obtaining the marginal posterior mode of the posterior z chain
+RDA_SampsonMonks_Directed_ZIPLPCM_Sup_T60k_R1_LSz_States <- c() # initialize a list which will store different clustering states; the clustering states are labeled from 1,2,3... and are put at the 1st,2nd,3rd... row of the matrix, respectively
+RDA_SampsonMonks_Directed_ZIPLPCM_Sup_T60k_R1_LSz_StatesIteration <- list() # store all the t's (iteration number) which provides the same cluster as the clustering state 1,2,3...
+RDA_SampsonMonks_Directed_ZIPLPCM_Sup_T60k_R1_LSz_IterationLoop <- iteration_after_burn_in # the "IterationLoop" which stores all the iteration t's which we focus on, that is, all the iteration t's after burn-in
+StatesLabelIndicator = 0 # initialize the label for the clustering states
+while (length(RDA_SampsonMonks_Directed_ZIPLPCM_Sup_T60k_R1_LSz_IterationLoop)!=0){ # if the "IterationLoop" is not empty
+  StatesLabelIndicator <- StatesLabelIndicator + 1 # assign the next label to the next clustering state
+  RDA_SampsonMonks_Directed_ZIPLPCM_Sup_T60k_R1_LSz_FirstState <- RDA_SampsonMonks_Directed_ZIPLPCM_Sup_T60k_R1_LSz[RDA_SampsonMonks_Directed_ZIPLPCM_Sup_T60k_R1_LSz_IterationLoop[1],] # extract the first clustering state for the "IterationLoop"
+  RDA_SampsonMonks_Directed_ZIPLPCM_Sup_T60k_R1_LSz_States <- rbind(RDA_SampsonMonks_Directed_ZIPLPCM_Sup_T60k_R1_LSz_States,
+                                                                             RDA_SampsonMonks_Directed_ZIPLPCM_Sup_T60k_R1_LSz_FirstState) # store the first state within the "IterationLoop" with label "StatesLabelIndicator" in the list which will contain all different unique states
+  RDA_SampsonMonks_Directed_ZIPLPCM_Sup_T60k_R1_LSz_StatesIteration_temp <- c() # create a vector to temporarily store all the iteration t's whose clustering is the same as the first clustering state within the "IterationLoop"
+  for (t in RDA_SampsonMonks_Directed_ZIPLPCM_Sup_T60k_R1_LSz_IterationLoop){ # loop over all the current existing iterations in "IterationLoop"
+    if (sum(RDA_SampsonMonks_Directed_ZIPLPCM_Sup_T60k_R1_LSz[t,]==RDA_SampsonMonks_Directed_ZIPLPCM_Sup_T60k_R1_LSz_FirstState)==length(RDA_SampsonMonks_Directed_ZIPLPCM_Sup_T60k_R1_LSz_FirstState)){ # if the t's clustering is the same as the "FirstState"
+      RDA_SampsonMonks_Directed_ZIPLPCM_Sup_T60k_R1_LSz_StatesIteration_temp <- c(RDA_SampsonMonks_Directed_ZIPLPCM_Sup_T60k_R1_LSz_StatesIteration_temp,t) # store the iteration t in the temporary vector
+    }
+  }
+  RDA_SampsonMonks_Directed_ZIPLPCM_Sup_T60k_R1_LSz_StatesIteration[[StatesLabelIndicator]] <- RDA_SampsonMonks_Directed_ZIPLPCM_Sup_T60k_R1_LSz_StatesIteration_temp # store all the t's as the list element
+  RDA_SampsonMonks_Directed_ZIPLPCM_Sup_T60k_R1_LSz_IterationLoop <-
+    (iteration_after_burn_in)[-(unlist(RDA_SampsonMonks_Directed_ZIPLPCM_Sup_T60k_R1_LSz_StatesIteration)-burn_in)] # remove all the iterations we have stored and then move to the next clustering state
+}
+rownames(RDA_SampsonMonks_Directed_ZIPLPCM_Sup_T60k_R1_LSz_States) <- NULL
+nrow(RDA_SampsonMonks_Directed_ZIPLPCM_Sup_T60k_R1_LSz_States) # check the number of different clustering states
+RDA_SampsonMonks_Directed_ZIPLPCM_Sup_T60k_R1_LSz_StatesFrequency <- c() # check the number of times each clustering state occurs
+for (t in 1:nrow(RDA_SampsonMonks_Directed_ZIPLPCM_Sup_T60k_R1_LSz_States)){
+  RDA_SampsonMonks_Directed_ZIPLPCM_Sup_T60k_R1_LSz_StatesFrequency <-
+    c(RDA_SampsonMonks_Directed_ZIPLPCM_Sup_T60k_R1_LSz_StatesFrequency,
+      length(RDA_SampsonMonks_Directed_ZIPLPCM_Sup_T60k_R1_LSz_StatesIteration[[t]]))
+}
+library(GreedyEPL) # obtain the summarized z by the greedy algorithm proposed by Rastelli and Friel (2018)
+output <- MinimiseEPL(RDA_SampsonMonks_Directed_ZIPLPCM_Sup_T60k_R1_LSz[iteration_after_burn_in,],
+                      list(Kup = 20, loss_type = "VI",decision_init = RDA_SampsonMonks_Directed_ZIPLPCM_Sup_T60k_R1_LSz_States[
+                        which.max(RDA_SampsonMonks_Directed_ZIPLPCM_Sup_T60k_R1_LSz_StatesFrequency),]))
+output$EPL # check minEVI posterior loss: 0.03696773
+RDA_SampsonMonks_Directed_ZIPLPCM_Sup_T60k_R1_hat_z <- output$decision # Save output as summarized z
+table(RDA_SampsonMonks_Directed_ZIPLPCM_Sup_T60k_R1_hat_z,sampson_monks_group,dnn = c("","")) # compare to the reference clustering
+```
+
+It's shown that the summarized clustering is exactly the same as the reference clustering.
+Based on the results we obtained above, we can also follow equation (30) of the **ZIP-LPCM-MFM** paper to obtain a point estimate $\hat{\boldsymbol{U}}$ for the latent positions:
+
+``` r
+# Obtain summarized U
+RDA_SampsonMonks_Directed_ZIPLPCM_Sup_T60k_R1_LSz_hat_zIteration <- # extract all the iterations whose clustering is identical to hat_z
+  RDA_SampsonMonks_Directed_ZIPLPCM_Sup_T60k_R1_LSz_StatesIteration[[
+    which(apply(t(RDA_SampsonMonks_Directed_ZIPLPCM_Sup_T60k_R1_LSz_States)==
+                  RDA_SampsonMonks_Directed_ZIPLPCM_Sup_T60k_R1_hat_z,2,sum)==length(RDA_SampsonMonks_Directed_ZIPLPCM_Sup_T60k_R1_hat_z))
+  ]]
+RDA_SampsonMonks_Directed_ZIPLPCM_Sup_T60k_R1_MaxLikeHatz_iteration <- RDA_SampsonMonks_Directed_ZIPLPCM_Sup_T60k_R1_LSz_hat_zIteration[
+  which.max(RDA_SampsonMonks_Directed_ZIPLPCM_Sup_T60k_R1_LSz_Like[RDA_SampsonMonks_Directed_ZIPLPCM_Sup_T60k_R1_LSz_hat_zIteration])]
+RDA_SampsonMonks_Directed_ZIPLPCM_Sup_T60k_R1_hat_U <-
+  RDA_SampsonMonks_Directed_ZIPLPCM_Sup_T60k_R1_PTU[[RDA_SampsonMonks_Directed_ZIPLPCM_Sup_T60k_R1_MaxLikeHatz_iteration]]
+```
+
+Once we obtained both $\hat{\boldsymbol{z}}$ and $\hat{\boldsymbol{U}}$, the 3-dimensional interactive plot of them can be produced following:
+
+``` r
+library("igraph")
+library("RColorBrewer")
+library("ggplot2")
+My_colors <- c(brewer.pal(10,"RdBu")[c(4,7)],brewer.pal(10,"PRGn")[c(7,4)],brewer.pal(9,"YlOrBr")[3],
+               brewer.pal(10,"RdBu")[c(2,9)],brewer.pal(10,"PRGn")[c(9,2)],brewer.pal(9,"YlOrBr")[6],
+               brewer.pal(9,"Reds")[c(9,6)],brewer.pal(9,"RdPu")[5],brewer.pal(9,"Greys")[c(3,6,9)],brewer.pal(9,"GnBu")[5])
+g_obs <- graph_from_adjacency_matrix(SampsonMonks_Directed_adj,mode = "directed",weighted = TRUE)
+E(g_obs)$color <- colorRampPalette(brewer.pal(9,"Greys")[c(3,9)])(max(SampsonMonks_Directed_adj))[E(g_obs)$weight]
+betw <- betweenness(g_obs) # evaluate the betweeness of the network
+VertexSize <- sqrt(betw/1.5+mean(betw))*1 # set the vertex size
+library("plotly")
+fig <- plot_ly() %>% # plot the summarized hat_z and hat_U
+  add_markers(x = RDA_SampsonMonks_Directed_ZIPLPCM_Sup_T60k_R1_hat_U[,1],
+              y = RDA_SampsonMonks_Directed_ZIPLPCM_Sup_T60k_R1_hat_U[,2],
+              z = RDA_SampsonMonks_Directed_ZIPLPCM_Sup_T60k_R1_hat_U[,3],
+              text=paste("Node:",1:nrow(SampsonMonks_Directed_adj),"<br>z*:",sampson_monks_group),
+              size=VertexSize,sizes=c(300,600),
+              color=as.factor(RDA_SampsonMonks_Directed_ZIPLPCM_Sup_T60k_R1_hat_z),colors=My_colors[6:8]
+  )
+Edges <- get.edgelist(g_obs)
+for (i in 1:nrow(Edges)){
+  fig <- fig %>%
+    add_trace(x = RDA_SampsonMonks_Directed_ZIPLPCM_Sup_T60k_R1_hat_U[Edges[i,],1],
+              y = RDA_SampsonMonks_Directed_ZIPLPCM_Sup_T60k_R1_hat_U[Edges[i,],2],
+              z = RDA_SampsonMonks_Directed_ZIPLPCM_Sup_T60k_R1_hat_U[Edges[i,],3],
+              text=paste("Weight:",E(g_obs)$weight[i],"<br>UpperDiag?:",Edges[i,1]<Edges[i,2]),
+              type = "scatter3d", mode = "lines", showlegend = FALSE,line = list(color = E(g_obs)$color[i], width = 0.75*E(g_obs)$weight[i]))
+}
+fig <- fig %>% layout(title = "hat_U and hat_z",scene = list(xaxis = list(title = 'x1'),yaxis = list(title = 'x2'),zaxis = list(title = 'x3')))
+fig
+```
+
+which is uploaded at [`/Interactive 3-d latent positions plots/RDA_SampsonMonks_InteractivePlot.html`] of this repository.
+Since the GitHub page cannot directly view this file, we suggest the readers to download it first and then the 3-d interactive plot would be free to play with.
+Note that running the code above would bring some warning messages and these are raised by some package bugs which are not yet resolved.
+However, these bugs would not affect our output and the readers can ignore those warning messages.
+The above code for the interactive 3-d plot also attached some texts or notes for each node and each non-zero interaction to help readers have a better understanding of the network.
+If the readers put the mouse pointer on each node of the interactive plot, there will be a comment bracket showing (i) the coordinate of the node, (ii) the node number (e.g. node 1, node 2, ...), (iii) the reference clustering of the node.
+If the mouse pointer is put on each non-zero interaction, the bracket will show (i) either the start coordinate or the end coordinate of the interaction vector, (ii) the interaction weight, (iii) an indicator of whether the interaction is from node $i$ to node $j$ where $i\< j$, i.e., whether the corresponding $y_{ij}$ is the upper-diagonal entry of the $\boldsymbol{Y}$ for the directed networks.
+
+The **Figure 7** of the **ZIP-LPCM-MFM** paper can thus be reproduced by the `subplot()` and the `orca()` functions following the code below.
+The `subplot()` function helps us add two interactive plots with different default viewing angle into one figure while the `orca()` function can produce a high quality screenshot of the interactive plots.
+Directly taking a screenshot of the interactive plots would bring a low-quality figure which is not satisfactory.
+However, the readers need to first download the "orca" app following [https://plotly.com/r/static-image-export/](https://plotly.com/r/static-image-export/) and [https://github.com/plotly/orca#installation](https://github.com/plotly/orca#installation) in order to use the `orca()` function in the `plotly` package.
+
+``` r
+# Use subplot() to plot two interactive plot with different viewing angle
+library("plotly")
+# Plot the 1st viewing angle of the latent positions
+fig1 <- plot_ly(scene ="scene1") %>% # plot the summarized clustering and hat_U
+  add_markers(x = RDA_SampsonMonks_Directed_ZIPLPCM_Sup_Beta_1_9_T60k_R1_hat_U[,1],
+              y = RDA_SampsonMonks_Directed_ZIPLPCM_Sup_Beta_1_9_T60k_R1_hat_U[,2],
+              z = RDA_SampsonMonks_Directed_ZIPLPCM_Sup_Beta_1_9_T60k_R1_hat_U[,3],
+              text=paste("Node:",1:nrow(SampsonMonks_Directed_adj),"<br>c:",sampson_monks_group_cloisterville),
+              size=VertexSize,sizes=c(300,600),showlegend = FALSE,
+              color=as.factor(RDA_SampsonMonks_Directed_ZIPLPCM_Sup_Beta_1_9_T60k_R1_hat_z),colors=My_colors[6:8]
+  )
+Edges <- get.edgelist(g_obs)
+for (i in 1:nrow(Edges)){
+  fig1 <- fig1 %>%
+    add_trace(x = RDA_SampsonMonks_Directed_ZIPLPCM_Sup_Beta_1_9_T60k_R1_hat_U[Edges[i,],1],
+              y = RDA_SampsonMonks_Directed_ZIPLPCM_Sup_Beta_1_9_T60k_R1_hat_U[Edges[i,],2],
+              z = RDA_SampsonMonks_Directed_ZIPLPCM_Sup_Beta_1_9_T60k_R1_hat_U[Edges[i,],3],
+              text=paste("Weight:",E(g_obs)$weight[i],"<br>UpperDiag?:",Edges[i,1]<Edges[i,2]),
+              type = "scatter3d", mode = "lines", showlegend = FALSE,line = list(color = E(g_obs)$color[i], width = 0.75*E(g_obs)$weight[i]))
+}
+
+
+# Plot the 2nd viewing angle of the latent positions
+fig2 <- plot_ly(scene ="scene2") %>% # plot the summarized clustering and hat_U
+  add_markers(x = RDA_SampsonMonks_Directed_ZIPLPCM_Sup_Beta_1_9_T60k_R1_hat_U[,1],
+              y = RDA_SampsonMonks_Directed_ZIPLPCM_Sup_Beta_1_9_T60k_R1_hat_U[,2],
+              z = RDA_SampsonMonks_Directed_ZIPLPCM_Sup_Beta_1_9_T60k_R1_hat_U[,3],
+              text=paste("Node:",1:nrow(SampsonMonks_Directed_adj),"<br>c:",sampson_monks_group_cloisterville),
+              size=VertexSize,sizes=c(300,600),showlegend = FALSE,
+              color=as.factor(RDA_SampsonMonks_Directed_ZIPLPCM_Sup_Beta_1_9_T60k_R1_hat_z),colors=My_colors[6:8]
+  )
+Edges <- get.edgelist(g_obs)
+for (i in 1:nrow(Edges)){
+  fig2 <- fig2 %>%
+    add_trace(x = RDA_SampsonMonks_Directed_ZIPLPCM_Sup_Beta_1_9_T60k_R1_hat_U[Edges[i,],1],
+              y = RDA_SampsonMonks_Directed_ZIPLPCM_Sup_Beta_1_9_T60k_R1_hat_U[Edges[i,],2],
+              z = RDA_SampsonMonks_Directed_ZIPLPCM_Sup_Beta_1_9_T60k_R1_hat_U[Edges[i,],3],
+              text=paste("Weight:",E(g_obs)$weight[i],"<br>UpperDiag?:",Edges[i,1]<Edges[i,2]),
+              type = "scatter3d", mode = "lines", showlegend = FALSE,line = list(color = E(g_obs)$color[i], width = 0.75*E(g_obs)$weight[i]))
+}
+
+Fig <- subplot(fig1, fig2)
+Fig <- Fig %>% layout(title = "", margin = list(l = 0,r = 0,b = 0,t = 0,pad = 0),
+                        scene = list(domain=list(x=c(0,1/2),y=c(0,1)),
+                                     xaxis = list(title = ''),yaxis = list(title = ''),zaxis = list(title = ''),
+                                     camera = list(eye = list(x = 0.1, y = -1.75, z = 0.75)),
+                                     aspectmode='auto'),
+                        scene2 = list(domain=list(x=c(1/2,0.999),y=c(0,1)),
+                                      xaxis = list(title = ''),yaxis = list(title = ''),zaxis = list(title = ''),
+                                      camera = list(eye = list(x = 1.75, y = 0.1, z = 0.75)),
+                                      aspectmode='auto'))
+Fig # directly make the plot in Rstudio
+# Apply orca() to obtain a high quality screenshot
+orca(Fig, "RDA_SampsonMonks_hat_U_Y.pdf",scale=1,width=1800,height=850)
+```
+
+The summarized $\hat{\beta}$ obtained by posterior mean can also be easily obtained:
+
+``` r
+## Summarize beta
+RDA_SampsonMonks_Directed_ZIPLPCM_Sup_T60k_R1_hat_beta <-
+  mean(RDA_SampsonMonks_Directed_ZIPLPCM_Sup_T60k_R1$beta[iteration_after_burn_in])
+RDA_SampsonMonks_Directed_ZIPLPCM_Sup_T60k_R1_hat_beta #  1.008339
+```
+
+As no corresponding reference to compare with, we propose not to show the $\hat{\beta}$ in the paper.
+But we provide above the $\hat{\beta}$ value we obtained.
+
 ### 2.2 Windsurfers Network
 
 ### 2.3 Train Bombing Network
