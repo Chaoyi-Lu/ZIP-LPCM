@@ -578,7 +578,7 @@ g <- grid.arrange(RDA_SampsonMonks_Directed_Y_heatmap[[4]],
                   RDA_SampsonMonks_Directed_ZIPLPCM_Sup_T60k_R1_Y_hat_z_heatmap[[4]],
                   RDA_SampsonMonks_Directed_ZIPLPCM_Sup_T60k_R1_hat_P_m0_Non0_heatmap[[4]],
                   nrow=1,ncol=3,vp=viewport(width=1, height=1))
-Fig <- cowplot::ggdraw(g)+ theme(plot.background =element_rect(fill=brewer.pal(9,"Greys")[1]))+theme(plot.background = element_rect(colour = "white", linewidth = 0))
+Fig <- cowplot::ggdraw(g)+ theme(plot.background = element_rect(colour = "white", linewidth = 0))
 Fig
 ```
 
@@ -962,7 +962,7 @@ g <- grid.arrange(RDA_Windsurfers_UnDirected_Y[[4]],
                   RDA_Windsurfers_UnDirected_ZIPLPCM_unSup_T60k_R1_Y_hat_z_heatmap[[4]],
                   RDA_Windsurfers_UnDirected_ZIPLPCM_unSup_T60k_R1_hat_P_m0_Non0_heatmap[[4]],
                   nrow=1,ncol=3,vp=viewport(width=1, height=1))
-Fig <- cowplot::ggdraw(g)+ theme(plot.background =element_rect(fill=brewer.pal(9,"Greys")[1]))+theme(plot.background = element_rect(colour = "white", linewidth = 0))
+Fig <- cowplot::ggdraw(g)+ theme(plot.background = element_rect(colour = "white", linewidth = 0))
 Fig
 ```
 
@@ -1211,6 +1211,120 @@ Fig1 <- Fig1 %>% layout(title = "", margin = list(l = 0,r = 0,b = 0,t = 0,pad = 
                                       aspectmode='auto'))
 # Fig1
 orca(Fig1, "RDA_TrainBombing_hat_U_Y.pdf",scale=1,width=1800,height=850)
+```
+
+Finally, the rest summary statistics and the corresponding heatmap plots as well as the **Figure 11** in the paper can be produced following the code below:
+
+``` r
+## Summarize beta
+RDA_TrainBombing_UnDirected_ZIPLPCM_unSup_T60k_R1_hat_beta <-
+  mean(RDA_TrainBombing_UnDirected_ZIPLPCM_unSup_T60k_R1$beta[iteration_after_burn_in])
+RDA_TrainBombing_UnDirected_ZIPLPCM_unSup_T60k_R1_hat_beta #  1.057638
+#--------------------------------------------------------------------------------------------------------------------------
+## Obtain posterior mean of nu, i.e. approximated P_m0
+RDA_TrainBombing_UnDirected_ZIPLPCM_unSup_T60k_R1_hat_nu <-
+  Reduce("+",RDA_TrainBombing_UnDirected_ZIPLPCM_unSup_T60k_R1$nu[iteration_after_burn_in])/length(iteration_after_burn_in)
+#--------------------------------------------------------------------------------------------------------------------------
+library("RColorBrewer")
+library("pheatmap")
+library("ggplot2")
+My_colors <- c(brewer.pal(10,"RdBu")[c(4,8)],brewer.pal(10,"PRGn")[c(7,4)],brewer.pal(9,"YlOrBr")[4],
+               brewer.pal(10,"RdBu")[c(2,9)],brewer.pal(10,"PRGn")[c(9,2)],brewer.pal(9,"YlOrBr")[6],
+               brewer.pal(9,"Reds")[c(9,6)],brewer.pal(9,"RdPu")[5],brewer.pal(9,"Greys")[c(3,6,9)],brewer.pal(9,"GnBu")[5])
+
+Train_bombing_adj_dataframe <- as.data.frame(Train_bombing_adj)
+rownames(Train_bombing_adj_dataframe) <- colnames(Train_bombing_adj_dataframe) <- 1:nrow(Train_bombing_adj)
+
+RDA_TrainBombing_UnDirected_ZIPLPCM_unSup_T60k_R1_hat_nu_dataframe <- as.data.frame(RDA_TrainBombing_UnDirected_ZIPLPCM_unSup_T60k_R1_hat_nu)
+rownames(RDA_TrainBombing_UnDirected_ZIPLPCM_unSup_T60k_R1_hat_nu_dataframe) <- colnames(RDA_TrainBombing_UnDirected_ZIPLPCM_unSup_T60k_R1_hat_nu_dataframe) <- 1:nrow(Train_bombing_adj)
+#--------------------------------------------------------------------------------------------------------------------------
+# Obtain p for each iteration
+RDA_TrainBombing_UnDirected_ZIPLPCM_unSup_T60k_R1_p <- list()
+library(Rfast)
+for (t in 1:nrow(RDA_TrainBombing_UnDirected_ZIPLPCM_unSup_T60k_R1$z)){
+  Z <- t(t(matrix(RDA_TrainBombing_UnDirected_ZIPLPCM_unSup_T60k_R1_LSz[t,],length(RDA_TrainBombing_UnDirected_ZIPLPCM_unSup_T60k_R1_LSz[t,]),
+                  RDA_TrainBombing_UnDirected_ZIPLPCM_unSup_T60k_R1$K[t]))==(1:RDA_TrainBombing_UnDirected_ZIPLPCM_unSup_T60k_R1$K[t]))*1
+  RDA_TrainBombing_UnDirected_ZIPLPCM_unSup_T60k_R1_p[[t]] <- Z%*%RDA_TrainBombing_UnDirected_ZIPLPCM_unSup_T60k_R1_LSP[[t]]%*%t(Z)
+  if ((t%%1000) == 0){cat("t=",t,"\n")}
+}
+RDA_TrainBombing_UnDirected_ZIPLPCM_unSup_T60k_R1_hat_p <- Reduce("+",RDA_TrainBombing_UnDirected_ZIPLPCM_unSup_T60k_R1_p[iteration_after_burn_in])/length(iteration_after_burn_in)
+diag(RDA_TrainBombing_UnDirected_ZIPLPCM_unSup_T60k_R1_hat_p) <- 0
+
+#--------------------------------------------------------------------------------------------------------------------------
+# Obtain lambda for each iteration
+RDA_TrainBombing_UnDirected_ZIPLPCM_unSup_T60k_R1_lambda <- list()
+library(Rfast)
+for (t in 1:nrow(RDA_TrainBombing_UnDirected_ZIPLPCM_unSup_T60k_R1$z)){
+  Z <- t(t(matrix(RDA_TrainBombing_UnDirected_ZIPLPCM_unSup_T60k_R1_LSz[t,],length(RDA_TrainBombing_UnDirected_ZIPLPCM_unSup_T60k_R1_LSz[t,]),RDA_TrainBombing_UnDirected_ZIPLPCM_unSup_T60k_R1$K[t]))==(1:RDA_TrainBombing_UnDirected_ZIPLPCM_unSup_T60k_R1$K[t]))*1
+  Dist_U <- Rfast::Dist(RDA_TrainBombing_UnDirected_ZIPLPCM_unSup_T60k_R1_PTU[[t]])
+  RDA_TrainBombing_UnDirected_ZIPLPCM_unSup_T60k_R1_lambda[[t]] <- exp(RDA_TrainBombing_UnDirected_ZIPLPCM_unSup_T60k_R1$beta[t]-Dist_U)
+  if ((t%%1000) == 0){cat("t=",t,"\n")}
+}
+RDA_TrainBombing_UnDirected_ZIPLPCM_unSup_T60k_R1_hat_lambda <- Reduce("+",RDA_TrainBombing_UnDirected_ZIPLPCM_unSup_T60k_R1_lambda[iteration_after_burn_in])/length(iteration_after_burn_in)
+diag(RDA_TrainBombing_UnDirected_ZIPLPCM_unSup_T60k_R1_hat_lambda) <- 0
+
+#--------------------------------------------------------------------------------------------------------------------------
+# Make the heatmap plots
+annotation_row_z_ref <- as.data.frame(as.factor(matrix(RDA_TrainBombing_UnDirected_ZIPLPCM_unSup_T60k_R1_hat_z,length(RDA_TrainBombing_UnDirected_ZIPLPCM_unSup_T60k_R1_hat_z),1)))
+colnames(annotation_row_z_ref) <- "z_ref"
+annotation_colors_z_ref <- My_colors[c(6,2,8,9)]
+names(annotation_colors_z_ref) <- sort(unique(annotation_row_z_ref$z_ref))
+annotation_colors_blank <- rep(brewer.pal(9,"Greys")[1],4)
+names(annotation_colors_blank) <- sort(unique(annotation_row_z_ref$z_ref))
+
+RDA_TrainBombing_UnDirected_Y <-
+  pheatmap(Train_bombing_adj_dataframe,
+           color=c(brewer.pal(9,"Greys")[3],colorRampPalette(brewer.pal(9,"YlOrRd"))(max(Train_bombing_adj))),
+           cluster_cols = FALSE,cluster_rows= FALSE,show_rownames=FALSE,show_colnames=FALSE,border_color=FALSE,legend=TRUE,
+           annotation_row = annotation_row_z_ref,annotation_col = annotation_row_z_ref,
+           annotation_colors=list(z_ref=annotation_colors_blank),annotation_names_row=FALSE,annotation_names_col=FALSE,annotation_legend=FALSE)
+
+RDA_TrainBombing_UnDirected_ZIPLPCM_unSup_T60k_R1_Y_hat_z_heatmap <-
+  pheatmap(Train_bombing_adj_dataframe[order(RDA_TrainBombing_UnDirected_ZIPLPCM_unSup_T60k_R1_hat_z),order(RDA_TrainBombing_UnDirected_ZIPLPCM_unSup_T60k_R1_hat_z)],
+           color=c(brewer.pal(9,"Greys")[3],colorRampPalette(brewer.pal(9,"YlOrRd"))(max(Train_bombing_adj))),
+           cluster_cols = FALSE,cluster_rows= FALSE,show_rownames=FALSE,show_colnames=FALSE,border_color=FALSE,legend=TRUE,
+           annotation_row = annotation_row_z_ref,annotation_col = annotation_row_z_ref,
+           annotation_colors=list(z_ref=annotation_colors_z_ref),annotation_names_row=FALSE,annotation_names_col=FALSE,annotation_legend=FALSE,
+           gaps_row=c(which(diff(sort(RDA_TrainBombing_UnDirected_ZIPLPCM_unSup_T60k_R1_hat_z))!=0)),gaps_col=c(which(diff(sort(RDA_TrainBombing_UnDirected_ZIPLPCM_unSup_T60k_R1_hat_z))!=0)))
+
+
+RDA_TrainBombing_UnDirected_ZIPLPCM_unSup_T60k_R1_hat_P_m0_Non0_heatmap <-
+  pheatmap((RDA_TrainBombing_UnDirected_ZIPLPCM_unSup_T60k_R1_hat_nu_dataframe*(1-dpois(0,RDA_TrainBombing_UnDirected_ZIPLPCM_unSup_T60k_R1_hat_Lambdaij)))[order(RDA_TrainBombing_UnDirected_ZIPLPCM_unSup_T60k_R1_hat_z),order(RDA_TrainBombing_UnDirected_ZIPLPCM_unSup_T60k_R1_hat_z)],
+           color=c(brewer.pal(9,"Greys")[3],colorRampPalette(brewer.pal(9,"YlOrRd")[1:5])(2000)),cluster_cols = FALSE,cluster_rows= FALSE,show_rownames=FALSE,show_colnames=FALSE,border_color=FALSE,legend=TRUE,
+           annotation_row = annotation_row_z_ref,annotation_col = annotation_row_z_ref,
+           annotation_colors=list(z_ref=annotation_colors_z_ref),annotation_names_row=FALSE,annotation_names_col=FALSE,annotation_legend=FALSE,
+           gaps_row=c(which(diff(sort(RDA_TrainBombing_UnDirected_ZIPLPCM_unSup_T60k_R1_hat_z))!=0)),gaps_col=c(which(diff(sort(RDA_TrainBombing_UnDirected_ZIPLPCM_unSup_T60k_R1_hat_z))!=0)))
+
+library("grid")
+library("gridExtra")
+g <- grid.arrange(RDA_TrainBombing_UnDirected_Y[[4]],
+                  RDA_TrainBombing_UnDirected_ZIPLPCM_unSup_T60k_R1_Y_hat_z_heatmap[[4]],
+                  RDA_TrainBombing_UnDirected_ZIPLPCM_unSup_T60k_R1_hat_P_m0_Non0_heatmap[[4]],
+                  nrow=1,ncol=3,vp=viewport(width=1, height=1))
+Fig <- cowplot::ggdraw(g)+ theme(plot.background = element_rect(colour = "white", linewidth = 0))
+Fig
+
+#--------------------------------------------------------------------------------------------------------------------------
+# Plot the hat_nu
+RDA_TrainBombing_UnDirected_ZIPLPCM_unSup_T60k_R1_hat_P_m0_heatmap <-
+  pheatmap(RDA_TrainBombing_UnDirected_ZIPLPCM_unSup_T60k_R1_hat_nu_dataframe[order(RDA_TrainBombing_UnDirected_ZIPLPCM_unSup_T60k_R1_hat_z),order(RDA_TrainBombing_UnDirected_ZIPLPCM_unSup_T60k_R1_hat_z)],
+           color=c(brewer.pal(9,"Greys")[3],colorRampPalette(brewer.pal(9,"YlOrRd")[1:6])(2000)),cluster_cols = FALSE,cluster_rows= FALSE,show_rownames=FALSE,show_colnames=FALSE,border_color=FALSE,legend=TRUE,
+           annotation_row = annotation_row_z_ref,annotation_col = annotation_row_z_ref,
+           annotation_colors=list(z_ref=annotation_colors_z_ref),annotation_names_row=FALSE,annotation_names_col=FALSE,annotation_legend=FALSE,
+           gaps_row=c(which(diff(sort(RDA_TrainBombing_UnDirected_ZIPLPCM_unSup_T60k_R1_hat_z))!=0)),gaps_col=c(which(diff(sort(RDA_TrainBombing_UnDirected_ZIPLPCM_unSup_T60k_R1_hat_z))!=0)))
+RDA_TrainBombing_UnDirected_ZIPLPCM_unSup_T60k_R1_hat_P_m0_heatmap_draw <- cowplot::ggdraw(RDA_TrainBombing_UnDirected_ZIPLPCM_unSup_T60k_R1_hat_P_m0_heatmap[[4]])+ theme(plot.background =element_rect(fill=brewer.pal(9,"Greys")[1]))
+print(RDA_TrainBombing_UnDirected_ZIPLPCM_unSup_T60k_R1_hat_P_m0_heatmap_draw)
+# Plot the hat_p
+RDA_TrainBombing_UnDirected_ZIPLPCM_unSup_T60k_R1_hat_p_dataframe <- as.data.frame(RDA_TrainBombing_UnDirected_ZIPLPCM_unSup_T60k_R1_hat_p)
+rownames(RDA_TrainBombing_UnDirected_ZIPLPCM_unSup_T60k_R1_hat_p_dataframe) <- colnames(RDA_TrainBombing_UnDirected_ZIPLPCM_unSup_T60k_R1_hat_p_dataframe) <- 1:nrow(Train_bombing_adj)
+RDA_TrainBombing_UnDirected_ZIPLPCM_unSup_T60k_R1_hat_p_heatmap <-
+  pheatmap(RDA_TrainBombing_UnDirected_ZIPLPCM_unSup_T60k_R1_hat_p_dataframe[order(RDA_TrainBombing_UnDirected_ZIPLPCM_unSup_T60k_R1_hat_z),order(RDA_TrainBombing_UnDirected_ZIPLPCM_unSup_T60k_R1_hat_z)],
+           color=c(brewer.pal(9,"Greys")[3],colorRampPalette(brewer.pal(9,"YlOrRd")[1:6])(100)),cluster_cols = FALSE,cluster_rows= FALSE,show_rownames=FALSE,show_colnames=FALSE,border_color=FALSE,legend=TRUE,
+           annotation_row = annotation_row_z_ref,annotation_col = annotation_row_z_ref,
+           annotation_colors=list(z_ref=annotation_colors_z_ref),annotation_names_row=FALSE,annotation_names_col=FALSE,annotation_legend=FALSE,
+           gaps_row=c(which(diff(sort(RDA_TrainBombing_UnDirected_ZIPLPCM_unSup_T60k_R1_hat_z))!=0)),gaps_col=c(which(diff(sort(RDA_TrainBombing_UnDirected_ZIPLPCM_unSup_T60k_R1_hat_z))!=0)))
+RDA_TrainBombing_UnDirected_ZIPLPCM_unSup_T60k_R1_hat_p_heatmap_draw <- cowplot::ggdraw(RDA_TrainBombing_UnDirected_ZIPLPCM_unSup_T60k_R1_hat_p_heatmap[[4]])+ theme(plot.background =element_rect(fill=brewer.pal(9,"Greys")[1]))
+print(RDA_TrainBombing_UnDirected_ZIPLPCM_unSup_T60k_R1_hat_p_heatmap_draw)
 ```
 
 ### 2.4 'Ndrangheta Mafia Network
