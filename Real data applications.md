@@ -1480,7 +1480,7 @@ fig <- plot_ly() %>%
   add_markers(x = RDA_Infinito_UnDirected_ZIPLPCM_Sup_T60k_R1_hat_U[,1],
               y = RDA_Infinito_UnDirected_ZIPLPCM_Sup_T60k_R1_hat_U[,2],
               z = RDA_Infinito_UnDirected_ZIPLPCM_Sup_T60k_R1_hat_U[,3],
-              text=paste("Node:",1:nrow(RDA_criminalNet$Y),"<br>z*:",RDA_criminalNet$OurA),
+              text=paste("Node:",1:nrow(RDA_criminalNet$Y),"<br>z*:",RDA_criminalNet$RoleLocale,"<br>c:",RDA_criminalNet$A),
               size=VertexSize,sizes=c(200,400),
               color=as.factor(RDA_criminalNet$RoleLocale),colors=My_colors[1:10],
               symbol=as.factor(RDA_criminalNet$role),symbols = c("circle","square")
@@ -1497,5 +1497,188 @@ for (i in 1:nrow(Edges)){
 fig <- fig %>% layout(title = "hat_U and z*",scene = list(xaxis = list(title = 'x1'),yaxis = list(title = 'x2'),zaxis = list(title = 'x3')))
 fig
 ```
+
+The 3-d interactive plot of the $\hat{\boldsymbol{U}}$ and $`\boldsymbol{z}^*`$ is available at [`/Interactive 3-d latent positions plots/RDA_NdranghetaMafia_InteractivePlot_Ref_z.html`] of this repository.
+Different from the 3-d interactive plots we show in the previous sections, if the readers put the mouse pointer on each node of the interactive plot, the comment bracket will also show the exogenous node attributes $\boldsymbol{c}$ we used in practice in our experiments.
+Note that the **Windsurfers**, **Train Bombing** and the **'Ndrangheta Mafia** networks are undirected networks, the comment bracket of each edge in the 3-d interactive plots no longer show the direction of the edge.
+
+Similarly, the 3-d interactive plot of the $\hat{\boldsymbol{U}}$ and $\hat{\boldsymbol{z}}$ is available to be downloaded at [`/Interactive 3-d latent positions plots/RDA_NdranghetaMafia_InteractivePlot_Hat_z.html`] of this repository, and can be reproduced following the code:
+
+``` r
+# Plot the hat_z and hat_U
+fig <- plot_ly() %>%
+  add_markers(x = RDA_Infinito_UnDirected_ZIPLPCM_Sup_T60k_R1_hat_U[,1],
+              y = RDA_Infinito_UnDirected_ZIPLPCM_Sup_T60k_R1_hat_U[,2],
+              z = RDA_Infinito_UnDirected_ZIPLPCM_Sup_T60k_R1_hat_U[,3],
+              text=paste("Node:",1:nrow(RDA_criminalNet$Y),"<br>z*:",RDA_criminalNet$RoleLocale,"<br>c:",RDA_criminalNet$A),
+              size=VertexSize,sizes=c(200,400),
+              color=as.factor(RDA_Infinito_UnDirected_ZIPLPCM_Sup_T60k_R1_hat_z),colors=My_colors[c(3,1,6,9,4,5,7,10,8,2)],
+              symbol=as.factor(RDA_criminalNet$role),symbols = c("circle","square")
+  )
+Edges <- get.edgelist(g_obs)
+for (i in 1:nrow(Edges)){
+  fig <- fig %>%
+    add_trace(x = RDA_Infinito_UnDirected_ZIPLPCM_Sup_T60k_R1_hat_U[Edges[i,],1],
+              y = RDA_Infinito_UnDirected_ZIPLPCM_Sup_T60k_R1_hat_U[Edges[i,],2],
+              z = RDA_Infinito_UnDirected_ZIPLPCM_Sup_T60k_R1_hat_U[Edges[i,],3],
+              text=paste("Weight:",E(g_obs)$weight[i]),
+              type = "scatter3d", mode = "lines", showlegend = FALSE,line = list(color = E(g_obs)$color[i], width = 0.5*E(g_obs)$weight[i]))
+}
+fig <- fig %>% layout(title = "hat_U and hat_z",scene = list(xaxis = list(title = 'x1'),yaxis = list(title = 'x2'),zaxis = list(title = 'x3')))
+fig
+```
+
+As we discussed in the **ZIP-LPCM-MFM** paper, it's interesting that there are three heterogeneous bosses whose corresponding inferred latent positions are close to each other and to the orange locale.
+These three bosses are, respectively, a blue boss node no.53, an orange boss node no.41 and a green boss node no.38.
+Thus we can check within how many posterior samples of clustering each pair of these three bosses are clustered together in one group:
+
+``` r
+### Check clustering of the heterogeneous bosses after burn-in
+## Check how often orange boss 41 and blue boss 53 in the same group
+sum((RDA_Infinito_UnDirected_ZIPLPCM_Sup_T60k_R1_LSz[iteration_after_burn_in,41]==
+       RDA_Infinito_UnDirected_ZIPLPCM_Sup_T60k_R1_LSz[iteration_after_burn_in,53]))/length(iteration_after_burn_in)
+# 0.6912667
+## Check how often green boss 38 and blue boss 53 in the same group
+sum((RDA_Infinito_UnDirected_ZIPLPCM_Sup_T60k_R1_LSz[iteration_after_burn_in,38]==
+       RDA_Infinito_UnDirected_ZIPLPCM_Sup_T60k_R1_LSz[iteration_after_burn_in,53]))/length(iteration_after_burn_in)
+# 0.2982667
+## Check how often green boss 38 and orange boss 41 in the same group
+sum((RDA_Infinito_UnDirected_ZIPLPCM_Sup_T60k_R1_LSz[iteration_after_burn_in,38]==
+       RDA_Infinito_UnDirected_ZIPLPCM_Sup_T60k_R1_LSz[iteration_after_burn_in,41]))/length(iteration_after_burn_in)
+# 0.002133333
+## Check how often green boss 38 and orange boss 41 and blue boss 53 in the same group
+sum((RDA_Infinito_UnDirected_ZIPLPCM_Sup_T60k_R1_LSz[iteration_after_burn_in,38]==
+       RDA_Infinito_UnDirected_ZIPLPCM_Sup_T60k_R1_LSz[iteration_after_burn_in,41])*
+      (RDA_Infinito_UnDirected_ZIPLPCM_Sup_T60k_R1_LSz[iteration_after_burn_in,38]==
+         RDA_Infinito_UnDirected_ZIPLPCM_Sup_T60k_R1_LSz[iteration_after_burn_in,53]))/length(iteration_after_burn_in)
+# 0.002133333
+```
+
+Thus it shows that the three heterogeneous bosses are not likely to be clustered into the same group.
+Though the clustering of the blue boss node no.53 is arguable as shown above, this boss is more likely to be clustered with the orange boss node no.41 who is clustered inside the core group of the orange locale based on our inferred clustering $\hat{\boldsymbol{z}}$.
+The green boss node no.38 is not likely to be within the core of the orange locale and most of the time is clustered with another orange boss node no.35 in the same group:
+
+``` r
+## Check how often another orange boss 35 and green boss 38 in the same group
+sum((RDA_Infinito_UnDirected_ZIPLPCM_Sup_T60k_R1_LSz[iteration_after_burn_in,38]==
+       RDA_Infinito_UnDirected_ZIPLPCM_Sup_T60k_R1_LSz[iteration_after_burn_in,35]))/length(iteration_after_burn_in)
+# 0.9975
+```
+
+The **Figure 13** illustrated in the **ZIP-LPCM-MFM** paper can be reproduced by:
+
+``` r
+# First plot the reference clustering z* and hat_U
+# Plot the front angle of the latent positions
+fig1 <- plot_ly(scene ="scene1") %>%
+  add_markers(x = RDA_Infinito_UnDirected_ZIPLPCM_Sup_T60k_R1_hat_U[,1],
+              y = RDA_Infinito_UnDirected_ZIPLPCM_Sup_T60k_R1_hat_U[,2],
+              z = RDA_Infinito_UnDirected_ZIPLPCM_Sup_T60k_R1_hat_U[,3],
+              text=paste("Node:",1:nrow(RDA_criminalNet$Y),"<br>z*:",RDA_criminalNet$RoleLocale,"<br>c:",RDA_criminalNet$A),
+              size=VertexSize,sizes=c(200,400), showlegend = FALSE,
+              color=as.factor(RDA_criminalNet$RoleLocale),colors=My_colors[1:10],
+              symbol=as.factor(RDA_criminalNet$role),symbols = c("circle","square")
+  )
+Edges <- get.edgelist(g_obs)
+for (i in 1:nrow(Edges)){
+  fig1 <- fig1 %>%
+    add_trace(x = RDA_Infinito_UnDirected_ZIPLPCM_Sup_T60k_R1_hat_U[Edges[i,],1],
+              y = RDA_Infinito_UnDirected_ZIPLPCM_Sup_T60k_R1_hat_U[Edges[i,],2],
+              z = RDA_Infinito_UnDirected_ZIPLPCM_Sup_T60k_R1_hat_U[Edges[i,],3],
+              text=paste("Weight:",E(g_obs)$weight[i]),
+              type = "scatter3d", mode = "lines", showlegend = FALSE,line = list(color = E(g_obs)$color[i], width = 0.5*E(g_obs)$weight[i]))
+}
+
+# Plot the right angle of the latent positions
+fig2 <- plot_ly(scene ="scene2") %>%
+  add_markers(x = RDA_Infinito_UnDirected_ZIPLPCM_Sup_T60k_R1_hat_U[,1],
+              y = RDA_Infinito_UnDirected_ZIPLPCM_Sup_T60k_R1_hat_U[,2],
+              z = RDA_Infinito_UnDirected_ZIPLPCM_Sup_T60k_R1_hat_U[,3],
+              text=paste("Node:",1:nrow(RDA_criminalNet$Y),"<br>z*:",RDA_criminalNet$RoleLocale,"<br>c:",RDA_criminalNet$A),
+              size=VertexSize,sizes=c(200,400),showlegend = FALSE,
+              color=as.factor(RDA_criminalNet$RoleLocale),colors=My_colors[1:10],
+              symbol=as.factor(RDA_criminalNet$role),symbols = c("circle","square")
+  )
+Edges <- get.edgelist(g_obs)
+for (i in 1:nrow(Edges)){
+  fig2 <- fig2 %>%
+    add_trace(x = RDA_Infinito_UnDirected_ZIPLPCM_Sup_T60k_R1_hat_U[Edges[i,],1],
+              y = RDA_Infinito_UnDirected_ZIPLPCM_Sup_T60k_R1_hat_U[Edges[i,],2],
+              z = RDA_Infinito_UnDirected_ZIPLPCM_Sup_T60k_R1_hat_U[Edges[i,],3],
+              text=paste("Weight:",E(g_obs)$weight[i]),
+              type = "scatter3d", mode = "lines", showlegend = FALSE,line = list(color = E(g_obs)$color[i], width = 0.5*E(g_obs)$weight[i]))
+}
+
+Fig1 <- subplot(fig1, fig2) 
+Fig1 <- Fig1 %>% layout(title = "", margin = list(l = 0,r = 0,b = 0,t = 0,pad = 0),
+                        scene = list(domain=list(x=c(0,1/2),y=c(0,1)),
+                                     xaxis = list(title = ''),yaxis = list(title = ''),zaxis = list(title = ''),
+                                     camera = list(eye = list(x = 0, y = 1.50, z = 0.50)),
+                                     aspectmode='auto'),
+                        scene2 = list(domain=list(x=c(1/2,0.999),y=c(0,1)),
+                                      xaxis = list(title = ''),yaxis = list(title = ''),zaxis = list(title = ''),
+                                      camera = list(eye = list(x = -1.50*sqrt(3)/2, y = 1.50/2, z = 0.50)),
+                                      aspectmode='auto'))
+# Fig1
+orca(Fig1, "RDA_Infinito_hat_U_RoleLocale.pdf",scale=1,width=1800,height=850)
+
+#--------------------------------------------------------------------------------------------------------------------------
+# Then plot the summarized clustering hat_z and hat_U
+
+# Plot the front angle of the latent positions
+fig3 <- plot_ly(scene ="scene3") %>%
+  add_markers(x = RDA_Infinito_UnDirected_ZIPLPCM_Sup_T60k_R1_hat_U[,1],
+              y = RDA_Infinito_UnDirected_ZIPLPCM_Sup_T60k_R1_hat_U[,2],
+              z = RDA_Infinito_UnDirected_ZIPLPCM_Sup_T60k_R1_hat_U[,3],
+              text=paste("Node:",1:nrow(RDA_criminalNet$Y),"<br>z*:",RDA_criminalNet$OurA),
+              size=VertexSize,sizes=c(200,400),showlegend = FALSE,
+              color=as.factor(RDA_Infinito_UnDirected_ZIPLPCM_Sup_T60k_R1_hat_z),colors=My_colors[c(3,1,6,9,4,5,7,10,8,2)],
+              symbol=as.factor(RDA_criminalNet$role),symbols = c("circle","square")
+  )
+Edges <- get.edgelist(g_obs)
+for (i in 1:nrow(Edges)){
+  fig3 <- fig3 %>%
+    add_trace(x = RDA_Infinito_UnDirected_ZIPLPCM_Sup_T60k_R1_hat_U[Edges[i,],1],
+              y = RDA_Infinito_UnDirected_ZIPLPCM_Sup_T60k_R1_hat_U[Edges[i,],2],
+              z = RDA_Infinito_UnDirected_ZIPLPCM_Sup_T60k_R1_hat_U[Edges[i,],3],
+              text=paste("Weight:",E(g_obs)$weight[i]),
+              type = "scatter3d", mode = "lines", showlegend = FALSE,line = list(color = E(g_obs)$color[i], width = 0.5*E(g_obs)$weight[i]))
+}
+
+# Plot the right angle of the latent positions
+fig4 <- plot_ly(scene ="scene4") %>% # plot the hat_z and hat_U
+  add_markers(x = RDA_Infinito_UnDirected_ZIPLPCM_Sup_T60k_R1_hat_U[,1],
+              y = RDA_Infinito_UnDirected_ZIPLPCM_Sup_T60k_R1_hat_U[,2],
+              z = RDA_Infinito_UnDirected_ZIPLPCM_Sup_T60k_R1_hat_U[,3],
+              text=paste("Node:",1:nrow(RDA_criminalNet$Y),"<br>z*:",RDA_criminalNet$OurA),
+              size=VertexSize,sizes=c(200,400),showlegend = FALSE,
+              color=as.factor(RDA_Infinito_UnDirected_ZIPLPCM_Sup_T60k_R1_hat_z),colors=My_colors[c(3,1,6,9,4,5,7,10,8,2)],
+              symbol=as.factor(RDA_criminalNet$role),symbols = c("circle","square")
+  )
+Edges <- get.edgelist(g_obs)
+for (i in 1:nrow(Edges)){
+  fig4 <- fig4 %>%
+    add_trace(x = RDA_Infinito_UnDirected_ZIPLPCM_Sup_T60k_R1_hat_U[Edges[i,],1],
+              y = RDA_Infinito_UnDirected_ZIPLPCM_Sup_T60k_R1_hat_U[Edges[i,],2],
+              z = RDA_Infinito_UnDirected_ZIPLPCM_Sup_T60k_R1_hat_U[Edges[i,],3],
+              text=paste("Weight:",E(g_obs)$weight[i]),
+              type = "scatter3d", mode = "lines", showlegend = FALSE,line = list(color = E(g_obs)$color[i], width = 0.5*E(g_obs)$weight[i]))
+}
+Fig2 <- subplot(fig3, fig4) 
+Fig2 <- Fig2 %>% layout(title = "", margin = list(l = 0,r = 0,b = 0,t = 0,pad = 0),
+                        scene3 = list(domain=list(x=c(0,1/2),y=c(0,1)),
+                                      xaxis = list(title = ''),yaxis = list(title = ''),zaxis = list(title = ''),
+                                      camera = list(eye = list(x = 0, y = 1.50, z = 0.50)),
+                                      aspectmode='auto'),
+                        scene4 = list(domain=list(x=c(1/2,0.999),y=c(0,1)),
+                                      xaxis = list(title = ''),yaxis = list(title = ''),zaxis = list(title = ''),
+                                      camera = list(eye = list(x = -1.50*sqrt(3)/2, y = 1.50/2, z = 0.50)),
+                                      aspectmode='auto'))
+# Fig2
+orca(Fig2, "RDA_Infinito_hat_U_hat_z.pdf",scale=1,width=1800,height=850)
+```
+
+
+
 
 
