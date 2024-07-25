@@ -611,6 +611,137 @@ print(RDA_SampsonMonks_Directed_ZIPLPCM_Sup_T60k_R1_hat_p_heatmap_draw)
 
 ### 2.2 Windsurfers Network
 
+We follow similar steps as Section 2.1 above to analyze the **Windsurfers** real network.
+This real network is a undirected network and no reference clustering or exogenous node attributes is available to us.
+Thus an unsupervised implementation of the ZIP-LPCM analysis is applied in practice.
+Further, since the size of this network is significantly larger than the **Sampson Monks** network, we propose $\text{Beta}(1,9)$ unusual zero probability prior to encourage the clustering.
+Once again, all the output are reproducible by setting `set.seed(1)`:
+
+``` r
+# Windsurfers undirected real network unsupervised ZIP-LPCM T = 60000 round 1
+set.seed(1)
+start.time <- Sys.time()
+RDA_Windsurfers_UnDirected_ZIPLPCM_unSup_T60k_R1 <- 
+  MwG_UnDirected_ZIPLPCM(Y = Windsurfers_adj,T = 60000,omega=0.01,alpha1=1,alpha2=0.103,alpha=3,beta1=1,beta2=19,
+                         sigma2prop_beta=0.15^2,sigma2prop_U=0.2,d=3,z=1:nrow(Windsurfers_adj),
+                         p_eject=0.5)
+end.time <- Sys.time()
+RDA_Windsurfers_UnDirected_ZIPLPCM_unSup_T60k_R1_time <- end.time - start.time
+RDA_Windsurfers_UnDirected_ZIPLPCM_unSup_T60k_R1_time
+# Time difference of 1.2212 hours
+```
+
+It's shown that larger network size brings higher computational burden, and the implementation in our experiment took 1.2212 hours to finish the running.
+
+The following post-processing steps are also similar to the **Sampson Monks** network case shown in Section 2.1:
+
+``` r
+# Define the burn in
+iteration_after_burn_in <- 30002:60001
+burn_in <- 30001
+
+## Check U acceptance rate
+apply(RDA_Windsurfers_UnDirected_ZIPLPCM_unSup_T60k_R1$acceptance_count_U[iteration_after_burn_in-1,],2,mean)
+mean(apply(RDA_Windsurfers_UnDirected_ZIPLPCM_unSup_T60k_R1$acceptance_count_U[iteration_after_burn_in-1,],2,mean)) # 0.236455
+## Check beta acceptance rate
+mean(RDA_Windsurfers_UnDirected_ZIPLPCM_unSup_T60k_R1$acceptance_count_beta[iteration_after_burn_in-1]) # 0.2179667
+
+# Apply label switching on the post clustering z
+RDA_Windsurfers_UnDirected_ZIPLPCM_unSup_T60k_R1_LSz <- matrix(NA,nrow=nrow(RDA_Windsurfers_UnDirected_ZIPLPCM_unSup_T60k_R1$z),ncol=ncol(RDA_Windsurfers_UnDirected_ZIPLPCM_unSup_T60k_R1$z))
+RDA_Windsurfers_UnDirected_ZIPLPCM_unSup_T60k_R1_LSP <- list()
+for (t in 1:nrow(RDA_Windsurfers_UnDirected_ZIPLPCM_unSup_T60k_R1$z)){
+  LS_temp <- LabelSwitching_SG2003(z = RDA_Windsurfers_UnDirected_ZIPLPCM_unSup_T60k_R1$z[t,],
+                                   matrix_KbyK = RDA_Windsurfers_UnDirected_ZIPLPCM_unSup_T60k_R1$P[[t]])
+  RDA_Windsurfers_UnDirected_ZIPLPCM_unSup_T60k_R1_LSz[t,] <- LS_temp$z
+  RDA_Windsurfers_UnDirected_ZIPLPCM_unSup_T60k_R1_LSP[[t]] <- LS_temp$matrix_KbyK
+  if ((t%%1000) == 0){cat("t=",t,"\n")}
+}
+# Apply Procrustes Transform on posterior latent positions U
+library("IMIFA")
+RDA_Windsurfers_UnDirected_ZIPLPCM_unSup_T60k_R1_PTU <- list()
+for (t in 1:nrow(RDA_Windsurfers_UnDirected_ZIPLPCM_unSup_T60k_R1$z)){
+  RDA_Windsurfers_UnDirected_ZIPLPCM_unSup_T60k_R1_PTU[[t]] <-
+    Procrustes(RDA_Windsurfers_UnDirected_ZIPLPCM_unSup_T60k_R1$U[[t]],
+               RDA_Windsurfers_UnDirected_ZIPLPCM_unSup_T60k_R1$U[[60001]], translate = TRUE ,dilate = FALSE)$X.new
+  if ((t%%1000) == 0){cat("t=",t,"\n")}
+}
+
+#------------------------------------------------------------------------------------
+## Check complete likelihood for each iteration
+RDA_Windsurfers_UnDirected_ZIPLPCM_unSup_T60k_R1_LSz_Like <- c()
+for (t in 1:nrow(RDA_Windsurfers_UnDirected_ZIPLPCM_unSup_T60k_R1$z)){
+  RDA_Windsurfers_UnDirected_ZIPLPCM_unSup_T60k_R1_LSz_Like <-
+    c(RDA_Windsurfers_UnDirected_ZIPLPCM_unSup_T60k_R1_LSz_Like,
+      UnDirected_ZIPLPCM_pgh_MFM_Likelihood(X=RDA_Windsurfers_UnDirected_ZIPLPCM_unSup_T60k_R1$X[[t]],
+                                            U=RDA_Windsurfers_UnDirected_ZIPLPCM_unSup_T60k_R1_PTU[[t]],
+                                            beta=RDA_Windsurfers_UnDirected_ZIPLPCM_unSup_T60k_R1$beta[t],
+                                            nu=RDA_Windsurfers_UnDirected_ZIPLPCM_unSup_T60k_R1$nu[[t]],
+                                            P=RDA_Windsurfers_UnDirected_ZIPLPCM_unSup_T60k_R1_LSP[[t]],
+                                            z=RDA_Windsurfers_UnDirected_ZIPLPCM_unSup_T60k_R1_LSz[t,],
+                                            alpha1=1,alpha2=0.103,omega=0.01,  alpha=3))
+  if ((t%%1000) == 0){cat("t=",t,"\n")}
+}
+plot(RDA_Windsurfers_UnDirected_ZIPLPCM_unSup_T60k_R1_LSz_Like,type = "l",xlab = "",ylab = "", main = "Likelihood",cex.axis = 0.8)
+
+# Check the trace plot of K
+plot(RDA_Windsurfers_UnDirected_ZIPLPCM_unSup_T60k_R1$K,type = "l",xlab = "",ylab = "", main = "K Trace Plot",cex.axis = 0.8)
+
+#------------------------------------------------------------------------------------
+# Summarize posterior clustering z by the greedy algorithm proposed by Rastelli and Friel (2018)
+# We start from obtaining the marginal posterior mode of the posterior z chain
+RDA_Windsurfers_UnDirected_ZIPLPCM_unSup_T60k_R1_LSz_States <- c() # initialize a list which will store different clustering states; the clustering states are labeled from 1,2,3... and are put at the 1st,2nd,3rd... row of the matrix, respectively
+RDA_Windsurfers_UnDirected_ZIPLPCM_unSup_T60k_R1_LSz_StatesIteration <- list() # store all the t's (iteration number) which provides the same cluster as the clustering state 1,2,3...
+RDA_Windsurfers_UnDirected_ZIPLPCM_unSup_T60k_R1_LSz_IterationLoop <- iteration_after_burn_in # the "IterationLoop" which stores all the iteration t's which we focus on, that is, all the iteration t's after burn-in
+StatesLabelIndicator = 0 # initialize the label for the clustering states
+while (length(RDA_Windsurfers_UnDirected_ZIPLPCM_unSup_T60k_R1_LSz_IterationLoop)!=0){ # if the "IterationLoop" is not empty
+  StatesLabelIndicator <- StatesLabelIndicator + 1 # assign the next label to the next clustering state
+  RDA_Windsurfers_UnDirected_ZIPLPCM_unSup_T60k_R1_LSz_FirstState <- RDA_Windsurfers_UnDirected_ZIPLPCM_unSup_T60k_R1_LSz[RDA_Windsurfers_UnDirected_ZIPLPCM_unSup_T60k_R1_LSz_IterationLoop[1],] # extract the first clustering state for the "IterationLoop"
+  RDA_Windsurfers_UnDirected_ZIPLPCM_unSup_T60k_R1_LSz_States <- rbind(RDA_Windsurfers_UnDirected_ZIPLPCM_unSup_T60k_R1_LSz_States,
+                                                                                 RDA_Windsurfers_UnDirected_ZIPLPCM_unSup_T60k_R1_LSz_FirstState) # store the first state within the "IterationLoop" with label "StatesLabelIndicator" in the list which will contain all different unique states
+  RDA_Windsurfers_UnDirected_ZIPLPCM_unSup_T60k_R1_LSz_StatesIteration_temp <- c() # create a vector to temporarily store all the iteration t's whose clustering is the same as the first clustering state within the "IterationLoop"
+  for (t in RDA_Windsurfers_UnDirected_ZIPLPCM_unSup_T60k_R1_LSz_IterationLoop){ # loop over all the current existing iterations in "IterationLoop"
+    if (sum(RDA_Windsurfers_UnDirected_ZIPLPCM_unSup_T60k_R1_LSz[t,]==RDA_Windsurfers_UnDirected_ZIPLPCM_unSup_T60k_R1_LSz_FirstState)==length(RDA_Windsurfers_UnDirected_ZIPLPCM_unSup_T60k_R1_LSz_FirstState)){ # if the t's clustering is the same as the "FirstState"
+      RDA_Windsurfers_UnDirected_ZIPLPCM_unSup_T60k_R1_LSz_StatesIteration_temp <- c(RDA_Windsurfers_UnDirected_ZIPLPCM_unSup_T60k_R1_LSz_StatesIteration_temp,t) # store the iteration t in the temporary vector
+    }
+  }
+  RDA_Windsurfers_UnDirected_ZIPLPCM_unSup_T60k_R1_LSz_StatesIteration[[StatesLabelIndicator]] <- RDA_Windsurfers_UnDirected_ZIPLPCM_unSup_T60k_R1_LSz_StatesIteration_temp # store all the t's as the list element
+  RDA_Windsurfers_UnDirected_ZIPLPCM_unSup_T60k_R1_LSz_IterationLoop <-
+    (iteration_after_burn_in)[-(unlist(RDA_Windsurfers_UnDirected_ZIPLPCM_unSup_T60k_R1_LSz_StatesIteration)-burn_in)] # remove all the iterations we have stored and then move to the next clustering state
+}
+rownames(RDA_Windsurfers_UnDirected_ZIPLPCM_unSup_T60k_R1_LSz_States) <- NULL
+nrow(RDA_Windsurfers_UnDirected_ZIPLPCM_unSup_T60k_R1_LSz_States) # check the number of different clustering states
+RDA_Windsurfers_UnDirected_ZIPLPCM_unSup_T60k_R1_LSz_StatesFrequency <- c() # check the number of times one clustering state occurs
+for (t in 1:nrow(RDA_Windsurfers_UnDirected_ZIPLPCM_unSup_T60k_R1_LSz_States)){
+  RDA_Windsurfers_UnDirected_ZIPLPCM_unSup_T60k_R1_LSz_StatesFrequency <-
+    c(RDA_Windsurfers_UnDirected_ZIPLPCM_unSup_T60k_R1_LSz_StatesFrequency,
+      length(RDA_Windsurfers_UnDirected_ZIPLPCM_unSup_T60k_R1_LSz_StatesIteration[[t]]))
+}
+RDA_Windsurfers_UnDirected_ZIPLPCM_unSup_T60k_R1_LSz_StatesFrequency
+sort(RDA_Windsurfers_UnDirected_ZIPLPCM_unSup_T60k_R1_LSz_StatesFrequency,decreasing=TRUE) # check the clustering state frequency in decreasing order
+order(RDA_Windsurfers_UnDirected_ZIPLPCM_unSup_T60k_R1_LSz_StatesFrequency,decreasing=TRUE) # check the corresponding positions
+which.max(RDA_Windsurfers_UnDirected_ZIPLPCM_unSup_T60k_R1_LSz_StatesFrequency) # find the marginal posterior mode, i.e. the most frequent clustering state
+RDA_Windsurfers_UnDirected_ZIPLPCM_unSup_T60k_R1_LSz_StatesFrequency[which.max(RDA_Windsurfers_UnDirected_ZIPLPCM_unSup_T60k_R1_LSz_StatesFrequency)] # Find the most frequency
+library(GreedyEPL) # obtain the summarized z by the greedy algorithm proposed by Rastelli and Friel (2018)
+output <- MinimiseEPL(RDA_Windsurfers_UnDirected_ZIPLPCM_unSup_T60k_R1_LSz[iteration_after_burn_in,],
+                      list(Kup = 20, loss_type = "VI",decision_init = RDA_Windsurfers_UnDirected_ZIPLPCM_unSup_T60k_R1_LSz_States[
+                        which.max(RDA_Windsurfers_UnDirected_ZIPLPCM_unSup_T60k_R1_LSz_StatesFrequency),]))
+output$EPL # check minEVI posterior loss: 0.5421714
+
+#-----------------------------------------------------------------------------------------
+# Obtain summarized U
+RDA_Windsurfers_UnDirected_ZIPLPCM_unSup_T60k_R1_LSz_hat_zIteration <- # extract all the iterations whose clustering is identical to hat_z
+  RDA_Windsurfers_UnDirected_ZIPLPCM_unSup_T60k_R1_LSz_StatesIteration[[
+    which(apply(t(RDA_Windsurfers_UnDirected_ZIPLPCM_unSup_T60k_R1_LSz_States)==
+                  RDA_Windsurfers_UnDirected_ZIPLPCM_unSup_T60k_R1_hat_z,2,sum)==length(RDA_Windsurfers_UnDirected_ZIPLPCM_unSup_T60k_R1_hat_z))
+  ]]
+RDA_Windsurfers_UnDirected_ZIPLPCM_unSup_T60k_R1_MaxLikeHatz_iteration <- RDA_Windsurfers_UnDirected_ZIPLPCM_unSup_T60k_R1_LSz_hat_zIteration[
+  which.max(RDA_Windsurfers_UnDirected_ZIPLPCM_unSup_T60k_R1_LSz_Like[RDA_Windsurfers_UnDirected_ZIPLPCM_unSup_T60k_R1_LSz_hat_zIteration])]
+RDA_Windsurfers_UnDirected_ZIPLPCM_unSup_T60k_R1_hat_U <-
+  RDA_Windsurfers_UnDirected_ZIPLPCM_unSup_T60k_R1_PTU[[RDA_Windsurfers_UnDirected_ZIPLPCM_unSup_T60k_R1_MaxLikeHatz_iteration]]
+```
+
+
+
 ### 2.3 Train Bombing Network
 
 ### 2.4 'Ndrangheta Mafia Network
