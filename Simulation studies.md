@@ -1532,7 +1532,7 @@ SS2_Scenario1_Directed_ZIPSBM_P_m0_heatmap <-
            annotation_row = annotation_row_z_ref,annotation_col = annotation_row_z_ref,
            annotation_colors=list(z_ref=annotation_colors_z_ref),annotation_names_row=FALSE,annotation_names_col=FALSE,annotation_legend=FALSE,
            gaps_row=c(which(diff(sort(SS2_Scenario1_Directed_ZIPSBM$z))!=0)),gaps_col=c(which(diff(sort(SS2_Scenario1_Directed_ZIPSBM$z))!=0)))
-SS2_Scenario1_Directed_ZIPSBM_P_m0_heatmap_draw <- cowplot::ggdraw(SS2_Scenario1_Directed_ZIPSBM_P_m0_heatmap[[4]])+ theme(plot.background =element_rect(fill=brewer.pal(9,"Greys")[3]))
+SS2_Scenario1_Directed_ZIPSBM_P_m0_heatmap_draw <- cowplot::ggdraw(SS2_Scenario1_Directed_ZIPSBM_P_m0_heatmap[[4]])+ theme(plot.background =element_rect(fill=brewer.pal(9,"Greys")[1]))
 print(SS2_Scenario1_Directed_ZIPSBM_P_m0_heatmap_draw)
 
 # Plot the summarized P_m0 which is hat_nu | hat_z for SS2 scenario 1
@@ -1545,7 +1545,7 @@ SS2_Scenario1_Directed_ZIPSBM_Sup_ZIPLPCM_T12k_R1_hat_P_m0_heatmap <-
            annotation_row = annotation_row_z_ref,annotation_col = annotation_row_z_ref,
            annotation_colors=list(z_ref=annotation_colors_z_ref),annotation_names_row=FALSE,annotation_names_col=FALSE,annotation_legend=FALSE,
            gaps_row=c(which(diff(sort(SS2_Scenario1_Directed_ZIPSBM_Sup_ZIPLPCM_T12k_R1_hat_z))!=0)),gaps_col=c(which(diff(sort(SS2_Scenario1_Directed_ZIPSBM_Sup_ZIPLPCM_T12k_R1_hat_z))!=0)))
-SS2_Scenario1_Directed_ZIPSBM_Sup_ZIPLPCM_T12k_R1_hat_P_m0_heatmap_draw <- cowplot::ggdraw(SS2_Scenario1_Directed_ZIPSBM_Sup_ZIPLPCM_T12k_R1_hat_P_m0_heatmap[[4]])+ theme(plot.background =element_rect(fill=brewer.pal(9,"Greys")[3]))
+SS2_Scenario1_Directed_ZIPSBM_Sup_ZIPLPCM_T12k_R1_hat_P_m0_heatmap_draw <- cowplot::ggdraw(SS2_Scenario1_Directed_ZIPSBM_Sup_ZIPLPCM_T12k_R1_hat_P_m0_heatmap[[4]])+ theme(plot.background =element_rect(fill=brewer.pal(9,"Greys")[1]))
 print(SS2_Scenario1_Directed_ZIPSBM_Sup_ZIPLPCM_T12k_R1_hat_P_m0_heatmap_draw)
 
 #-----------------------------------------------------------------------------------------------------
@@ -1570,7 +1570,7 @@ SS2_Scenario2_Directed_ZIPSBM_P_m0_heatmap <-
            annotation_row = annotation_row_z_ref,annotation_col = annotation_row_z_ref,
            annotation_colors=list(z_ref=annotation_colors_z_ref),annotation_names_row=FALSE,annotation_names_col=FALSE,annotation_legend=FALSE,
            gaps_row=c(which(diff(sort(SS2_Scenario2_Directed_ZIPSBM$z))!=0)),gaps_col=c(which(diff(sort(SS2_Scenario2_Directed_ZIPSBM$z))!=0)))
-SS2_Scenario2_Directed_ZIPSBM_P_m0_heatmap_draw <- cowplot::ggdraw(SS2_Scenario2_Directed_ZIPSBM_P_m0_heatmap[[4]])+ theme(plot.background =element_rect(fill=brewer.pal(9,"Greys")[3]))
+SS2_Scenario2_Directed_ZIPSBM_P_m0_heatmap_draw <- cowplot::ggdraw(SS2_Scenario2_Directed_ZIPSBM_P_m0_heatmap[[4]])+ theme(plot.background =element_rect(fill=brewer.pal(9,"Greys")[1]))
 print(SS2_Scenario2_Directed_ZIPSBM_P_m0_heatmap_draw)
 
 # Plot the summarized P_m0 which is hat_nu | hat_z for SS2 scenario 2
@@ -1583,7 +1583,7 @@ SS2_Scenario2_Directed_ZIPSBM_Sup_ZIPLPCM_T12k_R1_hat_P_m0_heatmap <-
            annotation_row = annotation_row_z_ref,annotation_col = annotation_row_z_ref,
            annotation_colors=list(z_ref=annotation_colors_z_ref),annotation_names_row=FALSE,annotation_names_col=FALSE,annotation_legend=FALSE,
            gaps_row=c(which(diff(sort(SS2_Scenario2_Directed_ZIPSBM_Sup_ZIPLPCM_T12k_R1_hat_z))!=0)),gaps_col=c(which(diff(sort(SS2_Scenario2_Directed_ZIPSBM_Sup_ZIPLPCM_T12k_R1_hat_z))!=0)))
-SS2_Scenario2_Directed_ZIPSBM_Sup_ZIPLPCM_T12k_R1_hat_P_m0_heatmap_draw <- cowplot::ggdraw(SS2_Scenario2_Directed_ZIPSBM_Sup_ZIPLPCM_T12k_R1_hat_P_m0_heatmap[[4]])+ theme(plot.background =element_rect(fill=brewer.pal(9,"Greys")[3]))
+SS2_Scenario2_Directed_ZIPSBM_Sup_ZIPLPCM_T12k_R1_hat_P_m0_heatmap_draw <- cowplot::ggdraw(SS2_Scenario2_Directed_ZIPSBM_Sup_ZIPLPCM_T12k_R1_hat_P_m0_heatmap[[4]])+ theme(plot.background =element_rect(fill=brewer.pal(9,"Greys")[1]))
 print(SS2_Scenario2_Directed_ZIPSBM_Sup_ZIPLPCM_T12k_R1_hat_P_m0_heatmap_draw)
 ```
 
@@ -1728,7 +1728,7 @@ SS2_Scenario1_Directed_ZIPSBM_Sup_ZIPLPCM_T12k_beta_1_19_R1_hat_P_m0_heatmap <-
            annotation_row = annotation_row_z_ref,annotation_col = annotation_row_z_ref,
            annotation_colors=list(z_ref=annotation_colors_z_ref),annotation_names_row=FALSE,annotation_names_col=FALSE,annotation_legend=FALSE,
            gaps_row=c(which(diff(sort(SS2_Scenario1_Directed_ZIPSBM_Sup_ZIPLPCM_T12k_beta_1_19_R1_hat_z))!=0)),gaps_col=c(which(diff(sort(SS2_Scenario1_Directed_ZIPSBM_Sup_ZIPLPCM_T12k_beta_1_19_R1_hat_z))!=0)))
-SS2_Scenario1_Directed_ZIPSBM_Sup_ZIPLPCM_T12k_beta_1_19_R1_hat_P_m0_heatmap_draw <- cowplot::ggdraw(SS2_Scenario1_Directed_ZIPSBM_Sup_ZIPLPCM_T12k_beta_1_19_R1_hat_P_m0_heatmap[[4]])+ theme(plot.background =element_rect(fill=brewer.pal(9,"Greys")[3]))
+SS2_Scenario1_Directed_ZIPSBM_Sup_ZIPLPCM_T12k_beta_1_19_R1_hat_P_m0_heatmap_draw <- cowplot::ggdraw(SS2_Scenario1_Directed_ZIPSBM_Sup_ZIPLPCM_T12k_beta_1_19_R1_hat_P_m0_heatmap[[4]])+ theme(plot.background =element_rect(fill=brewer.pal(9,"Greys")[1]))
 print(SS2_Scenario1_Directed_ZIPSBM_Sup_ZIPLPCM_T12k_beta_1_19_R1_hat_P_m0_heatmap_draw)
 
 # Mean and sd of the absolute error between the summarized and reference P_m0 for SS2 scenario 1
@@ -1757,7 +1757,7 @@ SS2_Scenario2_Directed_ZIPSBM_Sup_ZIPLPCM_T12k_beta_1_19_R1_hat_P_m0_heatmap <-
            annotation_row = annotation_row_z_ref,annotation_col = annotation_row_z_ref,
            annotation_colors=list(z_ref=annotation_colors_z_ref),annotation_names_row=FALSE,annotation_names_col=FALSE,annotation_legend=FALSE,
            gaps_row=c(which(diff(sort(SS2_Scenario2_Directed_ZIPSBM_Sup_ZIPLPCM_T12k_beta_1_19_R1_hat_z))!=0)),gaps_col=c(which(diff(sort(SS2_Scenario2_Directed_ZIPSBM_Sup_ZIPLPCM_T12k_beta_1_19_R1_hat_z))!=0)))
-SS2_Scenario2_Directed_ZIPSBM_Sup_ZIPLPCM_T12k_beta_1_19_R1_hat_P_m0_heatmap_draw <- cowplot::ggdraw(SS2_Scenario2_Directed_ZIPSBM_Sup_ZIPLPCM_T12k_beta_1_19_R1_hat_P_m0_heatmap[[4]])+ theme(plot.background =element_rect(fill=brewer.pal(9,"Greys")[3]))
+SS2_Scenario2_Directed_ZIPSBM_Sup_ZIPLPCM_T12k_beta_1_19_R1_hat_P_m0_heatmap_draw <- cowplot::ggdraw(SS2_Scenario2_Directed_ZIPSBM_Sup_ZIPLPCM_T12k_beta_1_19_R1_hat_P_m0_heatmap[[4]])+ theme(plot.background =element_rect(fill=brewer.pal(9,"Greys")[1]))
 print(SS2_Scenario2_Directed_ZIPSBM_Sup_ZIPLPCM_T12k_beta_1_19_R1_hat_P_m0_heatmap_draw)
 
 # Mean and sd of the absolute error between the summarized and reference P_m0 for SS2 scenario 2
