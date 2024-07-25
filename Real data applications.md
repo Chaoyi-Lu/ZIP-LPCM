@@ -404,6 +404,7 @@ Note that running the code above would bring some warning messages and these are
 However, these bugs would not affect our output and the readers can ignore those warning messages.
 The above code for the interactive 3-d plot also attached some texts or notes for each node and each non-zero interaction to help readers have a better understanding of the network.
 If the readers put the mouse pointer on each node of the interactive plot, there will be a comment bracket showing (i) the coordinate of the node, (ii) the node number (e.g. node 1, node 2, ...), (iii) the reference clustering of the node.
+Since in this real data application the inferred $\hat{\boldsymbol{z}}$ is exactly the same as the reference clustering, so we replace the reference clustering shown in such comment brackets with the node attributes `sampson_monks_group_cloisterville` in the rest 3-d plots shown next.
 If the mouse pointer is put on each non-zero interaction, the bracket will show (i) either the start coordinate or the end coordinate of the interaction vector, (ii) the interaction weight, (iii) an indicator of whether the interaction is from node $i$ to node $j$ where $i\< j$, i.e., whether the corresponding $y_{ij}$ is the upper-diagonal entry of the $\boldsymbol{Y}$ for the directed networks.
 
 The **Figure 7** of the **ZIP-LPCM-MFM** paper can thus be reproduced by the `subplot()` and the `orca()` functions following the code below.
