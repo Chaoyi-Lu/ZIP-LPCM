@@ -672,7 +672,7 @@ RDA_Windsurfers_UnDirected_ZIPLPCM_unSup_T60k_R1_LSz_Like <- c()
 for (t in 1:nrow(RDA_Windsurfers_UnDirected_ZIPLPCM_unSup_T60k_R1$z)){
   RDA_Windsurfers_UnDirected_ZIPLPCM_unSup_T60k_R1_LSz_Like <-
     c(RDA_Windsurfers_UnDirected_ZIPLPCM_unSup_T60k_R1_LSz_Like,
-      UnDirected_ZIPLPCM_pgh_MFM_Likelihood(X=RDA_Windsurfers_UnDirected_ZIPLPCM_unSup_T60k_R1$X[[t]],
+      UnDirected_ZIPLPCM_MFM_CompleteLikelihood(X=RDA_Windsurfers_UnDirected_ZIPLPCM_unSup_T60k_R1$X[[t]],
                                             U=RDA_Windsurfers_UnDirected_ZIPLPCM_unSup_T60k_R1_PTU[[t]],
                                             beta=RDA_Windsurfers_UnDirected_ZIPLPCM_unSup_T60k_R1$beta[t],
                                             nu=RDA_Windsurfers_UnDirected_ZIPLPCM_unSup_T60k_R1$nu[[t]],
@@ -726,6 +726,7 @@ output <- MinimiseEPL(RDA_Windsurfers_UnDirected_ZIPLPCM_unSup_T60k_R1_LSz[itera
                       list(Kup = 20, loss_type = "VI",decision_init = RDA_Windsurfers_UnDirected_ZIPLPCM_unSup_T60k_R1_LSz_States[
                         which.max(RDA_Windsurfers_UnDirected_ZIPLPCM_unSup_T60k_R1_LSz_StatesFrequency),]))
 output$EPL # check minEVI posterior loss: 0.5421714
+RDA_Windsurfers_UnDirected_ZIPLPCM_unSup_T60k_R1_hat_z <- output$decision # Save output as the summarized hat_z
 
 #-----------------------------------------------------------------------------------------
 # Obtain summarized U
@@ -991,8 +992,226 @@ RDA_Windsurfers_UnDirected_ZIPLPCM_unSup_T60k_R1_hat_p_heatmap_draw <- cowplot::
 print(RDA_Windsurfers_UnDirected_ZIPLPCM_unSup_T60k_R1_hat_p_heatmap_draw)
 ```
 
-
 ### 2.3 Train Bombing Network
+
+Similar to the **Windsurfers** real network, the **Train bombing** network is also an undirected network and reference clustering or exogenous node attributes are not available to us.
+Thus an **unsupervised ZIP-LPCM** implementation is applied in practice for this network along with the post processing steps:
+
+``` r
+# Train Bombing undirected real network unsupervised ZIP-LPCM T = 60000 round 1
+set.seed(1)
+start.time <- Sys.time()
+RDA_TrainBombing_UnDirected_ZIPLPCM_unSup_T60k_R1 <- 
+  MwG_UnDirected_ZIPLPCM(Y = Train_bombing_adj,T = 60000,omega=0.01,alpha1=1,alpha2=0.103,alpha=3,beta1=1,beta2=9,
+                         sigma2prop_beta=0.3^2,sigma2prop_U=0.7,d=3,z=1:nrow(Train_bombing_adj),
+                         p_eject=0.5)
+end.time <- Sys.time()
+RDA_TrainBombing_UnDirected_ZIPLPCM_unSup_T60k_R1_time <- end.time - start.time
+RDA_TrainBombing_UnDirected_ZIPLPCM_unSup_T60k_R1_time
+# Time difference of 1.747663 hours
+
+#--------------------------------------------------------------------------------------------------------------------------
+# Post-process the output
+
+# Define the burn in
+iteration_after_burn_in <- 30002:60001
+burn_in <- 30001
+
+## check U acceptance rate
+apply(RDA_TrainBombing_UnDirected_ZIPLPCM_unSup_T60k_R1$acceptance_count_U[iteration_after_burn_in-1,],2,mean)
+mean(apply(RDA_TrainBombing_UnDirected_ZIPLPCM_unSup_T60k_R1$acceptance_count_U[iteration_after_burn_in-1,],2,mean)) # 0.3209318
+## check beta acceptance rate
+mean(RDA_TrainBombing_UnDirected_ZIPLPCM_unSup_T60k_R1$acceptance_count_beta[iteration_after_burn_in-1]) # 0.2292
+
+# Apply label switching on the post clustering z
+RDA_TrainBombing_UnDirected_ZIPLPCM_unSup_T60k_R1_LSz <- matrix(NA,nrow=nrow(RDA_TrainBombing_UnDirected_ZIPLPCM_unSup_T60k_R1$z),ncol=ncol(RDA_TrainBombing_UnDirected_ZIPLPCM_unSup_T60k_R1$z))
+RDA_TrainBombing_UnDirected_ZIPLPCM_unSup_T60k_R1_LSP <- list()
+for (t in 1:nrow(RDA_TrainBombing_UnDirected_ZIPLPCM_unSup_T60k_R1$z)){
+  LS_temp <- LabelSwitching_SG2003(z = RDA_TrainBombing_UnDirected_ZIPLPCM_unSup_T60k_R1$z[t,],
+                                   matrix_KbyK = RDA_TrainBombing_UnDirected_ZIPLPCM_unSup_T60k_R1$P[[t]])
+  RDA_TrainBombing_UnDirected_ZIPLPCM_unSup_T60k_R1_LSz[t,] <- LS_temp$z
+  RDA_TrainBombing_UnDirected_ZIPLPCM_unSup_T60k_R1_LSP[[t]] <- LS_temp$matrix_KbyK
+  if ((t%%1000) == 0){cat("t=",t,"\n")}
+}
+# Apply Procrustes Transform on posterior latent positions U
+library("IMIFA")
+RDA_TrainBombing_UnDirected_ZIPLPCM_unSup_T60k_R1_PTU <- list()
+for (t in 1:nrow(RDA_TrainBombing_UnDirected_ZIPLPCM_unSup_T60k_R1$z)){
+  RDA_TrainBombing_UnDirected_ZIPLPCM_unSup_T60k_R1_PTU[[t]] <-
+    Procrustes(RDA_TrainBombing_UnDirected_ZIPLPCM_unSup_T60k_R1$U[[t]],
+               RDA_TrainBombing_UnDirected_ZIPLPCM_unSup_T60k_R1$U[[60001]], translate = TRUE ,dilate = FALSE)$X.new
+  if ((t%%1000) == 0){cat("t=",t,"\n")}
+}
+
+#--------------------------------------------------------------------------------------------------------------------------
+## Check complete likelihood for each iteration
+RDA_TrainBombing_UnDirected_ZIPLPCM_unSup_T60k_R1_LSz_Like <- c()
+for (t in 1:nrow(RDA_TrainBombing_UnDirected_ZIPLPCM_unSup_T60k_R1$z)){
+  RDA_TrainBombing_UnDirected_ZIPLPCM_unSup_T60k_R1_LSz_Like <-
+    c(RDA_TrainBombing_UnDirected_ZIPLPCM_unSup_T60k_R1_LSz_Like,
+      UnDirected_ZIPLPCM_MFM_CompleteLikelihood(X=RDA_TrainBombing_UnDirected_ZIPLPCM_unSup_T60k_R1$X[[t]],
+                                            U=RDA_TrainBombing_UnDirected_ZIPLPCM_unSup_T60k_R1_PTU[[t]],
+                                            beta=RDA_TrainBombing_UnDirected_ZIPLPCM_unSup_T60k_R1$beta[t],
+                                            nu=RDA_TrainBombing_UnDirected_ZIPLPCM_unSup_T60k_R1$nu[[t]],
+                                            P=RDA_TrainBombing_UnDirected_ZIPLPCM_unSup_T60k_R1_LSP[[t]],
+                                            z=RDA_TrainBombing_UnDirected_ZIPLPCM_unSup_T60k_R1_LSz[t,],
+                                            alpha1=1,alpha2=0.103,omega=0.01,  alpha=3))
+  if ((t%%1000) == 0){cat("t=",t,"\n")}
+}
+plot(RDA_TrainBombing_UnDirected_ZIPLPCM_unSup_T60k_R1_LSz_Like,type = "l",xlab = "",ylab = "", main = "Likelihood",cex.axis = 0.8)
+
+# Check the trace plot of K
+plot(RDA_TrainBombing_UnDirected_ZIPLPCM_unSup_T60k_R1$K,type = "l",xlab = "",ylab = "", main = "K Trace Plot",cex.axis = 0.8)
+
+#--------------------------------------------------------------------------------------------------------------------------
+# Summarize posterior clustering z by the greedy algorithm proposed by Rastelli and Friel (2018)
+# We start from obtaining the marginal posterior mode of the posterior z chain
+RDA_TrainBombing_UnDirected_ZIPLPCM_unSup_T60k_R1_LSz_States <- c() # initialize a list which will store different clustering states; the clustering states are labeled from 1,2,3... and are put at the 1st,2nd,3rd... row of the matrix, respectively
+RDA_TrainBombing_UnDirected_ZIPLPCM_unSup_T60k_R1_LSz_StatesIteration <- list() # store all the t's (iteration number) which provides the same cluster as the clustering state 1,2,3...
+RDA_TrainBombing_UnDirected_ZIPLPCM_unSup_T60k_R1_LSz_IterationLoop <- iteration_after_burn_in # the "IterationLoop" which stores all the iteration t's which we focus on, that is, all the iteration t's after burn-in
+StatesLabelIndicator = 0 # initialize the label for the clustering states
+while (length(RDA_TrainBombing_UnDirected_ZIPLPCM_unSup_T60k_R1_LSz_IterationLoop)!=0){ # if the "IterationLoop" is not empty
+  StatesLabelIndicator <- StatesLabelIndicator + 1 # assign the next label to the next clustering state
+  RDA_TrainBombing_UnDirected_ZIPLPCM_unSup_T60k_R1_LSz_FirstState <- RDA_TrainBombing_UnDirected_ZIPLPCM_unSup_T60k_R1_LSz[RDA_TrainBombing_UnDirected_ZIPLPCM_unSup_T60k_R1_LSz_IterationLoop[1],] # extract the first clustering state for the "IterationLoop"
+  RDA_TrainBombing_UnDirected_ZIPLPCM_unSup_T60k_R1_LSz_States <- rbind(RDA_TrainBombing_UnDirected_ZIPLPCM_unSup_T60k_R1_LSz_States,
+                                                                                 RDA_TrainBombing_UnDirected_ZIPLPCM_unSup_T60k_R1_LSz_FirstState) # store the first state within the "IterationLoop" with label "StatesLabelIndicator" in the list which will contain all different unique states
+  RDA_TrainBombing_UnDirected_ZIPLPCM_unSup_T60k_R1_LSz_StatesIteration_temp <- c() # create a vector to temporarily store all the iteration t's whose clustering is the same as the first clustering state within the "IterationLoop"
+  for (t in RDA_TrainBombing_UnDirected_ZIPLPCM_unSup_T60k_R1_LSz_IterationLoop){ # loop over all the current existing iterations in "IterationLoop"
+    if (sum(RDA_TrainBombing_UnDirected_ZIPLPCM_unSup_T60k_R1_LSz[t,]==RDA_TrainBombing_UnDirected_ZIPLPCM_unSup_T60k_R1_LSz_FirstState)==length(RDA_TrainBombing_UnDirected_ZIPLPCM_unSup_T60k_R1_LSz_FirstState)){ # if the t's clustering is the same as the "FirstState"
+      RDA_TrainBombing_UnDirected_ZIPLPCM_unSup_T60k_R1_LSz_StatesIteration_temp <- c(RDA_TrainBombing_UnDirected_ZIPLPCM_unSup_T60k_R1_LSz_StatesIteration_temp,t) # store the iteration t in the temporary vector
+    }
+  }
+  RDA_TrainBombing_UnDirected_ZIPLPCM_unSup_T60k_R1_LSz_StatesIteration[[StatesLabelIndicator]] <- RDA_TrainBombing_UnDirected_ZIPLPCM_unSup_T60k_R1_LSz_StatesIteration_temp # store all the t's as the list element
+  RDA_TrainBombing_UnDirected_ZIPLPCM_unSup_T60k_R1_LSz_IterationLoop <-
+    (iteration_after_burn_in)[-(unlist(RDA_TrainBombing_UnDirected_ZIPLPCM_unSup_T60k_R1_LSz_StatesIteration)-burn_in)] # remove all the iterations we have stored and then move to the next clustering state
+}
+rownames(RDA_TrainBombing_UnDirected_ZIPLPCM_unSup_T60k_R1_LSz_States) <- NULL
+nrow(RDA_TrainBombing_UnDirected_ZIPLPCM_unSup_T60k_R1_LSz_States) # check the number of different clustering states
+RDA_TrainBombing_UnDirected_ZIPLPCM_unSup_T60k_R1_LSz_StatesFrequency <- c() # check the number of times one clustering state occurs
+for (t in 1:nrow(RDA_TrainBombing_UnDirected_ZIPLPCM_unSup_T60k_R1_LSz_States)){
+  RDA_TrainBombing_UnDirected_ZIPLPCM_unSup_T60k_R1_LSz_StatesFrequency <-
+    c(RDA_TrainBombing_UnDirected_ZIPLPCM_unSup_T60k_R1_LSz_StatesFrequency,
+      length(RDA_TrainBombing_UnDirected_ZIPLPCM_unSup_T60k_R1_LSz_StatesIteration[[t]]))
+}
+RDA_TrainBombing_UnDirected_ZIPLPCM_unSup_T60k_R1_LSz_StatesFrequency
+sort(RDA_TrainBombing_UnDirected_ZIPLPCM_unSup_T60k_R1_LSz_StatesFrequency,decreasing=TRUE) # check the clustering state frequency in decreasing order
+order(RDA_TrainBombing_UnDirected_ZIPLPCM_unSup_T60k_R1_LSz_StatesFrequency,decreasing=TRUE) # check the corresponding positions
+which.max(RDA_TrainBombing_UnDirected_ZIPLPCM_unSup_T60k_R1_LSz_StatesFrequency) # find the marginal posterior mode, i.e. the most frequent clustering state
+RDA_TrainBombing_UnDirected_ZIPLPCM_unSup_T60k_R1_LSz_StatesFrequency[which.max(RDA_TrainBombing_UnDirected_ZIPLPCM_unSup_T60k_R1_LSz_StatesFrequency)] # Find the most frequency
+library(GreedyEPL) # obtain the summarized z by the greedy algorithm proposed by Rastelli and Friel (2018)
+output <- MinimiseEPL(RDA_TrainBombing_UnDirected_ZIPLPCM_unSup_T60k_R1_LSz[iteration_after_burn_in,],
+                      list(Kup = 20, loss_type = "VI",decision_init = RDA_TrainBombing_UnDirected_ZIPLPCM_unSup_T60k_R1_LSz_States[
+                        which.max(RDA_TrainBombing_UnDirected_ZIPLPCM_unSup_T60k_R1_LSz_StatesFrequency),]))
+output$EPL # check minEVI posterior loss: 0.4427744
+RDA_TrainBombing_UnDirected_ZIPLPCM_unSup_T60k_R1_hat_z <- output$decision # Save output as summarized hat_z
+
+#--------------------------------------------------------------------------------------------------------------------------
+# Obtain summarized U
+RDA_TrainBombing_UnDirected_ZIPLPCM_unSup_T60k_R1_LSz_hat_zIteration <- # extract all the iterations whose clustering is identical to hat_z
+  RDA_TrainBombing_UnDirected_ZIPLPCM_unSup_T60k_R1_LSz_StatesIteration[[
+    which(apply(t(RDA_TrainBombing_UnDirected_ZIPLPCM_unSup_T60k_R1_LSz_States)==
+                  RDA_TrainBombing_UnDirected_ZIPLPCM_unSup_T60k_R1_hat_z,2,sum)==length(RDA_TrainBombing_UnDirected_ZIPLPCM_unSup_T60k_R1_hat_z))
+  ]]
+RDA_TrainBombing_UnDirected_ZIPLPCM_unSup_T60k_R1_MaxLikeHatz_iteration <- RDA_TrainBombing_UnDirected_ZIPLPCM_unSup_T60k_R1_LSz_hat_zIteration[
+  which.max(RDA_TrainBombing_UnDirected_ZIPLPCM_unSup_T60k_R1_LSz_Like[RDA_TrainBombing_UnDirected_ZIPLPCM_unSup_T60k_R1_LSz_hat_zIteration])]
+RDA_TrainBombing_UnDirected_ZIPLPCM_unSup_T60k_R1_hat_U <-
+  RDA_TrainBombing_UnDirected_ZIPLPCM_unSup_T60k_R1_PTU[[RDA_TrainBombing_UnDirected_ZIPLPCM_unSup_T60k_R1_MaxLikeHatz_iteration]]
+```
+
+After obtaining the summarized $\hat{\boldsymbol{z}}$ and $\hat{\boldsymbol{U}}$, the corresponding 3-d interactive plot can be produced following:
+
+``` r
+library("igraph")
+library("RColorBrewer")
+library("ggplot2")
+
+My_colors <- c(brewer.pal(10,"RdBu")[c(4,8)],brewer.pal(10,"PRGn")[c(7,4)],brewer.pal(9,"YlOrBr")[4],
+               brewer.pal(10,"RdBu")[c(2,9)],brewer.pal(10,"PRGn")[c(9,2)],brewer.pal(9,"YlOrBr")[6],
+               brewer.pal(9,"Reds")[c(9,6)],brewer.pal(9,"RdPu")[5],brewer.pal(9,"Greys")[c(3,6,9)],brewer.pal(9,"GnBu")[5])
+
+g_obs <- graph_from_adjacency_matrix(Train_bombing_adj,mode = "undirected",weighted = TRUE)
+E(g_obs)$color <- colorRampPalette(brewer.pal(9,"Greys")[c(3,9)])(max(Train_bombing_adj))[E(g_obs)$weight]
+betw <- betweenness(g_obs)
+VertexSize <- sqrt(betw/1.5+mean(betw))*1
+
+library("plotly")
+fig <- plot_ly() %>%
+  add_markers(x = RDA_TrainBombing_UnDirected_ZIPLPCM_unSup_T60k_R1_hat_U[,1],
+              y = RDA_TrainBombing_UnDirected_ZIPLPCM_unSup_T60k_R1_hat_U[,2],
+              z = RDA_TrainBombing_UnDirected_ZIPLPCM_unSup_T60k_R1_hat_U[,3],
+              text=paste("Node:",1:nrow(Train_bombing_adj)),
+              size=VertexSize,sizes=c(200,400),
+              color=as.factor(RDA_TrainBombing_UnDirected_ZIPLPCM_unSup_T60k_R1_hat_z),colors=My_colors[c(6,2,8,9)]
+  )
+Edges <- get.edgelist(g_obs)
+for (i in 1:nrow(Edges)){
+  fig <- fig %>%
+    add_trace(x = RDA_TrainBombing_UnDirected_ZIPLPCM_unSup_T60k_R1_hat_U[Edges[i,],1],
+              y = RDA_TrainBombing_UnDirected_ZIPLPCM_unSup_T60k_R1_hat_U[Edges[i,],2],
+              z = RDA_TrainBombing_UnDirected_ZIPLPCM_unSup_T60k_R1_hat_U[Edges[i,],3],
+              text=paste("Weight:",E(g_obs)$weight[i]),
+              type = "scatter3d", mode = "lines", showlegend = FALSE,line = list(color = E(g_obs)$color[i], width = 0.75*E(g_obs)$weight[i]))
+}
+fig <- fig %>% layout(title = "hat_U and hat_z",scene = list(xaxis = list(title = 'x1'),yaxis = list(title = 'x2'),zaxis = list(title = 'x3')))
+fig
+```
+
+Such a 3-d plot can be downloaded at [`/Interactive 3-d latent positions plots/RDA_TrainBombing_InteractivePlot.html`] of this repository.
+Following the above code for the 3-d plotting, the **Figure 11** in the **ZIP-LPCM-MFM** paper can be reproduced by:
+
+``` r
+# Plot the front angle of the latent positions
+fig1 <- plot_ly(scene ="scene1") %>%
+  add_markers(x = RDA_TrainBombing_UnDirected_ZIPLPCM_unSup_T60k_R1_hat_U[,1],
+              y = RDA_TrainBombing_UnDirected_ZIPLPCM_unSup_T60k_R1_hat_U[,2],
+              z = RDA_TrainBombing_UnDirected_ZIPLPCM_unSup_T60k_R1_hat_U[,3],
+              text=paste("Node:",1:nrow(Train_bombing_adj)),
+              size=VertexSize,sizes=c(200,400),showlegend = FALSE,
+              color=as.factor(RDA_TrainBombing_UnDirected_ZIPLPCM_unSup_T60k_R1_hat_z),colors=My_colors[c(6,2,8,9)]
+  )
+Edges <- get.edgelist(g_obs)
+for (i in 1:nrow(Edges)){
+  fig1 <- fig1 %>%
+    add_trace(x = RDA_TrainBombing_UnDirected_ZIPLPCM_unSup_T60k_R1_hat_U[Edges[i,],1],
+              y = RDA_TrainBombing_UnDirected_ZIPLPCM_unSup_T60k_R1_hat_U[Edges[i,],2],
+              z = RDA_TrainBombing_UnDirected_ZIPLPCM_unSup_T60k_R1_hat_U[Edges[i,],3],
+              text=paste("Weight:",E(g_obs)$weight[i]),
+              type = "scatter3d", mode = "lines", showlegend = FALSE,line = list(color = E(g_obs)$color[i], width = 0.75*E(g_obs)$weight[i]))
+}
+
+
+# Plot the right angle of the latent positions
+fig2 <- plot_ly(scene ="scene2") %>%
+  add_markers(x = RDA_TrainBombing_UnDirected_ZIPLPCM_unSup_T60k_R1_hat_U[,1],
+              y = RDA_TrainBombing_UnDirected_ZIPLPCM_unSup_T60k_R1_hat_U[,2],
+              z = RDA_TrainBombing_UnDirected_ZIPLPCM_unSup_T60k_R1_hat_U[,3],
+              text=paste("Node:",1:nrow(Train_bombing_adj)),
+              size=VertexSize,sizes=c(200,400),showlegend = FALSE,
+              color=as.factor(RDA_TrainBombing_UnDirected_ZIPLPCM_unSup_T60k_R1_hat_z),colors=My_colors[c(6,2,8,9)]
+  )
+Edges <- get.edgelist(g_obs)
+for (i in 1:nrow(Edges)){
+  fig2 <- fig2 %>%
+    add_trace(x = RDA_TrainBombing_UnDirected_ZIPLPCM_unSup_T60k_R1_hat_U[Edges[i,],1],
+              y = RDA_TrainBombing_UnDirected_ZIPLPCM_unSup_T60k_R1_hat_U[Edges[i,],2],
+              z = RDA_TrainBombing_UnDirected_ZIPLPCM_unSup_T60k_R1_hat_U[Edges[i,],3],
+              text=paste("Weight:",E(g_obs)$weight[i]),
+              type = "scatter3d", mode = "lines", showlegend = FALSE,line = list(color = E(g_obs)$color[i], width = 0.75*E(g_obs)$weight[i]))
+}
+
+Fig1 <- subplot(fig1, fig2)
+Fig1 <- Fig1 %>% layout(title = "", margin = list(l = 0,r = 0,b = 0,t = 0,pad = 0),
+                        scene = list(domain=list(x=c(0,1/2),y=c(0,1)),
+                                     xaxis = list(title = ''),yaxis = list(title = ''),zaxis = list(title = ''),
+                                     camera = list(eye = list(x = -1.1, y = -1.5, z = 0.85)),
+                                     aspectmode='auto'),
+                        scene2 = list(domain=list(x=c(1/2,0.999),y=c(0,1)),
+                                      xaxis = list(title = ''),yaxis = list(title = ''),zaxis = list(title = ''),
+                                      camera = list(eye = list(x = 1.1, y = -1.5, z = 0.85)),
+                                      aspectmode='auto'))
+# Fig1
+orca(Fig1, "RDA_TrainBombing_hat_U_Y.pdf",scale=1,width=1800,height=850)
+```
 
 ### 2.4 'Ndrangheta Mafia Network
 
