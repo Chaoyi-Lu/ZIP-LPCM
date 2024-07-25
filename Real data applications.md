@@ -1631,7 +1631,7 @@ fig3 <- plot_ly(scene ="scene3") %>%
   add_markers(x = RDA_Infinito_UnDirected_ZIPLPCM_Sup_T60k_R1_hat_U[,1],
               y = RDA_Infinito_UnDirected_ZIPLPCM_Sup_T60k_R1_hat_U[,2],
               z = RDA_Infinito_UnDirected_ZIPLPCM_Sup_T60k_R1_hat_U[,3],
-              text=paste("Node:",1:nrow(RDA_criminalNet$Y),"<br>z*:",RDA_criminalNet$OurA),
+              text=paste("Node:",1:nrow(RDA_criminalNet$Y),"<br>z*:",RDA_criminalNet$RoleLocale,"<br>c:",RDA_criminalNet$A),
               size=VertexSize,sizes=c(200,400),showlegend = FALSE,
               color=as.factor(RDA_Infinito_UnDirected_ZIPLPCM_Sup_T60k_R1_hat_z),colors=My_colors[c(3,1,6,9,4,5,7,10,8,2)],
               symbol=as.factor(RDA_criminalNet$role),symbols = c("circle","square")
@@ -1651,7 +1651,7 @@ fig4 <- plot_ly(scene ="scene4") %>% # plot the hat_z and hat_U
   add_markers(x = RDA_Infinito_UnDirected_ZIPLPCM_Sup_T60k_R1_hat_U[,1],
               y = RDA_Infinito_UnDirected_ZIPLPCM_Sup_T60k_R1_hat_U[,2],
               z = RDA_Infinito_UnDirected_ZIPLPCM_Sup_T60k_R1_hat_U[,3],
-              text=paste("Node:",1:nrow(RDA_criminalNet$Y),"<br>z*:",RDA_criminalNet$OurA),
+              text=paste("Node:",1:nrow(RDA_criminalNet$Y),"<br>z*:",RDA_criminalNet$RoleLocale,"<br>c:",RDA_criminalNet$A),
               size=VertexSize,sizes=c(200,400),showlegend = FALSE,
               color=as.factor(RDA_Infinito_UnDirected_ZIPLPCM_Sup_T60k_R1_hat_z),colors=My_colors[c(3,1,6,9,4,5,7,10,8,2)],
               symbol=as.factor(RDA_criminalNet$role),symbols = c("circle","square")
