@@ -520,8 +520,8 @@ for (t in 1:nrow(RDA_SampsonMonks_Directed_ZIPLPCM_Sup_T60k_R1$z)){
   RDA_SampsonMonks_Directed_ZIPLPCM_Sup_T60k_R1_lambda[[t]] <- exp(RDA_SampsonMonks_Directed_ZIPLPCM_Sup_T60k_R1$beta[t]-Dist_U)
   if ((t%%1000) == 0){cat("t=",t,"\n") }
 }
-RDA_SampsonMonks_Directed_ZIPLPCM_Sup_T60k_R1_hat_Lambdaij <- Reduce("+",RDA_SampsonMonks_Directed_ZIPLPCM_Sup_T60k_R1_lambda[iteration_after_burn_in])/length(iteration_after_burn_in)
-diag(RDA_SampsonMonks_Directed_ZIPLPCM_Sup_T60k_R1_hat_Lambdaij) <- 0
+RDA_SampsonMonks_Directed_ZIPLPCM_Sup_T60k_R1_hat_lambda <- Reduce("+",RDA_SampsonMonks_Directed_ZIPLPCM_Sup_T60k_R1_lambda[iteration_after_burn_in])/length(iteration_after_burn_in)
+diag(RDA_SampsonMonks_Directed_ZIPLPCM_Sup_T60k_R1_hat_lambda) <- 0
 ```
 
 Based on the above individual-level statistics, the heatmap plots shown in **Figure 8** of the **ZIP-LPCM-MFM** paper can be recovered by:
@@ -740,6 +740,256 @@ RDA_Windsurfers_UnDirected_ZIPLPCM_unSup_T60k_R1_hat_U <-
   RDA_Windsurfers_UnDirected_ZIPLPCM_unSup_T60k_R1_PTU[[RDA_Windsurfers_UnDirected_ZIPLPCM_unSup_T60k_R1_MaxLikeHatz_iteration]]
 ```
 
+Up to this point, we have obtained the $\hat{\boldsymbol{z}}$ and $\hat{\boldsymbol{U}}$, the interactive 3-dimensional plot of which can be directly produced following:
+
+``` r
+library("igraph")
+library("RColorBrewer")
+library("ggplot2")
+
+My_colors <- c(brewer.pal(10,"RdBu")[c(4,7)],brewer.pal(10,"PRGn")[c(7,4)],brewer.pal(9,"YlOrBr")[4],
+               brewer.pal(10,"RdBu")[c(2,9)],brewer.pal(10,"PRGn")[c(9,2)],brewer.pal(9,"YlOrBr")[6],
+               brewer.pal(9,"Reds")[c(9,6)],brewer.pal(9,"RdPu")[5],brewer.pal(9,"Greys")[c(3,6,9)],brewer.pal(9,"GnBu")[5])
+
+g_obs <- graph_from_adjacency_matrix(Windsurfers_adj,mode = "undirected",weighted = TRUE)
+E(g_obs)$color <- colorRampPalette(brewer.pal(9,"Greys")[c(3,9)])(max(Windsurfers_adj))[E(g_obs)$weight]
+betw <- betweenness(g_obs)
+VertexSize <- sqrt(betw/1.5+mean(betw))*1
+
+library("plotly")
+fig <- plot_ly() %>%
+  add_markers(x = RDA_Windsurfers_UnDirected_ZIPLPCM_unSup_T60k_R1_hat_U[,1],
+              y = RDA_Windsurfers_UnDirected_ZIPLPCM_unSup_T60k_R1_hat_U[,2],
+              z = RDA_Windsurfers_UnDirected_ZIPLPCM_unSup_T60k_R1_hat_U[,3],
+              text=paste("Node:",1:nrow(Windsurfers_adj)),
+              size=VertexSize,sizes=c(200,400),
+              color=as.factor(RDA_Windsurfers_UnDirected_ZIPLPCM_unSup_T60k_R1_hat_z),colors=My_colors[c(1,6,2)]
+  )
+Edges <- get.edgelist(g_obs)
+for (i in 1:nrow(Edges)){
+  fig <- fig %>%
+    add_trace(x = RDA_Windsurfers_UnDirected_ZIPLPCM_unSup_T60k_R1_hat_U[Edges[i,],1],
+              y = RDA_Windsurfers_UnDirected_ZIPLPCM_unSup_T60k_R1_hat_U[Edges[i,],2],
+              z = RDA_Windsurfers_UnDirected_ZIPLPCM_unSup_T60k_R1_hat_U[Edges[i,],3],
+              text=paste("Weight:",E(g_obs)$weight[i]),
+              type = "scatter3d", mode = "lines", showlegend = FALSE,line = list(color = E(g_obs)$color[i], width = 0.3*E(g_obs)$weight[i]))
+}
+fig <- fig %>% layout(title = "hat_U and hat_z",scene = list(xaxis = list(title = 'x1'),yaxis = list(title = 'x2'),zaxis = list(title = 'x3')))
+fig
+```
+
+However, it seems to be not easy to find two nice angle to take screenshots of the above interactive 3-d plot in order to show in the **ZIP-LPCM-MFM** paper, because the three inferred groups in the above plot lie along the vertical axis.
+Considering the fact that our model is invariant under any rotation or translation applied on the latent positions, we propose to apply Procrutes transformation on the $\hat{\boldsymbol{U}}$ to make the three inferred groups lie down along the horizontal plane, i.e., move the latent positions from "portrait" to "landscape":
+
+``` r
+library("IMIFA") # translate the latent positions from portrait to landscape
+U_ref <- RDA_Windsurfers_UnDirected_ZIPLPCM_unSup_T60k_R1_hat_U
+U_ref[RDA_Windsurfers_UnDirected_ZIPLPCM_unSup_T60k_R1_hat_z==1,] <- c(-3,3,0)
+U_ref[RDA_Windsurfers_UnDirected_ZIPLPCM_unSup_T60k_R1_hat_z==2,] <- c(-3,3,0)
+U_ref[RDA_Windsurfers_UnDirected_ZIPLPCM_unSup_T60k_R1_hat_z==3,] <- c(3,-3,0)
+RDA_Windsurfers_UnDirected_ZIPLPCM_unSup_T60k_R1_hat_U <-
+  Procrustes(RDA_Windsurfers_UnDirected_ZIPLPCM_unSup_T60k_R1_hat_U,
+             U_ref, translate = TRUE ,dilate = FALSE)$X.new
+```
+
+This brings the 3-d plots of the latent positions we illustrate in **Figure 9** of the paper:
+
+``` r
+fig <- plot_ly() %>%
+  add_markers(x = RDA_Windsurfers_UnDirected_ZIPLPCM_unSup_T60k_R1_hat_U[,1],
+              y = RDA_Windsurfers_UnDirected_ZIPLPCM_unSup_T60k_R1_hat_U[,2],
+              z = RDA_Windsurfers_UnDirected_ZIPLPCM_unSup_T60k_R1_hat_U[,3],
+              text=paste("Node:",1:nrow(Windsurfers_adj)),
+              size=VertexSize,sizes=c(200,400),
+              color=as.factor(RDA_Windsurfers_UnDirected_ZIPLPCM_unSup_T60k_R1_hat_z),colors=My_colors[c(1,6,2)]
+  )
+Edges <- get.edgelist(g_obs)
+for (i in 1:nrow(Edges)){
+  fig <- fig %>%
+    add_trace(x = RDA_Windsurfers_UnDirected_ZIPLPCM_unSup_T60k_R1_hat_U[Edges[i,],1],
+              y = RDA_Windsurfers_UnDirected_ZIPLPCM_unSup_T60k_R1_hat_U[Edges[i,],2],
+              z = RDA_Windsurfers_UnDirected_ZIPLPCM_unSup_T60k_R1_hat_U[Edges[i,],3],
+              text=paste("Weight:",E(g_obs)$weight[i]),
+              type = "scatter3d", mode = "lines", showlegend = FALSE,line = list(color = E(g_obs)$color[i], width = 0.3*E(g_obs)$weight[i]))
+}
+fig <- fig %>% layout(title = "hat_U and hat_z",scene = list(xaxis = list(title = 'x1'),yaxis = list(title = 'x2'),zaxis = list(title = 'x3')))
+fig
+```
+
+Such an interactive 3-d plot is uploaded as [`/Interactive 3-d latent positions plots/RDA_Windsurfers_InteractivePlot.html`] of this repository.
+The **Figure 9** of the **ZIP-LPCM-MFM** paper can thus be reporduced following:
+
+``` r
+# Plot the front angle of the latent positions
+fig1 <- plot_ly(scene ="scene1") %>% # plot the summarized clustering and hat_U
+  add_markers(x = RDA_Windsurfers_UnDirected_ZIPLPCM_unSup_T60k_R1_hat_U[,1],
+              y = RDA_Windsurfers_UnDirected_ZIPLPCM_unSup_T60k_R1_hat_U[,2],
+              z = RDA_Windsurfers_UnDirected_ZIPLPCM_unSup_T60k_R1_hat_U[,3],
+              text=paste("Node:",1:nrow(Windsurfers_adj)),
+              size=VertexSize,sizes=c(200,400),showlegend = FALSE,
+              color=as.factor(RDA_Windsurfers_UnDirected_ZIPLPCM_unSup_T60k_R1_hat_z),colors=My_colors[c(1,6,2)]
+  )
+Edges <- get.edgelist(g_obs)
+for (i in 1:nrow(Edges)){
+  fig1 <- fig1 %>%
+    add_trace(x = RDA_Windsurfers_UnDirected_ZIPLPCM_unSup_T60k_R1_hat_U[Edges[i,],1],
+              y = RDA_Windsurfers_UnDirected_ZIPLPCM_unSup_T60k_R1_hat_U[Edges[i,],2],
+              z = RDA_Windsurfers_UnDirected_ZIPLPCM_unSup_T60k_R1_hat_U[Edges[i,],3],
+              text=paste("Weight:",E(g_obs)$weight[i]),showlegend = FALSE,
+              type = "scatter3d", mode = "lines", showlegend = FALSE,line = list(color = E(g_obs)$color[i], width = 0.3*E(g_obs)$weight[i]))
+}
+
+# Plot the right angle of the latent positions
+fig2 <- plot_ly(scene ="scene2") %>% # plot the summarized clustering and hat_U
+  add_markers(x = RDA_Windsurfers_UnDirected_ZIPLPCM_unSup_T60k_R1_hat_U[,1],
+              y = RDA_Windsurfers_UnDirected_ZIPLPCM_unSup_T60k_R1_hat_U[,2],
+              z = RDA_Windsurfers_UnDirected_ZIPLPCM_unSup_T60k_R1_hat_U[,3],
+              text=paste("Node:",1:nrow(Windsurfers_adj)),
+              size=VertexSize,sizes=c(200,400),showlegend = FALSE,
+              color=as.factor(RDA_Windsurfers_UnDirected_ZIPLPCM_unSup_T60k_R1_hat_z),colors=My_colors[c(1,6,2)]
+  )
+Edges <- get.edgelist(g_obs)
+for (i in 1:nrow(Edges)){
+  fig2 <- fig2 %>%
+    add_trace(x = RDA_Windsurfers_UnDirected_ZIPLPCM_unSup_T60k_R1_hat_U[Edges[i,],1],
+              y = RDA_Windsurfers_UnDirected_ZIPLPCM_unSup_T60k_R1_hat_U[Edges[i,],2],
+              z = RDA_Windsurfers_UnDirected_ZIPLPCM_unSup_T60k_R1_hat_U[Edges[i,],3],
+              text=paste("Weight:",E(g_obs)$weight[i]),
+              type = "scatter3d", mode = "lines", showlegend = FALSE,line = list(color = E(g_obs)$color[i], width = 0.3*E(g_obs)$weight[i]))
+}
+Fig1 <- subplot(fig1, fig2)
+Fig1 <- Fig1 %>% layout(title = "", margin = list(l = 0,r = 0,b = 0,t = 0,pad = 0),
+                        scene = list(domain=list(x=c(0,1/2),y=c(0,1)),
+                                     xaxis = list(title = ''),yaxis = list(title = ''),zaxis = list(title = ''),
+                                     camera = list(eye = list(x = 1.0, y = 0.6, z = 1.4)),
+                                     aspectmode='auto'),
+                        scene2 = list(domain=list(x=c(1/2,0.999),y=c(0,1)),
+                                      xaxis = list(title = ''),yaxis = list(title = ''),zaxis = list(title = ''),
+                                      camera = list(eye = list(x = -0.6, y = 1.0, z = 1.4)),
+                                      aspectmode='auto'))
+# Fig1
+orca(Fig1, "RDA_Windsurfers_hat_U_Y.pdf",scale=1,width=1500,height=700)
+```
+
+The rest summary statistics can be obtained by:
+
+``` r
+## Summarize beta
+RDA_Windsurfers_UnDirected_ZIPLPCM_unSup_T60k_R1_hat_beta <-
+  mean(RDA_Windsurfers_UnDirected_ZIPLPCM_unSup_T60k_R1$beta[iteration_after_burn_in])
+RDA_Windsurfers_UnDirected_ZIPLPCM_unSup_T60k_R1_hat_beta #  3.614686
+#---------------------------------------------------------------------------------------------------------------------------
+## Obtain posterior mean of nu, i.e. approximated P_m0
+RDA_Windsurfers_UnDirected_ZIPLPCM_unSup_T60k_R1_hat_nu <-
+  Reduce("+",RDA_Windsurfers_UnDirected_ZIPLPCM_unSup_T60k_R1$nu[iteration_after_burn_in])/length(iteration_after_burn_in)
+#---------------------------------------------------------------------------------------------------------------------------
+
+library("RColorBrewer")
+library("pheatmap")
+library("ggplot2")
+
+My_colors <- c(brewer.pal(10,"RdBu")[c(4,7)],brewer.pal(10,"PRGn")[c(7,4)],brewer.pal(9,"YlOrBr")[4],
+               brewer.pal(10,"RdBu")[c(2,9)],brewer.pal(10,"PRGn")[c(9,2)],brewer.pal(9,"YlOrBr")[6],
+               brewer.pal(9,"Reds")[c(9,6)],brewer.pal(9,"RdPu")[5],brewer.pal(9,"Greys")[c(3,6,9)],brewer.pal(9,"GnBu")[5])
+
+Windsurfers_adj_dataframe <- as.data.frame(Windsurfers_adj)
+rownames(Windsurfers_adj_dataframe) <- colnames(Windsurfers_adj_dataframe) <- 1:nrow(Windsurfers_adj)
+
+RDA_Windsurfers_UnDirected_ZIPLPCM_unSup_T60k_R1_hat_nu_dataframe <- as.data.frame(RDA_Windsurfers_UnDirected_ZIPLPCM_unSup_T60k_R1_hat_nu)
+rownames(RDA_Windsurfers_UnDirected_ZIPLPCM_unSup_T60k_R1_hat_nu_dataframe) <- colnames(RDA_Windsurfers_UnDirected_ZIPLPCM_unSup_T60k_R1_hat_nu_dataframe) <- 1:nrow(Windsurfers_adj)
+#---------------------------------------------------------------------------------------------------------------------------
+# Obtain the individual-level p for each iteration
+RDA_Windsurfers_UnDirected_ZIPLPCM_unSup_T60k_R1_p <- list()
+library(Rfast)
+for (t in 1:nrow(RDA_Windsurfers_UnDirected_ZIPLPCM_unSup_T60k_R1$z)){
+  Z <- t(t(matrix(RDA_Windsurfers_UnDirected_ZIPLPCM_unSup_T60k_R1_LSz[t,],length(RDA_Windsurfers_UnDirected_ZIPLPCM_unSup_T60k_R1_LSz[t,]),
+                  RDA_Windsurfers_UnDirected_ZIPLPCM_unSup_T60k_R1$K[t]))==(1:RDA_Windsurfers_UnDirected_ZIPLPCM_unSup_T60k_R1$K[t]))*1
+  RDA_Windsurfers_UnDirected_ZIPLPCM_unSup_T60k_R1_p[[t]] <- Z%*%RDA_Windsurfers_UnDirected_ZIPLPCM_unSup_T60k_R1_LSP[[t]]%*%t(Z)
+  if ((t%%1000) == 0){cat("t=",t,"\n")}
+}
+RDA_Windsurfers_UnDirected_ZIPLPCM_unSup_T60k_R1_hat_p <- Reduce("+",RDA_Windsurfers_UnDirected_ZIPLPCM_unSup_T60k_R1_p[iteration_after_burn_in])/length(iteration_after_burn_in)
+diag(RDA_Windsurfers_UnDirected_ZIPLPCM_unSup_T60k_R1_hat_p) <- 0
+#---------------------------------------------------------------------------------------------------------------------------
+# Obtain the individual-level lambda for each iteration
+RDA_Windsurfers_UnDirected_ZIPLPCM_unSup_T60k_R1_lambda <- list()
+library(Rfast)
+for (t in 1:nrow(RDA_Windsurfers_UnDirected_ZIPLPCM_unSup_T60k_R1$z)){
+  Z <- t(t(matrix(RDA_Windsurfers_UnDirected_ZIPLPCM_unSup_T60k_R1_LSz[t,],length(RDA_Windsurfers_UnDirected_ZIPLPCM_unSup_T60k_R1_LSz[t,]),RDA_Windsurfers_UnDirected_ZIPLPCM_unSup_T60k_R1$K[t]))==(1:RDA_Windsurfers_UnDirected_ZIPLPCM_unSup_T60k_R1$K[t]))*1
+  Dist_U <- Rfast::Dist(RDA_Windsurfers_UnDirected_ZIPLPCM_unSup_T60k_R1_PTU[[t]])
+  RDA_Windsurfers_UnDirected_ZIPLPCM_unSup_T60k_R1_lambda[[t]] <- exp(RDA_Windsurfers_UnDirected_ZIPLPCM_unSup_T60k_R1$beta[t]-Dist_U)
+  if ((t%%1000) == 0){cat("t=",t,"\n")}
+}
+RDA_Windsurfers_UnDirected_ZIPLPCM_unSup_T60k_R1_hat_lambda <- Reduce("+",RDA_Windsurfers_UnDirected_ZIPLPCM_unSup_T60k_R1_lambda[iteration_after_burn_in])/length(iteration_after_burn_in)
+diag(RDA_Windsurfers_UnDirected_ZIPLPCM_unSup_T60k_R1_hat_lambda) <- 0
+```
+
+And thus the **Figure 10** in the paper can be recovered by:
+
+``` r
+annotation_row_z_ref <- as.data.frame(as.factor(matrix(RDA_Windsurfers_UnDirected_ZIPLPCM_unSup_T60k_R1_hat_z,length(RDA_Windsurfers_UnDirected_ZIPLPCM_unSup_T60k_R1_hat_z),1)))
+colnames(annotation_row_z_ref) <- "z_ref"
+annotation_colors_z_ref <- My_colors[c(1,6,2)]
+names(annotation_colors_z_ref) <- sort(unique(annotation_row_z_ref$z_ref))
+annotation_colors_blank <- rep(brewer.pal(9,"Greys")[1],3)
+names(annotation_colors_blank) <- sort(unique(annotation_row_z_ref$z_ref))
+
+RDA_Windsurfers_UnDirected_Y <-
+  pheatmap(Windsurfers_adj_dataframe,
+           color=c(brewer.pal(9,"Greys")[3],colorRampPalette(brewer.pal(9,"YlOrRd"))(max(Windsurfers_adj))),
+           cluster_cols = FALSE,cluster_rows= FALSE,show_rownames=FALSE,show_colnames=FALSE,border_color=FALSE,legend=TRUE,
+           annotation_row = annotation_row_z_ref,annotation_col = annotation_row_z_ref,
+           annotation_colors=list(z_ref=annotation_colors_blank),annotation_names_row=FALSE,annotation_names_col=FALSE,annotation_legend=FALSE)
+
+RDA_Windsurfers_UnDirected_ZIPLPCM_unSup_T60k_R1_Y_hat_z_heatmap <-
+  pheatmap(Windsurfers_adj_dataframe[order(RDA_Windsurfers_UnDirected_ZIPLPCM_unSup_T60k_R1_hat_z),order(RDA_Windsurfers_UnDirected_ZIPLPCM_unSup_T60k_R1_hat_z)],
+           color=c(brewer.pal(9,"Greys")[3],colorRampPalette(brewer.pal(9,"YlOrRd"))(max(Windsurfers_adj))),
+           cluster_cols = FALSE,cluster_rows= FALSE,show_rownames=FALSE,show_colnames=FALSE,border_color=FALSE,legend=TRUE,
+           annotation_row = annotation_row_z_ref,annotation_col = annotation_row_z_ref,
+           annotation_colors=list(z_ref=annotation_colors_z_ref),annotation_names_row=FALSE,annotation_names_col=FALSE,annotation_legend=FALSE,
+           gaps_row=c(which(diff(sort(RDA_Windsurfers_UnDirected_ZIPLPCM_unSup_T60k_R1_hat_z))!=0)),gaps_col=c(which(diff(sort(RDA_Windsurfers_UnDirected_ZIPLPCM_unSup_T60k_R1_hat_z))!=0)))
+
+RDA_Windsurfers_UnDirected_ZIPLPCM_unSup_T60k_R1_hat_P_m0_Non0_heatmap <-
+  pheatmap((RDA_Windsurfers_UnDirected_ZIPLPCM_unSup_T60k_R1_hat_nu_dataframe*(1-dpois(0,RDA_Windsurfers_UnDirected_ZIPLPCM_unSup_T60k_R1_hat_lambda)))[order(RDA_Windsurfers_UnDirected_ZIPLPCM_unSup_T60k_R1_hat_z),order(RDA_Windsurfers_UnDirected_ZIPLPCM_unSup_T60k_R1_hat_z)],
+           color=c(brewer.pal(9,"Greys")[3],colorRampPalette(brewer.pal(9,"YlOrRd")[1:8])(10000)),cluster_cols = FALSE,cluster_rows= FALSE,show_rownames=FALSE,show_colnames=FALSE,border_color=FALSE,legend=TRUE,
+           annotation_row = annotation_row_z_ref,annotation_col = annotation_row_z_ref,
+           annotation_colors=list(z_ref=annotation_colors_z_ref),annotation_names_row=FALSE,annotation_names_col=FALSE,annotation_legend=FALSE,
+           gaps_row=c(which(diff(sort(RDA_Windsurfers_UnDirected_ZIPLPCM_unSup_T60k_R1_hat_z))!=0)),gaps_col=c(which(diff(sort(RDA_Windsurfers_UnDirected_ZIPLPCM_unSup_T60k_R1_hat_z))!=0)))
+
+library("grid")
+library("gridExtra")
+g <- grid.arrange(RDA_Windsurfers_UnDirected_Y[[4]],
+                  RDA_Windsurfers_UnDirected_ZIPLPCM_unSup_T60k_R1_Y_hat_z_heatmap[[4]],
+                  RDA_Windsurfers_UnDirected_ZIPLPCM_unSup_T60k_R1_hat_P_m0_Non0_heatmap[[4]],
+                  nrow=1,ncol=3,vp=viewport(width=1, height=1))
+Fig <- cowplot::ggdraw(g)+ theme(plot.background =element_rect(fill=brewer.pal(9,"Greys")[1]))+theme(plot.background = element_rect(colour = "white", linewidth = 0))
+Fig
+```
+
+And further the heatmap plots of the $\hat{\boldsymbol{p}}$ and $\hat{\boldsymbol{\nu}}$ can be produced following:
+
+``` r
+# Plot the hat_nu
+RDA_Windsurfers_UnDirected_ZIPLPCM_unSup_T60k_R1_hat_P_m0_heatmap <-
+  pheatmap(RDA_Windsurfers_UnDirected_ZIPLPCM_unSup_T60k_R1_hat_nu_dataframe[order(RDA_Windsurfers_UnDirected_ZIPLPCM_unSup_T60k_R1_hat_z),order(RDA_Windsurfers_UnDirected_ZIPLPCM_unSup_T60k_R1_hat_z)],
+           color=c(brewer.pal(9,"Greys")[3],colorRampPalette(brewer.pal(9,"YlOrRd"))(10000)),cluster_cols = FALSE,cluster_rows= FALSE,show_rownames=FALSE,show_colnames=FALSE,border_color=FALSE,legend=TRUE,
+           annotation_row = annotation_row_z_ref,annotation_col = annotation_row_z_ref,
+           annotation_colors=list(z_ref=annotation_colors_z_ref),annotation_names_row=FALSE,annotation_names_col=FALSE,annotation_legend=FALSE,
+           gaps_row=c(which(diff(sort(RDA_Windsurfers_UnDirected_ZIPLPCM_unSup_T60k_R1_hat_z))!=0)),gaps_col=c(which(diff(sort(RDA_Windsurfers_UnDirected_ZIPLPCM_unSup_T60k_R1_hat_z))!=0)))
+RDA_Windsurfers_UnDirected_ZIPLPCM_unSup_T60k_R1_hat_P_m0_heatmap_draw <- cowplot::ggdraw(RDA_Windsurfers_UnDirected_ZIPLPCM_unSup_T60k_R1_hat_P_m0_heatmap[[4]])+ theme(plot.background =element_rect(fill=brewer.pal(9,"Greys")[1]))
+print(RDA_Windsurfers_UnDirected_ZIPLPCM_unSup_T60k_R1_hat_P_m0_heatmap_draw)
+
+# Plot the hat_p
+RDA_Windsurfers_UnDirected_ZIPLPCM_unSup_T60k_R1_hat_p_dataframe <- as.data.frame(RDA_Windsurfers_UnDirected_ZIPLPCM_unSup_T60k_R1_hat_p)
+rownames(RDA_Windsurfers_UnDirected_ZIPLPCM_unSup_T60k_R1_hat_p_dataframe) <- colnames(RDA_Windsurfers_UnDirected_ZIPLPCM_unSup_T60k_R1_hat_p_dataframe) <- 1:nrow(Windsurfers_adj)
+RDA_Windsurfers_UnDirected_ZIPLPCM_unSup_T60k_R1_hat_p_heatmap <-
+  pheatmap(RDA_Windsurfers_UnDirected_ZIPLPCM_unSup_T60k_R1_hat_p_dataframe[order(RDA_Windsurfers_UnDirected_ZIPLPCM_unSup_T60k_R1_hat_z),order(RDA_Windsurfers_UnDirected_ZIPLPCM_unSup_T60k_R1_hat_z)],
+           color=c(brewer.pal(9,"Greys")[3],colorRampPalette(brewer.pal(9,"YlOrRd")[1:3])(10000)),cluster_cols = FALSE,cluster_rows= FALSE,show_rownames=FALSE,show_colnames=FALSE,border_color=FALSE,legend=TRUE,
+           annotation_row = annotation_row_z_ref,annotation_col = annotation_row_z_ref,
+           annotation_colors=list(z_ref=annotation_colors_z_ref),annotation_names_row=FALSE,annotation_names_col=FALSE,annotation_legend=FALSE,
+           gaps_row=c(which(diff(sort(RDA_Windsurfers_UnDirected_ZIPLPCM_unSup_T60k_R1_hat_z))!=0)),gaps_col=c(which(diff(sort(RDA_Windsurfers_UnDirected_ZIPLPCM_unSup_T60k_R1_hat_z))!=0)))
+RDA_Windsurfers_UnDirected_ZIPLPCM_unSup_T60k_R1_hat_p_heatmap_draw <- cowplot::ggdraw(RDA_Windsurfers_UnDirected_ZIPLPCM_unSup_T60k_R1_hat_p_heatmap[[4]])+ theme(plot.background =element_rect(fill=brewer.pal(9,"Greys")[1]))
+print(RDA_Windsurfers_UnDirected_ZIPLPCM_unSup_T60k_R1_hat_p_heatmap_draw)
+```
 
 
 ### 2.3 Train Bombing Network
