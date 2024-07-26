@@ -1,6 +1,6 @@
 In this [`Interactive 3-d latent positions plots`] file, 
 we upload all the 3-dimensional interactive plots of the latent positions and clustering we illusrate 
-in the the paper "A Zero-Inflated Latent Position Cluster Model with Mixture of Finite Mixtures" (ZIP-LPCM-MFM).
+in the the paper **"A Zero-Inflated Latent Position Cluster Model with Mixture of Finite Mixtures" (ZIP-LPCM-MFM)**.
 Note that the GitHub page cannot directly have a view of these 3-d interactive plots which are stored as [`.html`] files, so the readers need to download these files first and then it should be straight-forward to see these 3-d plots by directly open these files by browser.
 
 Within each 3-d interactive plot, the readers are free to rotate, zoom in or zoom out the plot.
@@ -15,4 +15,11 @@ If the network is directed, the comment bracket would also show a variable `Uppe
 
 Each 3-d interactive plot contained in this file, respectively, corresponds to:
 
-[`SS1_Scenario1_InteractivePlot.html`]: Simulation study 1 scenario 1 reference latent positions $`\boldsymbol{U}^*`$ and referernce clustering $`\boldsymbol{z}^*`$.
+[`SS1_Scenario1_InteractivePlot.html`]: Simulation study 1 scenario 1 reference latent positions $`\boldsymbol{U}^*`$ and referernce clustering $`\boldsymbol{z}^*`$ shown as **Figure 1** of the **ZIP-LPCM-MFM** paper.
+
+[`SS1_Scenario2_InteractivePlot.html`]: Simulation study 1 scenario 2 reference latent positions $`\boldsymbol{U}^*`$ and referernce clustering $`\boldsymbol{z}^*`$ that are not shown in the paper.
+
+[`SS2_Scenario1_InteractivePlot.html`]: Simulation study 2 scenario 1 summarized latent positions $`\hat{\boldsymbol{U}}`$ and summarized clustering $`\hat{\boldsymbol{z}}`$ shown as the 1st row plots of **Figure 5** in the paper.
+
+[`SS2_Scenario2_InteractivePlot.html`]: Simulation study 2 scenario 2 summarized latent positions $`\hat{\boldsymbol{U}}`$ and summarized clustering $`\hat{\boldsymbol{z}}`$ shown as the 2nd row plots of **Figure 5** in the paper.
+
