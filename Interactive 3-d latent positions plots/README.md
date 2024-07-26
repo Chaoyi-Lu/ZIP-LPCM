@@ -15,7 +15,7 @@ If the network is directed, the comment bracket would also show a variable `Uppe
 
 Each 3-d interactive plot contained in this file, respectively, corresponds to:
 <br>[`SS1_Scenario1_InteractivePlot.html`]: Simulation study 1 scenario 1 reference latent positions $`\boldsymbol{U}^*`$ and referernce clustering $`\boldsymbol{z}^*`$ shown as **Figure 1** of the **ZIP-LPCM-MFM** paper.
-[`SS1_Scenario2_InteractivePlot.html`]: Simulation study 1 scenario 2 reference latent positions $`\boldsymbol{U}^*`$ and referernce clustering $`\boldsymbol{z}^*`$ that are not shown in the paper.
-[`SS2_Scenario1_InteractivePlot.html`]: Simulation study 2 scenario 1 summarized latent positions $`\hat{\boldsymbol{U}}`$ and summarized clustering $`\hat{\boldsymbol{z}}`$ shown as the 1st row plots of **Figure 5** in the paper.
-[`SS2_Scenario2_InteractivePlot.html`]: Simulation study 2 scenario 2 summarized latent positions $`\hat{\boldsymbol{U}}`$ and summarized clustering $`\hat{\boldsymbol{z}}`$ shown as the 2nd row plots of **Figure 5** in the paper.
+<br>[`SS1_Scenario2_InteractivePlot.html`]: Simulation study 1 scenario 2 reference latent positions $`\boldsymbol{U}^*`$ and referernce clustering $`\boldsymbol{z}^*`$ that are not shown in the paper.
+<br>[`SS2_Scenario1_InteractivePlot.html`]: Simulation study 2 scenario 1 summarized latent positions $`\hat{\boldsymbol{U}}`$ and summarized clustering $`\hat{\boldsymbol{z}}`$ shown as the 1st row plots of **Figure 5** in the paper.
+<br>[`SS2_Scenario2_InteractivePlot.html`]: Simulation study 2 scenario 2 summarized latent positions $`\hat{\boldsymbol{U}}`$ and summarized clustering $`\hat{\boldsymbol{z}}`$ shown as the 2nd row plots of **Figure 5** in the paper.
 
