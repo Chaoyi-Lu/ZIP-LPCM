@@ -1290,7 +1290,7 @@ RDA_TrainBombing_UnDirected_ZIPLPCM_unSup_T60k_R1_Y_hat_z_heatmap <-
 
 
 RDA_TrainBombing_UnDirected_ZIPLPCM_unSup_T60k_R1_hat_P_m0_Non0_heatmap <-
-  pheatmap((RDA_TrainBombing_UnDirected_ZIPLPCM_unSup_T60k_R1_hat_nu_dataframe*(1-dpois(0,RDA_TrainBombing_UnDirected_ZIPLPCM_unSup_T60k_R1_hat_Lambdaij)))[order(RDA_TrainBombing_UnDirected_ZIPLPCM_unSup_T60k_R1_hat_z),order(RDA_TrainBombing_UnDirected_ZIPLPCM_unSup_T60k_R1_hat_z)],
+  pheatmap((RDA_TrainBombing_UnDirected_ZIPLPCM_unSup_T60k_R1_hat_nu_dataframe*(1-dpois(0,RDA_TrainBombing_UnDirected_ZIPLPCM_unSup_T60k_R1_hat_lambda)))[order(RDA_TrainBombing_UnDirected_ZIPLPCM_unSup_T60k_R1_hat_z),order(RDA_TrainBombing_UnDirected_ZIPLPCM_unSup_T60k_R1_hat_z)],
            color=c(brewer.pal(9,"Greys")[3],colorRampPalette(brewer.pal(9,"YlOrRd")[1:5])(2000)),cluster_cols = FALSE,cluster_rows= FALSE,show_rownames=FALSE,show_colnames=FALSE,border_color=FALSE,legend=TRUE,
            annotation_row = annotation_row_z_ref,annotation_col = annotation_row_z_ref,
            annotation_colors=list(z_ref=annotation_colors_z_ref),annotation_names_row=FALSE,annotation_names_col=FALSE,annotation_legend=FALSE,
@@ -1679,7 +1679,133 @@ Fig2 <- Fig2 %>% layout(title = "", margin = list(l = 0,r = 0,b = 0,t = 0,pad = 
 orca(Fig2, "RDA_Infinito_hat_U_hat_z.pdf",scale=1,width=1800,height=850)
 ```
 
+Similar to all the previous experiments, we can following the code below to obtain the summary statistics: (i) the posterior mean of intercept $\hat{\beta}$; (ii) the posterior mean of unusual zero indicator $\hat{\boldsymbol{\nu}}$ which approximates the conditional probability of missing zeros provided that the corresponding interactions are zeros, i.e., the `P_m0` we denote in the code and the equation (22) of the **ZIP-LPCM-MFM** paper; (iii) the individual-level unusual probability $\boldsymbol{p}$ which is a $N \times N$ matrix with each entry $i,j$ being the $p_{z_iz_j}$ for each posterior state, and thus the posterior mean brings the $\hat{\boldsymbol{p}}$ accounting for the uncertainty of the posterior clustering; (iv) the individual-level Poisson rate $N \times N$ matrix `lambda` we denote in the code with each entry being the $\lambda_{ij}=\text{exp}(\beta-||\boldsymbol{u_i}-\boldsymbol{u_j}||)$ obtained by the corresponding $\beta$ and $\boldsymbol{U}$ for each posterior state, and the corresponding posterior mean `hat_lambda` can thus be obtained.
 
+``` r
+## Summarize beta
+RDA_Infinito_UnDirected_ZIPLPCM_Sup_T60k_R1_hat_beta <-
+  mean(RDA_Infinito_UnDirected_ZIPLPCM_Sup_T60k_R1$beta[iteration_after_burn_in])
+RDA_Infinito_UnDirected_ZIPLPCM_Sup_T60k_R1_hat_beta # 2.169797
+#--------------------------------------------------------------------------------------------------------------------------
+## Obtain posterior mean of nu, i.e. approximated P_m0
+RDA_Infinito_UnDirected_ZIPLPCM_Sup_T60k_R1_hat_nu <-
+  Reduce("+",RDA_Infinito_UnDirected_ZIPLPCM_Sup_T60k_R1$nu[iteration_after_burn_in])/length(iteration_after_burn_in)
+#--------------------------------------------------------------------------------------------------------------------------
+# Obtain individual-level unusual zero probability p for each iteration
+RDA_Infinito_UnDirected_ZIPLPCM_Sup_T60k_R1_p <- list()
+library(Rfast)
+for (t in 1:nrow(RDA_Infinito_UnDirected_ZIPLPCM_Sup_T60k_R1$z)){
+  Z <- t(t(matrix(RDA_Infinito_UnDirected_ZIPLPCM_Sup_T60k_R1_LSz[t,],length(RDA_Infinito_UnDirected_ZIPLPCM_Sup_T60k_R1_LSz[t,]),
+                  RDA_Infinito_UnDirected_ZIPLPCM_Sup_T60k_R1$K[t]))==(1:RDA_Infinito_UnDirected_ZIPLPCM_Sup_T60k_R1$K[t]))*1
+  RDA_Infinito_UnDirected_ZIPLPCM_Sup_T60k_R1_p[[t]] <- Z%*%RDA_Infinito_UnDirected_ZIPLPCM_Sup_T60k_R1_LSP[[t]]%*%t(Z)
+  if ((t%%1000) == 0){cat("t=",t,"\n")}
+}
+RDA_Infinito_UnDirected_ZIPLPCM_Sup_T60k_R1_hat_p <- Reduce("+",RDA_Infinito_UnDirected_ZIPLPCM_Sup_T60k_R1_p[iteration_after_burn_in])/length(iteration_after_burn_in)
 
+#--------------------------------------------------------------------------------------------------------------------------
+# Obtain individual-level Poisson rate lambda for each iteration
+RDA_Infinito_UnDirected_ZIPLPCM_Sup_T60k_R1_lambda <- list()
+library(Rfast) # for Rfast::Dist()
+for (t in 1:nrow(RDA_Infinito_UnDirected_ZIPLPCM_Sup_T60k_R1$z)){
+  Z <- t(t(matrix(RDA_Infinito_UnDirected_ZIPLPCM_Sup_T60k_R1_LSz[t,],length(RDA_Infinito_UnDirected_ZIPLPCM_Sup_T60k_R1_LSz[t,]),RDA_Infinito_UnDirected_ZIPLPCM_Sup_T60k_R1$K[t]))==(1:RDA_Infinito_UnDirected_ZIPLPCM_Sup_T60k_R1$K[t]))*1
+  Dist_U <- Rfast::Dist(RDA_Infinito_UnDirected_ZIPLPCM_Sup_T60k_R1_PTU[[t]])
+  RDA_Infinito_UnDirected_ZIPLPCM_Sup_T60k_R1_lambda[[t]] <- exp(RDA_Infinito_UnDirected_ZIPLPCM_Sup_T60k_R1$beta[t]-Dist_U)
+  if ((t%%1000) == 0){cat("t=",t,"\n")}
+}
+RDA_Infinito_UnDirected_ZIPLPCM_Sup_T60k_R1_hat_lambda <- Reduce("+",RDA_Infinito_UnDirected_ZIPLPCM_Sup_T60k_R1_lambda[iteration_after_burn_in])/length(iteration_after_burn_in)
+```
 
+The heatmap plots shown in **Figure 14** of the **ZIP-LPCM-MFM** paper can be recoverred by first creating a new clustering which label-switches the $\hat{\boldsymbol{z}}$ so that the inferred groups which contain bosses are sorted to have higher group numbers, that is,
+
+``` r
+RDA_Infinito_UnDirected_ZIPLPCM_Sup_T60k_R1_hat_z_Manual <- RDA_Infinito_UnDirected_ZIPLPCM_Sup_T60k_R1_hat_z
+RDA_Infinito_UnDirected_ZIPLPCM_Sup_T60k_R1_hat_z_Manual[RDA_Infinito_UnDirected_ZIPLPCM_Sup_T60k_R1_hat_z==2]<-4
+RDA_Infinito_UnDirected_ZIPLPCM_Sup_T60k_R1_hat_z_Manual[RDA_Infinito_UnDirected_ZIPLPCM_Sup_T60k_R1_hat_z==10]<-2
+RDA_Infinito_UnDirected_ZIPLPCM_Sup_T60k_R1_hat_z_Manual[RDA_Infinito_UnDirected_ZIPLPCM_Sup_T60k_R1_hat_z==1]<-3
+RDA_Infinito_UnDirected_ZIPLPCM_Sup_T60k_R1_hat_z_Manual[RDA_Infinito_UnDirected_ZIPLPCM_Sup_T60k_R1_hat_z==5]<-1
+RDA_Infinito_UnDirected_ZIPLPCM_Sup_T60k_R1_hat_z_Manual[RDA_Infinito_UnDirected_ZIPLPCM_Sup_T60k_R1_hat_z==6]<-5
+RDA_Infinito_UnDirected_ZIPLPCM_Sup_T60k_R1_hat_z_Manual[RDA_Infinito_UnDirected_ZIPLPCM_Sup_T60k_R1_hat_z==3]<-9
+RDA_Infinito_UnDirected_ZIPLPCM_Sup_T60k_R1_hat_z_Manual[RDA_Infinito_UnDirected_ZIPLPCM_Sup_T60k_R1_hat_z==7]<-7
+RDA_Infinito_UnDirected_ZIPLPCM_Sup_T60k_R1_hat_z_Manual[RDA_Infinito_UnDirected_ZIPLPCM_Sup_T60k_R1_hat_z==9]<-8
+RDA_Infinito_UnDirected_ZIPLPCM_Sup_T60k_R1_hat_z_Manual[RDA_Infinito_UnDirected_ZIPLPCM_Sup_T60k_R1_hat_z==4]<-6
+RDA_Infinito_UnDirected_ZIPLPCM_Sup_T60k_R1_hat_z_Manual[RDA_Infinito_UnDirected_ZIPLPCM_Sup_T60k_R1_hat_z==8]<-10
+```
+
+In this way, the left color bars of **Figure 14** plots showing the reference clustering $\boldsymbol{z}^*$ would let the groups which contain bosses sit in the bottom and let the groups only containing affiliates sit at top.
+Similarly for the top color bars.
+Note that this rearragement would not affect any results we obtained, but it can help us have a clearer view of how the core-periphery architecture is structured by criminals based on the heatmap plots of the adcacency matrices, inferred conditional unusual zero probability and so on.
+Thus the heatmap plots in **Figure 14** can be reproduced via:
+
+``` r
+library("RColorBrewer")
+library("pheatmap")
+library("ggplot2")
+
+My_colors <- c(brewer.pal(10,"RdBu")[c(4,7)],brewer.pal(10,"PRGn")[c(7,4)],brewer.pal(9,"YlOrBr")[4],
+               brewer.pal(10,"RdBu")[c(2,9)],brewer.pal(10,"PRGn")[c(9,2)],brewer.pal(9,"YlOrBr")[6],
+               brewer.pal(9,"Reds")[c(9,6)],brewer.pal(9,"RdPu")[5],brewer.pal(9,"Greys")[c(3,6,9)],brewer.pal(9,"GnBu")[5])
+
+RDA_criminalNet_Y_dataframe <- as.data.frame(RDA_criminalNet$Y)
+rownames(RDA_criminalNet_Y_dataframe) <- colnames(RDA_criminalNet_Y_dataframe) <- 1:nrow(RDA_criminalNet$Y)
+
+RDA_Infinito_UnDirected_ZIPLPCM_Sup_T60k_R1_hat_nu_dataframe <- as.data.frame(RDA_Infinito_UnDirected_ZIPLPCM_Sup_T60k_R1_hat_nu)
+rownames(RDA_Infinito_UnDirected_ZIPLPCM_Sup_T60k_R1_hat_nu_dataframe) <- colnames(RDA_Infinito_UnDirected_ZIPLPCM_Sup_T60k_R1_hat_nu_dataframe) <- 1:nrow(RDA_criminalNet$Y)
+
+annotation_row_z_ref <- as.data.frame(as.factor(matrix(RDA_criminalNet$RoleLocale,length(RDA_criminalNet$RoleLocale),1)))
+colnames(annotation_row_z_ref) <- "z_ref"
+annotation_colors_z_ref <- My_colors[c(1:10)]
+names(annotation_colors_z_ref) <- sort(unique(annotation_row_z_ref$z_ref))
+
+RDA_Infinito_UnDirected_ZIPLPCM_Sup_T60k_R1_Y_hat_z_heatmap <-
+  pheatmap(RDA_criminalNet_Y_dataframe[order(RDA_Infinito_UnDirected_ZIPLPCM_Sup_T60k_R1_hat_z_Manual),order(RDA_Infinito_UnDirected_ZIPLPCM_Sup_T60k_R1_hat_z_Manual)],
+           color=c(brewer.pal(9,"Greys")[3],colorRampPalette(brewer.pal(9,"YlOrRd"))(max(RDA_criminalNet$Y))),
+           cluster_cols = FALSE,cluster_rows= FALSE,show_rownames=FALSE,show_colnames=FALSE,border_color=FALSE,legend=TRUE,
+           annotation_row = annotation_row_z_ref,annotation_col = annotation_row_z_ref,
+           annotation_colors=list(z_ref=annotation_colors_z_ref),annotation_names_row=FALSE,annotation_names_col=FALSE,annotation_legend=FALSE,
+           gaps_row=c(which(diff(sort(RDA_Infinito_UnDirected_ZIPLPCM_Sup_T60k_R1_hat_z_Manual))!=0)),gaps_col=c(which(diff(sort(RDA_Infinito_UnDirected_ZIPLPCM_Sup_T60k_R1_hat_z_Manual))!=0))
+  )
+
+RDA_Infinito_UnDirected_ZIPLPCM_Sup_T60k_R1_hat_P_m0_heatmap <-
+  pheatmap(RDA_Infinito_UnDirected_ZIPLPCM_Sup_T60k_R1_hat_nu_dataframe[order(RDA_Infinito_UnDirected_ZIPLPCM_Sup_T60k_R1_hat_z_Manual),order(RDA_Infinito_UnDirected_ZIPLPCM_Sup_T60k_R1_hat_z_Manual)],
+           color=c(brewer.pal(9,"Greys")[3],colorRampPalette(brewer.pal(9,"YlOrRd")[1:8])(5000)),cluster_cols = FALSE,cluster_rows= FALSE,show_rownames=FALSE,show_colnames=FALSE,border_color=FALSE,legend=TRUE,
+           annotation_row = annotation_row_z_ref,annotation_col = annotation_row_z_ref,
+           annotation_colors=list(z_ref=annotation_colors_z_ref),annotation_names_row=FALSE,annotation_names_col=FALSE,annotation_legend=FALSE,
+           gaps_row=c(which(diff(sort(RDA_Infinito_UnDirected_ZIPLPCM_Sup_T60k_R1_hat_z_Manual))!=0)),gaps_col=c(which(diff(sort(RDA_Infinito_UnDirected_ZIPLPCM_Sup_T60k_R1_hat_z_Manual))!=0))
+  )
+
+RDA_Infinito_UnDirected_ZIPLPCM_Sup_T60k_R1_hat_P_m0_Non0_heatmap <-
+  pheatmap((RDA_Infinito_UnDirected_ZIPLPCM_Sup_T60k_R1_hat_nu_dataframe*(1-dpois(0,RDA_Infinito_UnDirected_ZIPLPCM_Sup_T60k_R1_hat_Lambdaij)))[order(RDA_Infinito_UnDirected_ZIPLPCM_Sup_T60k_R1_hat_z_Manual),order(RDA_Infinito_UnDirected_ZIPLPCM_Sup_T60k_R1_hat_z_Manual)],
+           color=c(brewer.pal(9,"Greys")[3],colorRampPalette(brewer.pal(9,"YlOrRd")[1:6])(5000)),cluster_cols = FALSE,cluster_rows= FALSE,show_rownames=FALSE,show_colnames=FALSE,border_color=FALSE,legend=TRUE,
+           annotation_row = annotation_row_z_ref,annotation_col = annotation_row_z_ref,
+           annotation_colors=list(z_ref=annotation_colors_z_ref),annotation_names_row=FALSE,annotation_names_col=FALSE,annotation_legend=FALSE,
+           gaps_row=c(which(diff(sort(RDA_Infinito_UnDirected_ZIPLPCM_Sup_T60k_R1_hat_z_Manual))!=0)),gaps_col=c(which(diff(sort(RDA_Infinito_UnDirected_ZIPLPCM_Sup_T60k_R1_hat_z_Manual))!=0))
+  )
+
+library("grid")
+library("gridExtra")
+g <- grid.arrange(RDA_Infinito_UnDirected_ZIPLPCM_Sup_T60k_R1_Y_hat_z_heatmap[[4]],
+                  RDA_Infinito_UnDirected_ZIPLPCM_Sup_T60k_R1_hat_P_m0_heatmap[[4]],
+                  RDA_Infinito_UnDirected_ZIPLPCM_Sup_T60k_R1_hat_P_m0_Non0_heatmap[[4]],
+                  nrow=1,ncol=3,vp=viewport(width=1, height=1))
+Fig <- cowplot::ggdraw(g)+ theme(plot.background = element_rect(colour = "white", linewidth = 0))
+Fig
+```
+
+Similarly, we can also produce the heatmap plot of the summarized individual-level unusual zero probability $\hat{\boldsymbol{p}}$ here:
+
+``` r
+# Plot the posterior mean summary statistic hat_p
+RDA_Infinito_UnDirected_ZIPLPCM_Sup_T60k_R1_hat_p_dataframe <- as.data.frame(RDA_Infinito_UnDirected_ZIPLPCM_Sup_T60k_R1_hat_p)
+rownames(RDA_Infinito_UnDirected_ZIPLPCM_Sup_T60k_R1_hat_p_dataframe) <- colnames(RDA_Infinito_UnDirected_ZIPLPCM_Sup_T60k_R1_hat_p_dataframe) <- 1:nrow(RDA_criminalNet$Y)
+RDA_Infinito_UnDirected_ZIPLPCM_Sup_T60k_R1_hat_p_heatmap <-
+  pheatmap(RDA_Infinito_UnDirected_ZIPLPCM_Sup_T60k_R1_hat_p_dataframe[order(RDA_Infinito_UnDirected_ZIPLPCM_Sup_T60k_R1_hat_z),order(RDA_Infinito_UnDirected_ZIPLPCM_Sup_T60k_R1_hat_z)],
+           color=colorRampPalette(brewer.pal(9,"YlOrRd")[1:7])(5000),cluster_cols = FALSE,cluster_rows= FALSE,show_rownames=FALSE,show_colnames=FALSE,border_color=FALSE,legend=TRUE,
+           annotation_row = annotation_row_z_ref,annotation_col = annotation_row_z_ref,
+           annotation_colors=list(z_ref=annotation_colors_z_ref),annotation_names_row=FALSE,annotation_names_col=FALSE,annotation_legend=FALSE,
+           gaps_row=c(which(diff(sort(RDA_Infinito_UnDirected_ZIPLPCM_Sup_T60k_R1_hat_z))!=0)),gaps_col=c(which(diff(sort(RDA_Infinito_UnDirected_ZIPLPCM_Sup_T60k_R1_hat_z))!=0)))
+RDA_Infinito_UnDirected_ZIPLPCM_Sup_T60k_R1_hat_p_heatmap_draw <- cowplot::ggdraw(RDA_Infinito_UnDirected_ZIPLPCM_Sup_T60k_R1_hat_p_heatmap[[4]])+ theme(plot.background =element_rect(fill=brewer.pal(9,"Greys")[3]))
+print(RDA_Infinito_UnDirected_ZIPLPCM_Sup_T60k_R1_hat_p_heatmap_draw)
+```
+
+Here we complete this tutorial of the coding for the **ZIP-LPCM-MFM** paper.
 
