@@ -585,8 +585,16 @@ max(SS1_Scenario1_Directed_ZIPLPCM_Sup_ZIPLPCM_T12k_R1_hat_z)
 And the VI distance between the $`\hat{\boldsymbol{z}}`$ and $`\boldsymbol{z}^*`$ shown in the 3rd column can be obtained by:
 
 ``` r
+library(mcclust.ext)
 vi.dist(SS1_Scenario1_Directed_ZIPLPCM_Sup_ZIPLPCM_T12k_R1_hat_z,SS1_Scenario1_Directed_ZIPLPCM$z) # evaluate the VI distance between the summarized clustering and the reference clustering
 # 0
+```
+
+The package `library(mcclust.ext)` leveraged above can be downloaded following the code below. We refer to [https://github.com/sarawade/mcclust.ext](https://github.com/sarawade/mcclust.ext) for more details of this package.
+
+``` r
+library(devtools)
+devtools::install_github("sarawade/mcclust.ext")
 ```
 
 The code for obtaining the marginal posterior mode of the posterior clustering can also help us obtain $\hat{\boldsymbol{U}}$ following (23) of the **ZI-LPCM-MFM** paper, that is,
