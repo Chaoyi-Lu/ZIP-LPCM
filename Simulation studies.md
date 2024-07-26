@@ -1,13 +1,13 @@
-# Simulation Studies for ZIP-LPCM-MFM
+# Simulation Studies for ZI-LPCM-MFM
 
-This tutorial includes the coding for the two simulation studies illusrated in the paper **"A Zero-Inflated Latent Position Cluster Model with Mixture of Finite Mixtures" (ZIP-LPCM-MFM)**.
+This tutorial includes the coding for the two simulation studies illusrated in the paper **"A Zero-Inflated Latent Position Cluster Model with Mixture of Finite Mixtures" (ZI-LPCM-MFM)**.
 
 Recall here that we have two different scenarios within each simulation study.
 The **scenario 1** in the **first simulation study (SS1)** focuses on a network randomly generated from a **zero-inflated Poisson latent position cluster model (ZIP-LPCM)** while the **scenario 2** works on a network randomly generated from a **Poisson latent position cluster model (Pois-LPCM)**.
 In our **second simulation study (SS2)**, we mainly focus on the networks randomly generated from the **zero-inflated Poisson stochastic block model (ZIP-SBM)**, which is the one we newly proposed in [Lu, C., Durante, D., and Friel, N. [2024+], "Zero-inflated stochastic block modeling of efficiency-security tradeoffs in weighted criminal networks"]().
 The synthetic network in **scenario 2** of **SS2** is equipped with a hub while the one in **scenario 1** is not.
 
-We implement the supervised and unsupervised ZIP-LPCM and Pois-LPCM inference with default unusual zero probability prior setting, Beta(1,9), for each scenario following **Algorithm 1** of the **ZIP-LPCM-MFM** paper. 
+We implement the supervised and unsupervised ZIP-LPCM and Pois-LPCM inference with default unusual zero probability prior setting, Beta(1,9), for each scenario following **Algorithm 1** of the **ZI-LPCM-MFM** paper. 
 We also test four other different unusual zero probability prior settings for supervised ZIP-LPCM implementations, i.e., Beta(1,1), Beta(1,3), Beta(1,19) and Beta(1,99).
 These bring totally eight different implementations for each scenario of the two simulation studies that are illustrated in this tutorial.
 
@@ -40,7 +40,7 @@ SS1_Scenario1_Directed_ZIPLPCM <-
 
 where (i) "beta" corresponds to the intercept parameter $\beta$ of the model, (ii) "P" corresponds to the $\boldsymbol{P}$ which is a group-level $K \times K$ matrix indicating the probability of unusual zero for the interactions between each pair of groups, (iii) "mu" and "tau" correspond to the $\boldsymbol{\mu}$ and $\boldsymbol{\tau}$ which are, respectively, the group centres and the group precisions of the corresponding multivariate normal distributions, (iv) "z" corresponds to the latent clutering or membership variable $\boldsymbol{z}$ which is an $1\times N$ vector storing the pre-specified clustering. Here, $K$ is the number of non-empty clusters that can be easily extracted from $\boldsymbol{z}$.
 
-The corresponding model parameters and latent variables are in line with those introduced in the **ZIP-LPCM-MFM** paper.
+The corresponding model parameters and latent variables are in line with those introduced in the **ZI-LPCM-MFM** paper.
 The above simulation function brings the following contents for a **ZIP-LPCM** network.
 
 ``` r
@@ -157,7 +157,7 @@ The above code for the interactive 3-d plot also attached some texts or notes fo
 If the readers put the mouse pointer on each node of the interactive plot, there will be a comment bracket showing (i) the coordinate of the node, (ii) the node number (e.g. node 1, node 2, ...), (iii) the reference clustering of the node.
 If the mouse pointer is put on each non-zero interaction, the bracket will show (i) either the start coordinate or the end coordinate of the interaction vector, (ii) the interaction weight, (iii) an indicator of whether the interaction is from node $i$ to node $j$ where $i\< j$, i.e., whether the corresponding $y_{ij}$ is the upper-diagonal entry of the $\boldsymbol{Y}$.
 
-The **Figure 1** in the **ZIP-LPCM-MFM** paper can be recovered following the code below where the functions `subplot()` and `orca()` are leveraged to aggregate multiple interactive plots from different specific angles in one figure and to output a high-quality screenshot, respectively.
+The **Figure 1** in the **ZI-LPCM-MFM** paper can be recovered following the code below where the functions `subplot()` and `orca()` are leveraged to aggregate multiple interactive plots from different specific angles in one figure and to output a high-quality screenshot, respectively.
 
 ``` r
 g_obs <- graph_from_adjacency_matrix(SS1_Scenario1_Directed_ZIPLPCM$Y,mode = "directed",weighted = TRUE)
@@ -226,7 +226,7 @@ However, before running the `orca()` function in the package `plotly`, the reade
 orca(fig, "SS1_Sce1_Obs.pdf",scale=1,width=1800,height=850)
 ```
 
-The above code will output exactly the same figure as the **Figure 1** of the **ZIP-LPCM-MFM** paper.
+The above code will output exactly the same figure as the **Figure 1** of the **ZI-LPCM-MFM** paper.
 
 The following code provides some extra statistics about the interaction weights of the **scenario 1** network.
 
@@ -338,7 +338,7 @@ fig <- fig %>% layout(title = "Pois-LPCM U* and z*",scene = list(xaxis = list(ti
 fig
 ```
 
-The adjacency matrices heatmap plots shown in **Figure 2** of the **ZIP-LPCM-MFM** paper can be reproduced following the code:
+The adjacency matrices heatmap plots shown in **Figure 2** of the **ZI-LPCM-MFM** paper can be reproduced following the code:
 
 ``` r
 library("RColorBrewer")
@@ -405,7 +405,7 @@ SS1_Scenario1_Directed_ZIPLPCM_Sup_ZIPLPCM_T12k_R1_time
 ```
 
 where we focus on 3-dimensional latent positions here and the algorithm is implemented for 12,000 iterations.
-The prior parameters are set to be $(\omega=0.01,\alpha_1=1,\alpha_2=0.103,\alpha=3)$ which are all in agreement with those stated in the **ZIP-LPCM-MFM** paper.
+The prior parameters are set to be $(\omega=0.01,\alpha_1=1,\alpha_2=0.103,\alpha=3)$ which are all in agreement with those stated in the **ZI-LPCM-MFM** paper.
 The unusual zero probability prior is set to be $\text{Beta}(1,9)$ above, corresponding to the **ZIP-LPCM Sup Beta(1,9)** case we show in the paper.
 We also attached a reference running time of the code above and it took 24.18005 mins for the above algorithm to finish on a laptop equipped with eight 1.80GHz processors.
 The proposal variances of the Metropolis-Hastings (M-H) steps of $\beta$ and $\boldsymbol{U}$ are, respectively, tuned to be $\sigma^2_{\beta}=0.06$ and $\sigma^2_{\boldsymbol{U}}=0.06$ as shown above.
@@ -518,7 +518,7 @@ We can then obtain the summarized $\hat{\boldsymbol{D}}$ with each entry being $
 SS1_Scenario1_Directed_ZIPLPCM_Sup_ZIPLPCM_T12k_R1_hat_D <- Reduce("+",SS1_Scenario1_Directed_ZIPLPCM_Sup_ZIPLPCM_T12k_R1_D[iteration_after_burn_in])/length(iteration_after_burn_in)
 ```
 
-The statistic $`\mathbb{E}(\\{|\hat{d}_{ij}-d^*_{ij}|\\}){\scriptsize [\text{sd}]}`$ in the 5th column of the **Table 1** in the **ZIP-LPCM-MFM** paper can be obtained for the **ZIP-LPCM Sup Beta(1,9)** case in **scenario 1** following:
+The statistic $`\mathbb{E}(\\{|\hat{d}_{ij}-d^*_{ij}|\\}){\scriptsize [\text{sd}]}`$ in the 5th column of the **Table 1** in the **ZI-LPCM-MFM** paper can be obtained for the **ZIP-LPCM Sup Beta(1,9)** case in **scenario 1** following:
 
 ``` r
 # Compare \hat{d}_{ij} and d^*_{ij} via the mean and sd of the |bias(d_{ij})|
@@ -575,7 +575,7 @@ SS1_Scenario1_Directed_ZIPLPCM_Sup_ZIPLPCM_T12k_R1_hat_z <- output$decision # Sa
 ```
 
 It's shown that the summarized $\hat{\boldsymbol{z}}$ we obtained above is exactly the same as the reference clustering $`\boldsymbol{z}^*`$.
-The `output$EPL` code above returns the statistic $`\mathbb{E}_{\boldsymbol{z}}[\text{VI}(\hat{\boldsymbol{z}},\boldsymbol{z}) \mid \boldsymbol{Y}]`$ shown in the 4th column of **Table 1** of the **ZIP-LPCM-MFM** paper for the **ZIP-LPCM Sup Beta(1,9)** case in **scenario 1**.
+The `output$EPL` code above returns the statistic $`\mathbb{E}_{\boldsymbol{z}}[\text{VI}(\hat{\boldsymbol{z}},\boldsymbol{z}) \mid \boldsymbol{Y}]`$ shown in the 4th column of **Table 1** of the **ZI-LPCM-MFM** paper for the **ZIP-LPCM Sup Beta(1,9)** case in **scenario 1**.
 The $\hat{K}$ of $`\hat{\boldsymbol{z}}`$ shown in the 2nd column can be extracted by:
 
 ``` r
@@ -589,7 +589,7 @@ vi.dist(SS1_Scenario1_Directed_ZIPLPCM_Sup_ZIPLPCM_T12k_R1_hat_z,SS1_Scenario1_D
 # 0
 ```
 
-The code for obtaining the marginal posterior mode of the posterior clustering can also help us obtain $\hat{\boldsymbol{U}}$ following (23) of the **ZIP-LPCM-MFM** paper, that is,
+The code for obtaining the marginal posterior mode of the posterior clustering can also help us obtain $\hat{\boldsymbol{U}}$ following (23) of the **ZI-LPCM-MFM** paper, that is,
 
 ``` r
 # Obtain a point estimate of U
@@ -657,7 +657,7 @@ SS1_Scenario1_Directed_ZIPLPCM_Sup_ZIPLPCM_T12k_R1_hat_beta <-
 SS1_Scenario1_Directed_ZIPLPCM_Sup_ZIPLPCM_T12k_R1_hat_beta # 3.024843
 ```
 
-the value of which is eactly the one we show in the 6th column of **Table 1** of the **ZIP-LPCM-MFM** paper for the **ZIP-LPCM Sup Beta(1,9)** case in **scenario 1**.
+the value of which is eactly the one we show in the 6th column of **Table 1** of the **ZI-LPCM-MFM** paper for the **ZIP-LPCM Sup Beta(1,9)** case in **scenario 1**.
 
 Then we move to obtain the individual-level unusual probability $\boldsymbol{p}$ whose entry is $p_{z_iz_j}$ for each posterior sample of $\boldsymbol{P}$, and to evaluate the posterior mean for each entry $p_{z_iz_j}$, ending up with $\hat{\boldsymbol{p}}$:
 
@@ -674,7 +674,7 @@ SS1_Scenario1_Directed_ZIPLPCM_Sup_ZIPLPCM_T12k_R1_hat_p <- Reduce("+",SS1_Scena
 diag(SS1_Scenario1_Directed_ZIPLPCM_Sup_ZIPLPCM_T12k_R1_hat_p) <- 0
 ```
 
-Comparing the $\hat{\boldsymbol{p}}$ with the reference $`\boldsymbol{p}^*`$ gives the statistic $`\mathbb{E}(\{|\hat{p}_{z_iz_j}-p^*_{z_iz_j}|\}){\scriptsize [\text{sd}]}`$ shown in the 7th column of **Table 1** of the **ZIP-LPCM-MFM** paper for the **ZIP-LPCM Sup Beta(1,9)** case in **scenario 1**:
+Comparing the $\hat{\boldsymbol{p}}$ with the reference $`\boldsymbol{p}^*`$ gives the statistic $`\mathbb{E}(\{|\hat{p}_{z_iz_j}-p^*_{z_iz_j}|\}){\scriptsize [\text{sd}]}`$ shown in the 7th column of **Table 1** of the **ZI-LPCM-MFM** paper for the **ZIP-LPCM Sup Beta(1,9)** case in **scenario 1**:
 
 ``` r
 # Compare \hat{p} and the reference p* via the mean and sd of the absolute value of the error obtained for each entry
@@ -684,7 +684,7 @@ sd(abs((SS1_Scenario1_Directed_ZIPLPCM_Sup_ZIPLPCM_T12k_R1_hat_p-SS1_Scenario1_D
 # 0.03396754
 ```
 
-Finally, we ontain the $\hat{\boldsymbol{\nu}}$, which approximates the conditional probability of unusual zero provided that the corresponding observed interaction is a zero, i.e., equation (22) of the **ZIP-LPCM-MFM** paper, by posterior mean of  $\boldsymbol{\nu}$:
+Finally, we ontain the $\hat{\boldsymbol{\nu}}$, which approximates the conditional probability of unusual zero provided that the corresponding observed interaction is a zero, i.e., equation (22) of the **ZI-LPCM-MFM** paper, by posterior mean of  $\boldsymbol{\nu}$:
 
 ``` r
 ## Obtain the posterior mean of nu, i.e. \hat{nu} or the approximate P_m0
@@ -751,7 +751,7 @@ Multiple implementations can be easily applied by changing all the `SS1_Scenario
 
 ### 2.2 SS1 scenario 1 "ZIP-LPCM unSup Beta(1,9)" case
 
-We follow similar implementations shown above to apply the unsupervised version bringing the **ZIP-LPCM unSup Beta(1,9)** case for **scenario 1** network shown in our ZIP-LPCM-MFM paper:
+We follow similar implementations shown above to apply the unsupervised version bringing the **ZIP-LPCM unSup Beta(1,9)** case for **scenario 1** network shown in our **ZI-LPCM-MFM** paper:
 
 ``` r
 # SS1 Scenario 1 ZIP-LPCM network unSupervised ZIP-LPCM-MFM implementations with T=12000 Beta(1,9) Round 1
@@ -920,7 +920,7 @@ SS1_Scenario1_Directed_ZIPLPCM_Sup_ZIPLPCM_T12k_Beta_1_99_R1_hat_nu_dataframe <-
 rownames(SS1_Scenario1_Directed_ZIPLPCM_Sup_ZIPLPCM_T12k_Beta_1_99_R1_hat_nu_dataframe) <- colnames(SS1_Scenario1_Directed_ZIPLPCM_Sup_ZIPLPCM_T12k_Beta_1_99_R1_hat_nu_dataframe) <- 1:nrow(SS1_Scenario1_Directed_ZIPLPCM$Y)
 ```
 
-Thus the **Figure 3** in the **ZIP-LPCM-MFM** paper can be recovered by:
+Thus the **Figure 3** in the **ZI-LPCM-MFM** paper can be recovered by:
 
 ``` r
 My_colors <- c(brewer.pal(10,"RdBu")[c(4,7)],brewer.pal(10,"PRGn")[c(7,4)],brewer.pal(9,"YlOrBr")[4],
@@ -1072,7 +1072,7 @@ SS1_Scenario2_Directed_PoisLPCM_Sup_ZIPLPCM_T12k_beta_1_99_R1 <-
                        p_eject=0.5,A=SS1_Scenario2_Directed_PoisLPCM$A,omega_c=1)
 ```
 
-The post-processing code for the above implementations are also the same as **scenario 1** cases and finally completes the **Table 1** of the **ZIP-LPCM-MFM** paper.
+The post-processing code for the above implementations are also the same as **scenario 1** cases and finally completes the **Table 1** of the **ZI-LPCM-MFM** paper.
 
 ## 3. Simulation study 2 simulations
 
@@ -1329,7 +1329,7 @@ fig
 ```
 
 The corresponding interactive 3-d plots are uploaded as [`SS2_Scenario1_InteractivePlot.html`] and [`SS2_Scenario2_InteractivePlot.html`] files at [`/Interactive 3-d latent positions plots/`] of this repository.
-The 1st row and 2nd row of **Figure 5** in the **ZIP-LPCM-MFM** paper can be produced, respectively, following:
+The 1st row and 2nd row of **Figure 5** in the **ZI-LPCM-MFM** paper can be produced, respectively, following:
 
 ``` r
 library("igraph")
@@ -1500,7 +1500,7 @@ sd(abs((SS2_Scenario1_Directed_ZIPSBM_Sup_ZIPLPCM_T12k_R1_hat_lambda-SS2_Scenari
 the values of which provided above are exactly those we show in **Table 2**.
 Following similar steps and replacing all the `SS2_Scenario1` with `SS2_Scenario2` above will bring the values of the corresponding statistics for the **ZIP-LPCM Sup Beta(1,9)** case in **scenario 2** instead.
 
-Based on the posterior samples of the unusual zero indicator `SS2_Scenario1_Directed_ZIPSBM_Sup_ZIPLPCM_T12k_R1$nu` and `SS2_Scenario2_Directed_ZIPSBM_Sup_ZIPLPCM_T12k_R1$nu` for both scenarios, we can obtain the posterior mean for each entry leading to $\hat{\boldsymbol{\nu}}$ approximating the conditional probability (22) of the **ZIP-LPCM-MFM** paper.
+Based on the posterior samples of the unusual zero indicator `SS2_Scenario1_Directed_ZIPSBM_Sup_ZIPLPCM_T12k_R1$nu` and `SS2_Scenario2_Directed_ZIPSBM_Sup_ZIPLPCM_T12k_R1$nu` for both scenarios, we can obtain the posterior mean for each entry leading to $\hat{\boldsymbol{\nu}}$ approximating the conditional probability (22) of the **ZI-LPCM-MFM** paper.
 The top-left, top-middle, bottom-left and bottom-middle plots of **Figure 6** can be obtained, respectively, following:
 
 ``` r
