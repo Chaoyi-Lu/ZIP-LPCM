@@ -902,7 +902,327 @@ MwG_Directed_ZIPLPCM <- function(Y,T, omega,alpha1,alpha2,alpha, beta1,beta2,sig
 #--------------------------------------------------------------------------------------------------------------------------------------------
 #--------------------------------------------------------------------------------------------------------------------------------------------
 
-### The above algorithm for directed networks can be easily reduced to the undirected case shown below
+# The partially collapsed Metropolis-within-Gibbs algorithm for directed Poisson-LPCM-MFM 
+MwG_Directed_PoissonLPCM <- function(Y,T, omega,alpha1,alpha2,alpha, sigma2prop_beta,sigma2prop_U,d=3,z=NULL,p_eject=0.5,A=NULL,omega_c=NULL){
+  library(mvtnorm) # for rmvnorm
+  library(ergmito) # for geodesic
+  library(Rfast) # for Rfast::Dist()
+  
+  N <- nrow(Y) # Extract the number of nodes
+  log_p_0 <- function(a,n_k){lgamma(2*a)-lgamma(a)+lgamma(a+n_k)-lgamma(2*a+n_k)} # build the log look-up table for choosing Beta(a,a) in the truncated AE step
+  Set_a_for_P_E <- Vectorize(log_p_0,c("a","n_k")) # vectorize the variables a and n_k
+  lookuptable_for_a <- outer(seq(0.01,100,0.01),1:N,Set_a_for_P_E) # evaluate for each pair of a and n_k where a=seq(0.01,100,0.01) and n_k=0:N
+  # lookuptable_for_a[is.nan(lookuptable_for_a)]<-0 # transform NaN to 0 # no NaN in log form
+  # Note that we set logP(n_g=0)=logP(n_{K+1}=0)=log(0.01) in this algorithm
+  
+  # Y: The N X N observed adjacency matrix
+  # A: The 1 X N categorical exogenous node attributes which correspond to \boldsymbol{c} in the paper
+  # omega_c: The parameter of DM cohesion for A where omega_c is assumed to be the same for all c = 1,2,...,C
+  if (!is.null(A)){ # if A is provided
+    C <- max(A)
+    if (!is.null(omega_c)){
+      sum_omega_c <- omega_c*C # Note that no empty level is allowed in A for c = 1,2,...,C
+    }else{
+      stop("omega_c should be provided if node attributes A is included!")
+    }
+  }
+  
+  # Recall here that
+  # beta: a LPM intercept parameter
+  # U: N X d matrix, latent positions
+  # z: 1 X N vector, memberships
+  
+  # mu: 2 X K matrix MVN mean (collapsed, may be inferred if required)
+  # tau: 1 X K vector MVN precision, tau = 1/sigma2 (collapsed, may be inferred if required)
+  # Pi: 1 X K vector membership probability (collapsed, may be inferred if required)
+  
+  # omega, (alpha1,alpha2): Conjugate prior parameters for mu_k and tau_k, respectively
+  # alpha: prior parameter for Pi; 
+  # sigma2prop_U,sigma2prop_beta: the proposal variance proposed, respectively, for U and beta
+  # d: the dimension of the latent positions
+  # z: initial clustering specified
+  
+  # Note that K is the number of non-empty groups and no empty groups is allowed in z within this function
+  
+  #--------------------------------------------------------------------------------------------------------------------------------------------
+  # Initialize clustering
+  if (is.null(z)){ # if initial clustering is not provided
+    z <- 1:N # set the clustering where each node is in a singleton group as the initial clustering
+  }
+  K <- max(z)
+  Z <- t(t(matrix(z,N,K))==(1:K))*1 # transfer vector z to matrix Z
+  
+  #--------------------------------------------------------------------------------------------------------------------------------------------
+  # Initialize beta and P
+  beta <- 0
+  
+  #--------------------------------------------------------------------------------------------------------------------------------------------
+  # Initialize latent positions by Classical (Metric) Multidimensional Scaling (MDS) on asymmetric distance matrix
+  Y_GM <- geodesic(Y)[[1]] # geodesic matrix (GM) of Y, the length/the number of edges of the shortest paths between each pair of nodes
+  Y_GM[is.na(Y_GM)] <- 0 # remove NA as 0
+  U <- cmdscale(Y_GM,d) # obtain the initial latent positions by MDS
+  # Note here that MDS may bring the same position for multiple nodes
+  Dist_U <- Rfast::Dist(U)
+  
+  #--------------------------------------------------------------------------------------------------------------------------------------------
+  X <- Y
+  
+  #--------------------------------------------------------------------------------------------------------------------------------------------
+  # Posterior chains
+  z_list <- matrix(z,nrow=1) # the posterior chain will be a (T+1) X N matrix whose (t+1)th row is the t'th clustering z^{(t)}
+  U_list <- list(U) # the posterior chain will be a list()
+  beta_list <- c(beta) # the posterior chain will be a 1 X (T+1) matrix whose (t+1)'th entry is the t'th beta^{(t)}
+  K_list <- c(K) # the posterior chain will be a 1 X (T+1) matrix whose (t+1)'th entry is the t'th K^{(t)}
+  # Note that K here is the number of non-empty clusters
+  acceptance_count_U <- matrix(0,T,N) # Count the number of acceptance for the M-H step of each latent position u_i
+  acceptance_count_beta <- matrix(0,1,T) # Count the number of acceptance for the M-H step of beta
+  acceptance_count_TAE <- matrix(0,1,T) # Count the number of acceptance for the M-H step of AE move
+  
+  #--------------------------------------------------------------------------------------------------------------------------------------------
+  # Main algorithm
+  for (t in 1:T){
+    if ((t%%100) == 0){
+      cat("t=",t,", K=",K,"\n") # monitor the process
+    }
+    #--------------------------------------------------------------------------------------------------------------------------------------------
+    # Update beta by M-H step
+    beta_c <- beta
+    beta <- rnorm(1,beta_c,sd=sqrt(sigma2prop_beta)) # Note here that sigma2prop_beta is the proposal variance
+    log_alpha_beta_right <- dpois(X,exp(beta-Dist_U),log=TRUE)-dpois(X,exp(beta_c-Dist_U),log=TRUE)
+    diag(log_alpha_beta_right) <- 0
+    log_alpha_beta_right <- sum(log_alpha_beta_right)
+    
+    if (log(runif(1)) <= min(0,log_alpha_beta_right)){ # accept or not
+      beta_list[t+1] <- beta
+      acceptance_count_beta[t] <- 1
+    }else{
+      beta_list[t+1] <- beta <- beta_c
+    }
+    
+    #--------------------------------------------------------------------------------------------------------------------------------------------
+    # Update each u_i by M-H step
+    n_k <- table(z) # n_k of z
+    position_matrix <- Z==1 # return TRUE if z_ik = 1 and FALSE otherwise in Z matrix
+    for (i in sample.int(N,N)){ # update in random order
+      U_c <- U # Update the current latent positions
+      Dist_U_c <- Dist_U # Update the Dist_U_c based on U_c
+      n_zi <- n_k[[z[i]]] # extract the current number of nodes in group z_i; 
+      position_zi <- position_matrix[,z[i]] # z==z[i] # extract the positions within 1:N of those nodes from group z_i 
+      U_c_zi <- matrix(U_c[position_zi,],ncol=d) # extract the current latent positions of nodes in group z_i
+      # Note that the matrix(,ncol=d) transformation here aims to deal with the single vector case which would not be in the form of a 1 X 2 matrix
+      U[i,] <- mvtnorm::rmvnorm(1,U_c[i,],sigma2prop_U*diag(d)) # proposal distribution # Rfast also has the Rfast::rmvnorm which is faster, but it will reset the RNG seed by set.seed(NULL)
+      Dist_U <- Rfast::Dist(U) # Update the Dist_U based on proposed U
+      U_p_zi <- matrix(U[position_zi,],ncol=d) # extract the proposed latent positions of nodes in group z_i
+      log_alpha_U_right <-  (n_zi*d/2 + alpha1)*(log(sum(U_c_zi^2) - sum(colSums(U_c_zi)^2)/(n_zi + omega) + alpha2)-
+                                                   log(sum(U_p_zi^2) - sum(colSums(U_p_zi)^2)/(n_zi + omega) + alpha2))+ # f(U|z) terms
+        sum(dpois(X[i,-i],exp(beta-Dist_U[i,-i]),log=TRUE)+dpois(X[-i,i],exp(beta-Dist_U[-i,i]),log=TRUE)-
+              dpois(X[i,-i],exp(beta-Dist_U_c[i,-i]),log=TRUE)-dpois(X[-i,i],exp(beta-Dist_U_c[-i,i]),log=TRUE)) # f(X|beta,U) terms
+      
+      if (log(runif(1)) <= min(0,log_alpha_U_right)){ # accept or not
+        acceptance_count_U[t,i] <- 1
+      }else{
+        U <- U_c
+        Dist_U <- Dist_U_c
+      }# end if
+    }# end i
+    U_list[[t+1]] <- U
+    
+    #--------------------------------------------------------------------------------------------------------------------------------------------
+    # Update each z_i via MFM
+    # Note that this MFM inference step has no empty clusters
+    
+    for (i in sample.int(N,N)){
+      nonempty <- which(colSums(matrix(Z[-i,],nrow=N-1)) > 0) # extract non-empty groups after removing node i
+      Z <- Z[,nonempty] # remove the group if removing node i makes it empty
+      if (length(nonempty)==1){Z <- matrix(Z,N,1)} # ensure the matrix form of Z when K = 1 after removing the possible empty group
+      K <- ncol(Z) # update K after removing node i
+      Z_Ri <- Z[-i,] # remove node i from Z
+      if (K==1){Z_Ri <- matrix(Z_Ri,nrow=N-1,ncol=1)} # Z_Ri becomes vector form if k=1
+      z_Ri <- c(Z_Ri%*%1:K) # z after removing node i
+      U_Ri <- U[-i,] # U after removing node i
+      n_k_Ri_full <- colSums(Z_Ri) # an 1 X K matrix of {n_k} after removing node i
+      
+      z_i <- which(Z[i,] > 0) # this is z_i, e.g., = k; or = integer(0) with length==0 if removing node i leading to an empty cluster
+      
+      # 1. First obtain f(U|z) terms of the full-conditional distribution by assuming that node i is removed and then is reassigned
+      # Construct a N-1 X d*K matrix of latent positions where 
+      # the rows which correspond to cluster 1 individuals in the 1st three columns store the corresponding latent positions, and other elements in the 1st three columns are zeros
+      # The rows which correspond to cluster 2 individuals in the 2nd three columns store the corresponding latent positions, and other elements in the 2nd three columns are zeros
+      # Similarly for all the rest rows and columns
+      U_special_matrix_Ri <- matrix(U_Ri,nrow=N-1,ncol=d*K)*matrix(do.call("rbind", replicate(d,Z_Ri,simplify = FALSE)),nrow=N-1,ncol=d*K)
+      # Use rbind() function to combine the above matrix with a new K X d*K matrix, where matrix[1,1:3], matrix[2,3:6],matrix[3,7:9],... of this new matrix are U[i,] if d=3 while all other elements are zeros
+      U_special_matrix_Ai <- rbind(U_special_matrix_Ri,t(t(matrix(do.call("rbind", replicate(d,diag(K),simplify = FALSE)),nrow=K,ncol=d*K))*U[i,]))
+      Z_Ri_spcecial_Ai <- rbind(Z_Ri,diag(K)) # create a special clustering based on Z_Ri, where each cluster is added by one more node whose latent position is U[i,]
+      n_k_Ri_full_Ai <- n_k_Ri_full+1 # an 1 X K matrix of {n_k} after assuming that the node i is added to each cluster
+      
+      # Ri means removing node i; evaluate each non-empty k'th component of the full-conditional function U\{u_i} | z\{z_i}
+      # Ai means adding node i; evaluate each non-empty k'th component of the full-conditional function U|z by assuming that node i is assigned in each non-empty cluster
+      Uk_terms_Ai <- lgamma(alpha1+n_k_Ri_full_Ai*d/2)-n_k_Ri_full_Ai*d/2*log(pi)-d/2*log(omega+n_k_Ri_full_Ai)-
+        (n_k_Ri_full_Ai*d/2+alpha1)*log(rowSums(t(Z_Ri_spcecial_Ai)%*%(U_special_matrix_Ai^2))-
+                                          rowSums((t(Z_Ri_spcecial_Ai)%*%U_special_matrix_Ai)^2)/(n_k_Ri_full_Ai+omega)+alpha2)
+      Uk_terms_Ri <- lgamma(alpha1+n_k_Ri_full*d/2)-n_k_Ri_full*d/2*log(pi)-d/2*log(omega+n_k_Ri_full)-
+        (n_k_Ri_full*d/2+alpha1)*log(rowSums(t(Z_Ri)%*%(U_special_matrix_Ri^2))-
+                                       rowSums((t(Z_Ri)%*%U_special_matrix_Ri)^2)/(n_k_Ri_full+omega)+alpha2)
+      log_update_prob_U <- c(Uk_terms_Ai-Uk_terms_Ri,lgamma(alpha1+d/2)-d/2*log(pi)-d/2*log(omega+1) + alpha1*log(alpha2)+d/2*log(omega)-lgamma(alpha1)-
+                               (d/2+alpha1)*log(sum(U[i,]^2)*(1-1/(1+omega))+alpha2)) # here we evaluate the f(U|z\{z_i},z_i)/f(U\{u_i}|z\{z_i}) as well as the case which assigns node i to the new group K+1
+      # If we let U_k be the set of latent positions of nodes from cluster k, then some of the terms above correspond to:
+      # rowSums(t(Z_Ri)%*%(U_special_matrix_Ri^2)) is {sum(U_k^2)} before adding node i to each cluster
+      # rowSums((t(Z_Ri)%*%U_special_matrix_Ri)^2) is {sum(colSums(U_k)^2)} before adding node i to each cluster
+      # rowSums(t(Z_Ri_spcecial_Ai)%*%(U_special_matrix_Ai^2)) is {sum(U_k^2)} after adding node i to each cluster
+      # rowSums((t(Z_Ri_spcecial_Ai)%*%U_special_matrix_Ai)^2) is {sum(colSums(U_k)^2)} after adding node i to each cluster
+      
+      # 3. Obtain the f(z) term
+      log_update_prob_z <- c(log(n_k_Ri_full+alpha),log(alpha)+log(MFM_WNK_TruncPois1(N,K+1,alpha))-
+                               log(MFM_WNK_TruncPois1(N,K,alpha)))
+      
+      # 4. Obtain the assignment probability
+      log_update_prob <- log_update_prob_U+log_update_prob_z
+      if (!is.null(A)){ # if A is provided
+        A_Ri <- A[-i] # remove c_i from node attributes A
+        table.z_Ri.A_Ri <- table(z_Ri,factor(A_Ri,levels=1:C)) # it's possible that an empty level might exist in A_Ri, so we use factor(,levels) to avoid such a problem
+        log_update_prob <- log_update_prob + c(log(table.z_Ri.A_Ri[,A[i]]+omega_c)-log(n_k_Ri_full+sum_omega_c),log(omega_c)-log(sum_omega_c))
+      }
+      
+      update_prob <- exp(log_update_prob - max(log_update_prob))
+      
+      # 5. Determine the reassignment and update Z,K,nu_gh,n_gh,n_k
+      z_i_new <- which(rmultinom(1,1,update_prob) > 0)
+      if(length(z_i) == 1){Z[i,z_i]<-0} # if removing node i doesn't bring an empty group, let Z[i,] be zeros; otherwise, Z[i,] are already zeros
+      if (z_i_new==K+1){
+        Z <- cbind(Z,0)
+        K <- K+1
+        Z[i,z_i_new] <- 1
+      }else{
+        Z[i,z_i_new] <- 1
+      }
+    } # end for i
+    
+    z <- c(Z%*%c(1:ncol(Z)))
+    z_list <- rbind(z_list,z)
+    K_list[t+1] <- K
+    
+    #--------------------------------------------------------------------------------------------------------------------------------------------
+    # TAE step
+    if (K == 1){ # if only one cluster, eject
+      AE_decision <- 0
+      p_eject_p <- 1 # proposal probability of the eject move
+      p_absorb_p <- 1-p_eject # proposal probability of the reverse absorb move
+    }else if (K == N){ # if N clusters, absorb
+      AE_decision <- 1
+      p_eject_p <- p_eject
+      p_absorb_p <- 1
+    }else{ # with probability p_eject to eject or absorb
+      AE_decision <- runif(1)
+      p_eject_p <- p_eject # P(eject) in the proposal
+      p_absorb_p <- 1-p_eject
+    }
+    
+    if (AE_decision<=p_eject){ # eject move
+      g <- sample.int(K,1) # randomly choose one cluster
+      n_k <- table(z) # n_k of z
+      n_g_c <- n_k[[g]] # extract n_g for current clustering
+      U_g_c <- matrix(U[z==g,],ncol=d) # extract all the u_j for current clustering z_j=g
+      a <- seq(0.01,100,0.01)[which.min(abs(lookuptable_for_a[,n_g_c]-log(0.01)))] # Recall: check "a" ranging from 0.01 to 100 and check "n" from 1 to N; 0.01 here is set as the Pr(n_{K+1}=0);
+      p_E <- rbeta(1,a,a) # sample the probability of the nodes being assigned to cluster K+1
+      K_p <- K+1 # proposed number of clusters
+      z_p <- z # initialize proposed clustering
+      z_p[z_p==g]<-rbinom(n_g_c,1,p_E)*(K_p-g)+g # apply the eject move; for each node j in cluster g, if rbinom() returns 1, assign (K_p-g)+g to z_j; if rbinom() returns 0, assign g back to z_j
+      n_k_p <- table(factor(z_p,levels=1:K_p)) # {n_k} of z_p
+      n_g_p <- n_k_p[[g]] # extract n_g for proposed clustering after eject move
+      # Note that it's possible to have empty cluster in the proposed z and table() can not directly return 0 for empty clusters;
+      # Thus we use table(factor(z_p,levels=1:K_p)) to let the empty cluster appear.
+      if (n_g_p!=0 & n_g_p!=n_g_c){ # if any of the ejected cluster is not empty
+        if (K_p==N){ # If the proposed state has K == N
+          p_absorb_p <- 1 # the probability of the backward absorb move for the proposed state is 1
+        }
+        U_g_p <- matrix(U[z_p==g,],ncol=d) # extract all the u_j for proposed clustering z_j=g after eject move 
+        n_Kp_p <- n_k_p[[K_p]] # extract n_Kp for proposed clustering after eject move
+        U_Kp_p <- matrix(U[z_p==K_p,],ncol=d) # extract all the u_j for proposed clustering z_j=K_p after eject move 
+        log_alpha_E_right <-  alpha1*log(alpha2)-lgamma(alpha1)+d/2*log(omega)+log(p_absorb_p)-log(p_eject_p)+ # constant terms
+          lgamma(alpha1+n_g_p*d/2) - n_g_p*d/2*log(pi) - d/2*log(omega+n_g_p) - (alpha1+n_g_p*d/2)*log(sum(U_g_p^2)-sum(colSums(U_g_p)^2)/(n_g_p+omega)+alpha2)+ # proposed lambda'_g term
+          lgamma(alpha1+n_Kp_p*d/2) - n_Kp_p*d/2*log(pi) - d/2*log(omega+n_Kp_p) - (alpha1+n_Kp_p*d/2)*log(sum(U_Kp_p^2)-sum(colSums(U_Kp_p)^2)/(n_Kp_p+omega)+alpha2)- # proposed lambda'_Kp term
+          (lgamma(alpha1+n_g_c*d/2) - n_g_c*d/2*log(pi) - d/2*log(omega+n_g_c) - (alpha1+n_g_c*d/2)*log(sum(U_g_c^2)-sum(colSums(U_g_c)^2)/(n_g_c+omega)+alpha2))+ # current lambda^{(t+1)]}_g term; note that z^{(t+1)} was updated from z^{(t)} in the previous step, so current state is z^{(t+1)}
+          log(MFM_WNK_TruncPois1(N,K_p,alpha))+sum(log(alpha+0:(n_g_p-1)))+sum(log(alpha+0:(n_Kp_p-1)))- # z' MFM prior term
+          log(MFM_WNK_TruncPois1(N,K,alpha))-sum(log(alpha+0:(n_g_c-1)))+ # z MFM prior term
+          2*lgamma(a)-lgamma(2*a)+lgamma(2*a+n_g_c)-lgamma(a+n_g_p)-lgamma(a+n_Kp_p)+ # proposal terms
+          log(1-2*exp(log_p_0(a,n_g_c))) # normalizing term of truncating at the empty cluster cases
+        
+        if (!is.null(A)){ # if A is provided
+          table.z_c.A <- table(z,A)
+          table.z_p.A <- table(z_p,A)
+          log_alpha_E_right <- log_alpha_E_right +
+            sum(lgamma(table.z_p.A[g,]+omega_c))-lgamma(n_g_p+sum_omega_c)+
+            sum(lgamma(table.z_p.A[K_p,]+omega_c))-lgamma(n_Kp_p+sum_omega_c)+lgamma(sum_omega_c)-C*lgamma(omega_c)-
+            sum(lgamma(table.z_c.A[g,]+omega_c))+lgamma(n_g_c+sum_omega_c) # the ratio of A|z term
+        }
+        
+        Z_p <- t(t(matrix(z_p,N,K_p))==(1:K_p))*1 # transfer vector z to matrix Z
+        
+        if (log(runif(1)) <= min(0,log_alpha_E_right)){ # accept or not
+          z_list[t+1,] <- z <- z_p # update the new clustering
+          Z <- Z_p
+          K_list[t+1] <- K <- K_p
+          acceptance_count_TAE[t] <- 1 # 1 means accept, 0 means not accept
+        }# else: stay at the current state and do nothing
+      }# else: stay at the current state and do nothing
+    }else{ # absorb step
+      random_two_picks <- sort(sample.int(K,2))
+      g <- random_two_picks[1] # g < h, we let g absorb h
+      h <- random_two_picks[2]
+      n_k <- table(z)
+      n_g_c <- n_k[[g]] # extract n_g for current clustering
+      n_h_c <- n_k[[h]] # extract n_h for current clustering
+      U_g_c <- matrix(U[z==g,],ncol=d) # extract all the u_j for current clustering z_j=g
+      U_h_c <- matrix(U[z==h,],ncol=d) # extract all the u_j for current clustering z_j=h
+      K_p <- K-1
+      if (K_p==1){ # If the proposed state has K == 1
+        p_eject_p <- 1 # the probability of the backward eject move for the proposed state is 1
+      }
+      z_p <- z # initialize proposed clustering
+      z_p[z_p==h] <- g # assign all nodes from cluster h to cluster g
+      z_p[z_p>h] <- z_p[z_p>h]-1 # relabel the cluster labels which are greater than h
+      n_g_p <- n_g_c+n_h_c # table(z_p)[[g]] # extract n_g for proposed clustering after absorb move
+      U_g_p <- matrix(U[z_p==g,],ncol=d) # extract all the u_j for proposed clustering z_j=g after absorb move 
+      a <- seq(0.01,100,0.01)[which.min(abs(lookuptable_for_a[,n_g_p]-log(0.01)))] # Recall: check a ranging from 0.01 to 100 and check n from 0 to N 
+      log_alpha_A_right <-  -(alpha1*log(alpha2)-lgamma(alpha1)+d/2*log(omega))-log(p_absorb_p)+log(p_eject_p)+ #constant terms
+        lgamma(alpha1+n_g_p*d/2) - n_g_p*d/2*log(pi) - d/2*log(omega+n_g_p) - (alpha1+n_g_p*d/2)*log(sum(U_g_p^2)-sum(colSums(U_g_p)^2)/(n_g_p+omega)+alpha2)- # proposed lambda'_g term
+        (lgamma(alpha1+n_h_c*d/2) - n_h_c*d/2*log(pi) - d/2*log(omega+n_h_c) - (alpha1+n_h_c*d/2)*log(sum(U_h_c^2)-sum(colSums(U_h_c)^2)/(n_h_c+omega)+alpha2)+ # current lambda^{(t+1)}_h term
+           lgamma(alpha1+n_g_c*d/2) - n_g_c*d/2*log(pi) - d/2*log(omega+n_g_c) - (alpha1+n_g_c*d/2)*log(sum(U_g_c^2)-sum(colSums(U_g_c)^2)/(n_g_c+omega)+alpha2))+ # current lambda^{(t+1)}_g term
+        log(MFM_WNK_TruncPois1(N,K_p,alpha))+sum(log(alpha+0:(n_g_p-1)))-
+        log(MFM_WNK_TruncPois1(N,K,alpha))-sum(log(alpha+0:(n_g_c-1)))-sum(log(alpha+0:(n_h_c-1)))+
+        lgamma(2*a)-2*lgamma(a)-lgamma(2*a+n_g_p)+lgamma(a+n_g_c)+lgamma(a+n_h_c)-
+        log(1-2*exp(log_p_0(a,n_g_p))) # normalizing term of truncating at the empty cluster cases
+      
+      if (!is.null(A)){ # if A is provided
+        table.z_c.A <- table(z,A)
+        table.z_p.A <- table(z_p,A)
+        log_alpha_A_right <- log_alpha_A_right +
+          sum(lgamma(table.z_p.A[g,]+omega_c))-lgamma(n_g_p+sum_omega_c)-lgamma(sum_omega_c)+C*lgamma(omega_c)-
+          sum(lgamma(table.z_c.A[g,]+omega_c))+lgamma(n_g_c+sum_omega_c)-
+          sum(lgamma(table.z_c.A[h,]+omega_c))+lgamma(n_h_c+sum_omega_c) # the ratio of A|z term
+      }
+      
+      # Evaluate the ratio of the nu terms next
+      Z_p <- t(t(matrix(z_p,N,K_p))==(1:K_p))*1 # transfer vector z to matrix Z
+      
+      if (log(runif(1)) <= min(0,log_alpha_A_right)){ # accept or not
+        z_list[t+1,] <- z <- z_p
+        Z <- Z_p
+        K_list[t+1] <- K <- K_p
+        acceptance_count_TAE[t] <- 1
+      }# else: stay at the current state and do nothing
+    }
+    #--------------------------------------------------------------------------------------------------------------------------------------------
+  } # end T
+  return(list(z = z_list,U = U_list,K = K_list,beta = beta_list,
+              acceptance_count_U = acceptance_count_U, acceptance_count_beta = acceptance_count_beta, acceptance_count_TAE = acceptance_count_TAE))
+}
+
+#--------------------------------------------------------------------------------------------------------------------------------------------
+#--------------------------------------------------------------------------------------------------------------------------------------------
+#--------------------------------------------------------------------------------------------------------------------------------------------
+
+### The above PCMwG ZIP-LPCM algorithm for directed networks can be easily reduced to the undirected case shown below
 
 #--------------------------------------------------------------------------------------------------------------------------------------------
 #--------------------------------------------------------------------------------------------------------------------------------------------
