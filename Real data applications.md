@@ -1,6 +1,6 @@
-# Real Data Applications for ZI-LPCM-MFM
+# Real Data Applications for ZIP-LPCM
 
-This tutorial contains the **zero-inflated Poisson latent position cluster model (ZIP-LPCM)** implementation and post-processing code for all the four **real data applications (RDA)** we illustrate in the paper **"A Zero-Inflated Latent Position Cluster Model with Mixture of Finite Mixtures" (ZI-LPCM-MFM)**.
+This tutorial contains the **zero-inflated Poisson latent position cluster model (ZIP-LPCM)** implementation and post-processing code for all the four **real data applications (RDA)** we illustrate in the paper **"A Zero-Inflated Poisson Latent Position Cluster Model" (ZIP-LPCM)**.
 The functions required during the experiments are all included in the [`Functions.R`] file of this repository and can be loaded via:
 
 ``` r
@@ -214,7 +214,7 @@ colnames(RDA_criminalNet$Y) <- c()
 ## 2. Implementations and Post-processing
 
 For each real network, the inference algorithm was implemented for 60,000 iterations with 30,000-iteration burn-in in order for sufficient mixing.
-All the **RDA** output shown in the **ZI-LPCM-MFM** paper are reproducible by setting the seed of the random number generator (RNG) as `set.seed(1)`.
+All the **RDA** output shown in the **ZIP-LPCM** paper are reproducible by setting the seed of the random number generator (RNG) as `set.seed(1)`.
 Multiple implementations can be easily applied by setting different seeds for different rounds of implementations or by simply removing the seed via `set.seed(NULL)` if it's not required to reproduce the output.
 
 ### 2.1 Sampson Monks Network
@@ -305,7 +305,7 @@ plot(RDA_SampsonMonks_Directed_ZIPLPCM_Sup_T60k_R1_LSz_Like,type = "l",xlab = ""
 plot(RDA_SampsonMonks_Directed_ZIPLPCM_Sup_T60k_R1$K,type = "l",xlab = "",ylab = "", main = "K Trace Plot",cex.axis = 0.8)
 ```
 
-To obtain a point estimate of the posterior clustering, we follow equation (29) of the **ZI-LPCM-MFM** paper and leverage the greedy algorithm proposed by [Rastelli, R. and Friel, N. (2018)](https://pubmed.ncbi.nlm.nih.gov/30220822/).
+To obtain a point estimate of the posterior clustering, we follow equation (29) of the **ZIP-LPCM** paper and leverage the greedy algorithm proposed by [Rastelli, R. and Friel, N. (2018)](https://pubmed.ncbi.nlm.nih.gov/30220822/).
 However, we start from obtaining the marginal posterior mode of the posterior clustering and treat it as the initial state of the Rastelli, R. and Friel, N. (2018) greedy method:
 
 ``` r
@@ -348,7 +348,7 @@ table(RDA_SampsonMonks_Directed_ZIPLPCM_Sup_T60k_R1_hat_z,sampson_monks_group,dn
 ```
 
 It's shown that the summarized clustering is exactly the same as the reference clustering.
-Based on the results we obtained above, we can also follow equation (30) of the **ZI-LPCM-MFM** paper to obtain a point estimate $\hat{\boldsymbol{U}}$ for the latent positions:
+Based on the results we obtained above, we can also follow equation (30) of the **ZIP-LPCM** paper to obtain a point estimate $\hat{\boldsymbol{U}}$ for the latent positions:
 
 ``` r
 # Obtain summarized U
@@ -407,7 +407,7 @@ If the readers put the mouse pointer on each node of the interactive plot, there
 Since in this real data application the inferred $\hat{\boldsymbol{z}}$ is exactly the same as the reference clustering, so we replace the reference clustering shown in such comment brackets with the node attributes `sampson_monks_group_cloisterville` in the rest 3-d plots shown next.
 If the mouse pointer is put on each non-zero interaction, the bracket will show (i) either the start coordinate or the end coordinate of the interaction vector, (ii) the interaction weight, (iii) an indicator of whether the interaction is from node $i$ to node $j$ where $i\< j$, i.e., whether the corresponding $y_{ij}$ is the upper-diagonal entry of the $\boldsymbol{Y}$ for the directed networks.
 
-The **Figure 7** of the **ZI-LPCM-MFM** paper can thus be reproduced by the `subplot()` and the `orca()` functions following the code below.
+The **Figure 7** of the **ZIP-LPCM** paper can thus be reproduced by the `subplot()` and the `orca()` functions following the code below.
 The `subplot()` function helps us add two interactive plots with different default viewing angle into one figure while the `orca()` function can produce a high quality screenshot of the interactive plots.
 Directly taking a screenshot of the interactive plots would bring a low-quality figure which is not satisfactory.
 However, the readers need to first download the "orca" app following [https://plotly.com/r/static-image-export/](https://plotly.com/r/static-image-export/) and [https://github.com/plotly/orca#installation](https://github.com/plotly/orca#installation) in order to use the `orca()` function in the `plotly` package.
@@ -481,7 +481,7 @@ RDA_SampsonMonks_Directed_ZIPLPCM_Sup_T60k_R1_hat_beta #  1.008339
 As no corresponding reference to compare with, we propose not to show the $\hat{\beta}$ in the paper.
 But we provide above the $\hat{\beta}$ value we obtained.
 
-Recall here that the posterior mean of the unusual zero indicator $\boldsymbol{\nu}$ approximates the conditional probability of unusual zeros provided that the corresponding observed interactions are zeros, i.e., the equation (22) of the **ZI-LPCM-MFM** paper.
+Recall here that the posterior mean of the unusual zero indicator $\boldsymbol{\nu}$ approximates the conditional probability of unusual zeros provided that the corresponding observed interactions are zeros, i.e., the equation (22) of the **ZIP-LPCM** paper.
 We can obtain such a statistic by:
 
 ``` r
@@ -525,7 +525,7 @@ RDA_SampsonMonks_Directed_ZIPLPCM_Sup_T60k_R1_hat_lambda <- Reduce("+",RDA_Samps
 diag(RDA_SampsonMonks_Directed_ZIPLPCM_Sup_T60k_R1_hat_lambda) <- 0
 ```
 
-Based on the above individual-level statistics, the heatmap plots shown in **Figure 8** of the **ZI-LPCM-MFM** paper can be recovered by:
+Based on the above individual-level statistics, the heatmap plots shown in **Figure 8** of the **ZIP-LPCM** paper can be recovered by:
 
 ``` r
 library("RColorBrewer")
@@ -780,7 +780,7 @@ fig <- fig %>% layout(title = "hat_U and hat_z",scene = list(xaxis = list(title 
 fig
 ```
 
-However, it seems to be not easy to find two nice angle to take screenshots of the above interactive 3-d plot in order to show in the **ZI-LPCM-MFM** paper, because the three inferred groups in the above plot lie along the vertical axis.
+However, it seems to be not easy to find two nice angle to take screenshots of the above interactive 3-d plot in order to show in the **ZIP-LPCM** paper, because the three inferred groups in the above plot lie along the vertical axis.
 Considering the fact that our model is invariant under any rotation or translation applied on the latent positions, we propose to apply Procrutes transformation on the $\hat{\boldsymbol{U}}$ to make the three inferred groups lie down along the horizontal plane, i.e., move the latent positions from "portrait" to "landscape":
 
 ``` r
@@ -819,7 +819,7 @@ fig
 ```
 
 Such an interactive 3-d plot is uploaded as [`/Interactive 3-d latent positions plots/RDA_Windsurfers_InteractivePlot.html`] of this repository.
-The **Figure 9** of the **ZI-LPCM-MFM** paper can thus be reporduced following:
+The **Figure 9** of the **ZIP-LPCM** paper can thus be reporduced following:
 
 ``` r
 # Plot the front angle of the latent positions
@@ -1158,7 +1158,7 @@ fig
 ```
 
 Such a 3-d plot can be downloaded at [`/Interactive 3-d latent positions plots/RDA_TrainBombing_InteractivePlot.html`] of this repository.
-Following the above code for the 3-d plotting, the **Figure 11** in the **ZI-LPCM-MFM** paper can be reproduced by:
+Following the above code for the 3-d plotting, the **Figure 11** in the **ZIP-LPCM** paper can be reproduced by:
 
 ``` r
 # Plot the front angle of the latent positions
@@ -1529,7 +1529,7 @@ fig <- fig %>% layout(title = "hat_U and hat_z",scene = list(xaxis = list(title 
 fig
 ```
 
-As we discussed in the **ZI-LPCM-MFM** paper, it's interesting that there are three heterogeneous bosses whose corresponding inferred latent positions are close to each other and to the orange locale.
+As we discussed in the **ZIP-LPCM** paper, it's interesting that there are three heterogeneous bosses whose corresponding inferred latent positions are close to each other and to the orange locale.
 These three bosses are, respectively, a blue boss node no.53, an orange boss node no.41 and a green boss node no.38.
 Thus we can check within how many posterior samples of clustering each pair of these three bosses are clustered together in one group:
 
@@ -1566,7 +1566,7 @@ sum((RDA_Infinito_UnDirected_ZIPLPCM_Sup_T60k_R1_LSz[iteration_after_burn_in,38]
 # 0.9975
 ```
 
-The **Figure 13** illustrated in the **ZI-LPCM-MFM** paper can be reproduced by:
+The **Figure 13** illustrated in the **ZIP-LPCM** paper can be reproduced by:
 
 ``` r
 # First plot the reference clustering z* and hat_U
@@ -1679,7 +1679,7 @@ Fig2 <- Fig2 %>% layout(title = "", margin = list(l = 0,r = 0,b = 0,t = 0,pad = 
 orca(Fig2, "RDA_Infinito_hat_U_hat_z.pdf",scale=1,width=1800,height=850)
 ```
 
-Similar to all the previous experiments, we can following the code below to obtain the summary statistics: (i) the posterior mean of intercept $\hat{\beta}$; (ii) the posterior mean of unusual zero indicator $\hat{\boldsymbol{\nu}}$ which approximates the conditional probability of missing zeros provided that the corresponding interactions are zeros, i.e., the `P_m0` we denote in the code and the equation (22) of the **ZI-LPCM-MFM** paper; (iii) the individual-level unusual probability $\boldsymbol{p}$ which is a $N \times N$ matrix with each entry $i,j$ being the $p_{z_iz_j}$ for each posterior state, and thus the posterior mean brings the $\hat{\boldsymbol{p}}$ accounting for the uncertainty of the posterior clustering; (iv) the individual-level Poisson rate $N \times N$ matrix `lambda` we denote in the code with each entry being the $\lambda_{ij}=\text{exp}(\beta-||\boldsymbol{u_i}-\boldsymbol{u_j}||)$ obtained by the corresponding $\beta$ and $\boldsymbol{U}$ for each posterior state, and the corresponding posterior mean `hat_lambda` can thus be obtained.
+Similar to all the previous experiments, we can following the code below to obtain the summary statistics: (i) the posterior mean of intercept $\hat{\beta}$; (ii) the posterior mean of unusual zero indicator $\hat{\boldsymbol{\nu}}$ which approximates the conditional probability of missing zeros provided that the corresponding interactions are zeros, i.e., the `P_m0` we denote in the code and the equation (22) of the **ZIP-LPCM** paper; (iii) the individual-level unusual probability $\boldsymbol{p}$ which is a $N \times N$ matrix with each entry $i,j$ being the $p_{z_iz_j}$ for each posterior state, and thus the posterior mean brings the $\hat{\boldsymbol{p}}$ accounting for the uncertainty of the posterior clustering; (iv) the individual-level Poisson rate $N \times N$ matrix `lambda` we denote in the code with each entry being the $\lambda_{ij}=\text{exp}(\beta-||\boldsymbol{u_i}-\boldsymbol{u_j}||)$ obtained by the corresponding $\beta$ and $\boldsymbol{U}$ for each posterior state, and the corresponding posterior mean `hat_lambda` can thus be obtained.
 
 ``` r
 ## Summarize beta
@@ -1715,7 +1715,7 @@ for (t in 1:nrow(RDA_Infinito_UnDirected_ZIPLPCM_Sup_T60k_R1$z)){
 RDA_Infinito_UnDirected_ZIPLPCM_Sup_T60k_R1_hat_lambda <- Reduce("+",RDA_Infinito_UnDirected_ZIPLPCM_Sup_T60k_R1_lambda[iteration_after_burn_in])/length(iteration_after_burn_in)
 ```
 
-The heatmap plots shown in **Figure 14** of the **ZI-LPCM-MFM** paper can be recoverred by first creating a new clustering which label-switches the $\hat{\boldsymbol{z}}$ so that the inferred groups which contain bosses are sorted to have higher group numbers, that is,
+The heatmap plots shown in **Figure 14** of the **ZIP-LPCM** paper can be recoverred by first creating a new clustering which label-switches the $\hat{\boldsymbol{z}}$ so that the inferred groups which contain bosses are sorted to have higher group numbers, that is,
 
 ``` r
 RDA_Infinito_UnDirected_ZIPLPCM_Sup_T60k_R1_hat_z_Manual <- RDA_Infinito_UnDirected_ZIPLPCM_Sup_T60k_R1_hat_z
@@ -1807,5 +1807,5 @@ RDA_Infinito_UnDirected_ZIPLPCM_Sup_T60k_R1_hat_p_heatmap_draw <- cowplot::ggdra
 print(RDA_Infinito_UnDirected_ZIPLPCM_Sup_T60k_R1_hat_p_heatmap_draw)
 ```
 
-Here we complete this tutorial of the coding for the **ZI-LPCM-MFM** paper.
+Here we complete this tutorial of the coding for the **ZIP-LPCM** paper.
 
