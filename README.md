@@ -1,7 +1,7 @@
-# A Zero-Inflated Latent Position Cluster Model with Mixture of Finite Mixtures
+# A Zero-Inflated Poisson Latent Position Cluster Model
 
-This repository is a complementary material for the paper **"A Zero-Inflated Latent Position Cluster Model with Mixture of Finite Mixtures" (ZI-LPCM-MFM)** to provide tutorials for the coding of the experiments illustrated in the paper.
-This paper mainly works on the **zero-inflated Poisson Latent position cluster model (ZIP-LPCM)** in practice incorporated with the **mixture-of-finite-mixtures (MFM)** clustering  prior.
+This repository is a complementary material for the paper **"A Zero-Inflated Latent Position Cluster Model" (ZIP-LPCM)** to provide tutorials for the coding of the experiments illustrated in the paper.
+This paper mainly works on the ZIP-LPCM incorporated with the **mixture-of-finite-mixtures (MFM)** clustering prior.
 The inference is based on a **partially collapsed Metropolis-within-Gibbs (PCMwG)** sampler with a newly proposed **truncated absorb-eject (TAE)** move embedded inside.
 
 The notebooks [`Simulation studies.md`] and [`Real data applications.md`] are the main focus in this repository where step-by-step tutorials are provided.
