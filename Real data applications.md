@@ -383,6 +383,7 @@ fig <- plot_ly() %>% # plot the summarized hat_z and hat_U
               z = RDA_SampsonMonks_Directed_ZIPLPCM_Sup_T60k_R1_hat_U[,3],
               text=paste("Node:",1:nrow(SampsonMonks_Directed_adj),"<br>z*:",sampson_monks_group),
               size=VertexSize,sizes=c(300,600),
+              stroke = I("black"), span = I(1),
               color=as.factor(RDA_SampsonMonks_Directed_ZIPLPCM_Sup_T60k_R1_hat_z),colors=My_colors[6:8]
   )
 Edges <- get.edgelist(g_obs)
@@ -422,6 +423,7 @@ fig1 <- plot_ly(scene ="scene1") %>% # plot the summarized clustering and hat_U
               z = RDA_SampsonMonks_Directed_ZIPLPCM_Sup_T60k_R1_hat_U[,3],
               text=paste("Node:",1:nrow(SampsonMonks_Directed_adj),"<br>c:",sampson_monks_group_cloisterville),
               size=VertexSize,sizes=c(300,600),showlegend = FALSE,
+              stroke = I("black"), span = I(1),
               color=as.factor(RDA_SampsonMonks_Directed_ZIPLPCM_Sup_T60k_R1_hat_z),colors=My_colors[6:8]
   )
 Edges <- get.edgelist(g_obs)
@@ -442,6 +444,7 @@ fig2 <- plot_ly(scene ="scene2") %>% # plot the summarized clustering and hat_U
               z = RDA_SampsonMonks_Directed_ZIPLPCM_Sup_T60k_R1_hat_U[,3],
               text=paste("Node:",1:nrow(SampsonMonks_Directed_adj),"<br>c:",sampson_monks_group_cloisterville),
               size=VertexSize,sizes=c(300,600),showlegend = FALSE,
+              stroke = I("black"), span = I(1),
               color=as.factor(RDA_SampsonMonks_Directed_ZIPLPCM_Sup_T60k_R1_hat_z),colors=My_colors[6:8]
   )
 Edges <- get.edgelist(g_obs)
@@ -765,6 +768,7 @@ fig <- plot_ly() %>%
               z = RDA_Windsurfers_UnDirected_ZIPLPCM_unSup_T60k_R1_hat_U[,3],
               text=paste("Node:",1:nrow(Windsurfers_adj)),
               size=VertexSize,sizes=c(200,400),
+              stroke = I("black"), span = I(1),
               color=as.factor(RDA_Windsurfers_UnDirected_ZIPLPCM_unSup_T60k_R1_hat_z),colors=My_colors[c(1,6,2)]
   )
 Edges <- get.edgelist(g_obs)
@@ -803,6 +807,7 @@ fig <- plot_ly() %>%
               z = RDA_Windsurfers_UnDirected_ZIPLPCM_unSup_T60k_R1_hat_U[,3],
               text=paste("Node:",1:nrow(Windsurfers_adj)),
               size=VertexSize,sizes=c(200,400),
+              stroke = I("black"), span = I(1),
               color=as.factor(RDA_Windsurfers_UnDirected_ZIPLPCM_unSup_T60k_R1_hat_z),colors=My_colors[c(1,6,2)]
   )
 Edges <- get.edgelist(g_obs)
@@ -829,6 +834,7 @@ fig1 <- plot_ly(scene ="scene1") %>% # plot the summarized clustering and hat_U
               z = RDA_Windsurfers_UnDirected_ZIPLPCM_unSup_T60k_R1_hat_U[,3],
               text=paste("Node:",1:nrow(Windsurfers_adj)),
               size=VertexSize,sizes=c(200,400),showlegend = FALSE,
+              stroke = I("black"), span = I(1),
               color=as.factor(RDA_Windsurfers_UnDirected_ZIPLPCM_unSup_T60k_R1_hat_z),colors=My_colors[c(1,6,2)]
   )
 Edges <- get.edgelist(g_obs)
@@ -848,6 +854,7 @@ fig2 <- plot_ly(scene ="scene2") %>% # plot the summarized clustering and hat_U
               z = RDA_Windsurfers_UnDirected_ZIPLPCM_unSup_T60k_R1_hat_U[,3],
               text=paste("Node:",1:nrow(Windsurfers_adj)),
               size=VertexSize,sizes=c(200,400),showlegend = FALSE,
+              stroke = I("black"), span = I(1),
               color=as.factor(RDA_Windsurfers_UnDirected_ZIPLPCM_unSup_T60k_R1_hat_z),colors=My_colors[c(1,6,2)]
   )
 Edges <- get.edgelist(g_obs)
@@ -1142,6 +1149,7 @@ fig <- plot_ly() %>%
               z = RDA_TrainBombing_UnDirected_ZIPLPCM_unSup_T60k_R1_hat_U[,3],
               text=paste("Node:",1:nrow(Train_bombing_adj)),
               size=VertexSize,sizes=c(200,400),
+              stroke = I("black"), span = I(1),
               color=as.factor(RDA_TrainBombing_UnDirected_ZIPLPCM_unSup_T60k_R1_hat_z),colors=My_colors[c(6,2,8,9)]
   )
 Edges <- get.edgelist(g_obs)
@@ -1168,6 +1176,7 @@ fig1 <- plot_ly(scene ="scene1") %>%
               z = RDA_TrainBombing_UnDirected_ZIPLPCM_unSup_T60k_R1_hat_U[,3],
               text=paste("Node:",1:nrow(Train_bombing_adj)),
               size=VertexSize,sizes=c(200,400),showlegend = FALSE,
+              stroke = I("black"), span = I(1),
               color=as.factor(RDA_TrainBombing_UnDirected_ZIPLPCM_unSup_T60k_R1_hat_z),colors=My_colors[c(6,2,8,9)]
   )
 Edges <- get.edgelist(g_obs)
@@ -1188,6 +1197,7 @@ fig2 <- plot_ly(scene ="scene2") %>%
               z = RDA_TrainBombing_UnDirected_ZIPLPCM_unSup_T60k_R1_hat_U[,3],
               text=paste("Node:",1:nrow(Train_bombing_adj)),
               size=VertexSize,sizes=c(200,400),showlegend = FALSE,
+              stroke = I("black"), span = I(1),
               color=as.factor(RDA_TrainBombing_UnDirected_ZIPLPCM_unSup_T60k_R1_hat_z),colors=My_colors[c(6,2,8,9)]
   )
 Edges <- get.edgelist(g_obs)
@@ -1484,6 +1494,7 @@ fig <- plot_ly() %>%
               text=paste("Node:",1:nrow(RDA_criminalNet$Y),"<br>z*:",RDA_criminalNet$RoleLocale,"<br>c:",RDA_criminalNet$A),
               size=VertexSize,sizes=c(200,400),
               color=as.factor(RDA_criminalNet$RoleLocale),colors=My_colors[1:10],
+              stroke = I("black"), span = I(1),
               symbol=as.factor(RDA_criminalNet$role),symbols = c("circle","square")
   )
 Edges <- get.edgelist(g_obs)
@@ -1514,6 +1525,7 @@ fig <- plot_ly() %>%
               text=paste("Node:",1:nrow(RDA_criminalNet$Y),"<br>z*:",RDA_criminalNet$RoleLocale,"<br>c:",RDA_criminalNet$A),
               size=VertexSize,sizes=c(200,400),
               color=as.factor(RDA_Infinito_UnDirected_ZIPLPCM_Sup_T60k_R1_hat_z),colors=My_colors[c(3,1,6,9,4,5,7,10,8,2)],
+              stroke = I("black"), span = I(1),
               symbol=as.factor(RDA_criminalNet$role),symbols = c("circle","square")
   )
 Edges <- get.edgelist(g_obs)
@@ -1578,6 +1590,7 @@ fig1 <- plot_ly(scene ="scene1") %>%
               text=paste("Node:",1:nrow(RDA_criminalNet$Y),"<br>z*:",RDA_criminalNet$RoleLocale,"<br>c:",RDA_criminalNet$A),
               size=VertexSize,sizes=c(200,400), showlegend = FALSE,
               color=as.factor(RDA_criminalNet$RoleLocale),colors=My_colors[1:10],
+              stroke = I("black"), span = I(1),
               symbol=as.factor(RDA_criminalNet$role),symbols = c("circle","square")
   )
 Edges <- get.edgelist(g_obs)
@@ -1598,6 +1611,7 @@ fig2 <- plot_ly(scene ="scene2") %>%
               text=paste("Node:",1:nrow(RDA_criminalNet$Y),"<br>z*:",RDA_criminalNet$RoleLocale,"<br>c:",RDA_criminalNet$A),
               size=VertexSize,sizes=c(200,400),showlegend = FALSE,
               color=as.factor(RDA_criminalNet$RoleLocale),colors=My_colors[1:10],
+              stroke = I("black"), span = I(1),
               symbol=as.factor(RDA_criminalNet$role),symbols = c("circle","square")
   )
 Edges <- get.edgelist(g_obs)
@@ -1634,6 +1648,7 @@ fig3 <- plot_ly(scene ="scene3") %>%
               text=paste("Node:",1:nrow(RDA_criminalNet$Y),"<br>z*:",RDA_criminalNet$RoleLocale,"<br>c:",RDA_criminalNet$A),
               size=VertexSize,sizes=c(200,400),showlegend = FALSE,
               color=as.factor(RDA_Infinito_UnDirected_ZIPLPCM_Sup_T60k_R1_hat_z),colors=My_colors[c(3,1,6,9,4,5,7,10,8,2)],
+              stroke = I("black"), span = I(1),
               symbol=as.factor(RDA_criminalNet$role),symbols = c("circle","square")
   )
 Edges <- get.edgelist(g_obs)
@@ -1654,6 +1669,7 @@ fig4 <- plot_ly(scene ="scene4") %>% # plot the hat_z and hat_U
               text=paste("Node:",1:nrow(RDA_criminalNet$Y),"<br>z*:",RDA_criminalNet$RoleLocale,"<br>c:",RDA_criminalNet$A),
               size=VertexSize,sizes=c(200,400),showlegend = FALSE,
               color=as.factor(RDA_Infinito_UnDirected_ZIPLPCM_Sup_T60k_R1_hat_z),colors=My_colors[c(3,1,6,9,4,5,7,10,8,2)],
+              stroke = I("black"), span = I(1),
               symbol=as.factor(RDA_criminalNet$role),symbols = c("circle","square")
   )
 Edges <- get.edgelist(g_obs)
