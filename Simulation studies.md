@@ -136,6 +136,7 @@ fig <- plot_ly() %>% # plot the reference clustering and U
               z = SS1_Scenario1_Directed_ZIPLPCM$U[,3],
               text=paste("Node:",1:nrow(SS1_Scenario1_Directed_ZIPLPCM$Y),"<br>z*:",SS1_Scenario1_Directed_ZIPLPCM$z),
               size=VertexSize,sizes=c(200,400),
+              stroke = I("black"), span = I(1),
               color=as.factor(SS1_Scenario1_Directed_ZIPLPCM$z),colors=My_colors[6:10]
   )
 Edges <- get.edgelist(g_obs)
@@ -173,6 +174,7 @@ fig1 <- plot_ly(scene ="scene1") %>%
               z = SS1_Scenario1_Directed_ZIPLPCM$U[,3],
               text=paste("Node:",1:nrow(SS1_Scenario1_Directed_ZIPLPCM$Y),"<br>z*:",SS1_Scenario1_Directed_ZIPLPCM$z),
               size=VertexSize,sizes=c(200,400),showlegend = TRUE,
+              stroke = I("black"), span = I(1),
               color=as.factor(SS1_Scenario1_Directed_ZIPLPCM$z),colors=My_colors[6:10]
   )
 Edges <- get.edgelist(g_obs)
@@ -191,6 +193,7 @@ fig2 <- plot_ly(scene ="scene2") %>%
               z = SS1_Scenario1_Directed_ZIPLPCM$U[,3],
               text=paste("Node:",1:nrow(SS1_Scenario1_Directed_ZIPLPCM$Y),"<br>z*:",SS1_Scenario1_Directed_ZIPLPCM$z),
               size=VertexSize,sizes=c(200,400),showlegend = FALSE,
+              stroke = I("black"), span = I(1),
               color=as.factor(SS1_Scenario1_Directed_ZIPLPCM$z),colors=My_colors[6:10]
   )
 Edges <- get.edgelist(g_obs)
@@ -323,6 +326,7 @@ fig <- plot_ly() %>% # plot the reference clustering and U
               z = SS1_Scenario2_Directed_PoisLPCM$U[,3],
               text=paste("Node:",1:nrow(SS1_Scenario2_Directed_PoisLPCM$Y),"<br>z*:",SS1_Scenario2_Directed_PoisLPCM$z),
               size=VertexSize,sizes=c(200,400),
+              stroke = I("black"), span = I(1),
               color=as.factor(SS1_Scenario2_Directed_PoisLPCM$z),colors=My_colors[6:10]
   )
 Edges <- get.edgelist(g_obs)
@@ -631,6 +635,7 @@ fig <- plot_ly() %>%
               z = SS1_Scenario1_Directed_ZIPLPCM_Sup_ZIPLPCM_T12k_R1_hat_U[,3],
               text=paste("Node:",1:nrow(SS1_Scenario1_Directed_ZIPLPCM$Y),"<br>z_ref:",SS1_Scenario1_Directed_ZIPLPCM$z),
               size=VertexSize,sizes=c(200,400),
+              stroke = I("black"), span = I(1),
               color=as.factor(SS1_Scenario1_Directed_ZIPLPCM_Sup_ZIPLPCM_T12k_R1_hat_z),
               colors=My_colors[6:10]
   )
@@ -1293,6 +1298,7 @@ fig <- plot_ly() %>%
               z = SS2_Scenario1_Directed_ZIPSBM_Sup_ZIPLPCM_T12k_R1_hat_U[,3],
               text=paste("Node:",1:nrow(SS2_Scenario1_Directed_ZIPSBM$Y),"<br>z_ref:",SS2_Scenario1_Directed_ZIPSBM$z),
               size=VertexSize,sizes=c(200,400),
+              stroke = I("black"), span = I(1),
               color=as.factor(SS2_Scenario1_Directed_ZIPSBM_Sup_ZIPLPCM_T12k_R1_hat_z),
               colors=My_colors[6:10]
   )
@@ -1320,6 +1326,7 @@ fig <- plot_ly() %>%
               z = SS2_Scenario2_Directed_ZIPSBM_Sup_ZIPLPCM_T12k_R1_hat_U[,3],
               text=paste("Node:",1:nrow(SS2_Scenario2_Directed_ZIPSBM$Y),"<br>z_ref:",SS2_Scenario2_Directed_ZIPSBM$z),
               size=VertexSize,sizes=c(200,400),
+              stroke = I("black"), span = I(1),
               color=as.factor(SS2_Scenario2_Directed_ZIPSBM_Sup_ZIPLPCM_T12k_R1_hat_z),
               colors=My_colors[6:10]
   )
@@ -1361,6 +1368,7 @@ fig1 <- plot_ly(scene ="scene1") %>%
               z = SS2_Scenario1_Directed_ZIPSBM_Sup_ZIPLPCM_T12k_R1_hat_U[,3],
               text=paste("Node:",1:nrow(SS2_Scenario1_Directed_ZIPSBM$Y),"<br>z*:",SS2_Scenario1_Directed_ZIPSBM$z),
               size=VertexSize,sizes=c(200,400),showlegend = TRUE,
+              stroke = I("black"), span = I(1),
               color=as.factor(SS2_Scenario1_Directed_ZIPSBM_Sup_ZIPLPCM_T12k_R1_hat_z),colors=My_colors[6:10]
   )
 Edges <- get.edgelist(g_obs)
@@ -1381,6 +1389,7 @@ fig2 <- plot_ly(scene ="scene2") %>%
               z = SS2_Scenario1_Directed_ZIPSBM_Sup_ZIPLPCM_T12k_R1_hat_U[,3],
               text=paste("Node:",1:nrow(SS2_Scenario1_Directed_ZIPSBM$Y),"<br>z*:",SS2_Scenario1_Directed_ZIPSBM$z),
               size=VertexSize,sizes=c(200,400),showlegend = FALSE,
+              stroke = I("black"), span = I(1),
               color=as.factor(SS2_Scenario1_Directed_ZIPSBM_Sup_ZIPLPCM_T12k_R1_hat_z),colors=My_colors[6:10]
   )
 Edges <- get.edgelist(g_obs)
@@ -1418,6 +1427,7 @@ fig3 <- plot_ly(scene ="scene3") %>%
               z = SS2_Scenario2_Directed_ZIPSBM_Sup_ZIPLPCM_T12k_R1_hat_U[,3],
               text=paste("Node:",1:nrow(SS2_Scenario2_Directed_ZIPSBM$Y),"<br>z*:",SS2_Scenario2_Directed_ZIPSBM$z),
               size=VertexSize,sizes=c(200,400),showlegend = FALSE,
+              stroke = I("black"), span = I(1),
               color=as.factor(SS2_Scenario2_Directed_ZIPSBM_Sup_ZIPLPCM_T12k_R1_hat_z),colors=My_colors[6:10]
   )
 Edges <- get.edgelist(g_obs)
@@ -1438,6 +1448,7 @@ fig4 <- plot_ly(scene ="scene4") %>%
               z = SS2_Scenario2_Directed_ZIPSBM_Sup_ZIPLPCM_T12k_R1_hat_U[,3],
               text=paste("Node:",1:nrow(SS2_Scenario2_Directed_ZIPSBM$Y),"<br>z*:",SS2_Scenario2_Directed_ZIPSBM$z),
               size=VertexSize,sizes=c(200,400),showlegend = FALSE,
+              stroke = I("black"), span = I(1),
               color=as.factor(SS2_Scenario2_Directed_ZIPSBM_Sup_ZIPLPCM_T12k_R1_hat_z),colors=My_colors[6:10]
   )
 Edges <- get.edgelist(g_obs)
