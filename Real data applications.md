@@ -1815,7 +1815,7 @@ RDA_Infinito_UnDirected_ZIPLPCM_Sup_T60k_R1_hat_p_dataframe <- as.data.frame(RDA
 rownames(RDA_Infinito_UnDirected_ZIPLPCM_Sup_T60k_R1_hat_p_dataframe) <- colnames(RDA_Infinito_UnDirected_ZIPLPCM_Sup_T60k_R1_hat_p_dataframe) <- 1:nrow(RDA_criminalNet$Y)
 RDA_Infinito_UnDirected_ZIPLPCM_Sup_T60k_R1_hat_p_heatmap <-
   pheatmap(RDA_Infinito_UnDirected_ZIPLPCM_Sup_T60k_R1_hat_p_dataframe[order(RDA_Infinito_UnDirected_ZIPLPCM_Sup_T60k_R1_hat_z),order(RDA_Infinito_UnDirected_ZIPLPCM_Sup_T60k_R1_hat_z)],
-           color=colorRampPalette(brewer.pal(9,"YlOrRd")[1:7])(5000),cluster_cols = FALSE,cluster_rows= FALSE,show_rownames=FALSE,show_colnames=FALSE,border_color=FALSE,legend=TRUE,
+           color=c(brewer.pal(9,"Greys")[3],colorRampPalette(brewer.pal(9,"YlOrRd")[1:7])(5000)),cluster_cols = FALSE,cluster_rows= FALSE,show_rownames=FALSE,show_colnames=FALSE,border_color=FALSE,legend=TRUE,
            annotation_row = annotation_row_z_ref,annotation_col = annotation_row_z_ref,
            annotation_colors=list(z_ref=annotation_colors_z_ref),annotation_names_row=FALSE,annotation_names_col=FALSE,annotation_legend=FALSE,
            gaps_row=c(which(diff(sort(RDA_Infinito_UnDirected_ZIPLPCM_Sup_T60k_R1_hat_z))!=0)),gaps_col=c(which(diff(sort(RDA_Infinito_UnDirected_ZIPLPCM_Sup_T60k_R1_hat_z))!=0)))
