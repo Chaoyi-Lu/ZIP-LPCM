@@ -1823,5 +1823,167 @@ RDA_Infinito_UnDirected_ZIPLPCM_Sup_T60k_R1_hat_p_heatmap_draw <- cowplot::ggdra
 print(RDA_Infinito_UnDirected_ZIPLPCM_Sup_T60k_R1_hat_p_heatmap_draw)
 ```
 
+### 2.5 Comparisons to 2-Dimensional Inference
+
+This subsection corresponds to **Section 5.5** of the **ZIP-LPCM** paper where we compare the 3-d inference output to the corresponding 2-d inference output obtained following the similar steps shown in the previous subsections of this tutorial.
+The only difference in the 2-d inference is that the dimension of the latent positions is set as $d=2$ during the implementations.
+Here we provide some example code to begin with and omit the rest repeated post-processing code.
+The readers can simply modify the code variable names of 3-d cases for the implementations of 2-d inference.
+
+``` r
+# Sampson monks directed real network supervised ZIP-LPCM d=2 T = 60000 round 1 
+set.seed(1)
+start.time <- Sys.time()
+RDA_SampsonMonks_Directed_ZIPLPCM_Sup_2d_T60k_R1 <- 
+  MwG_Directed_ZIPLPCM(Y = SampsonMonks_Directed_adj,T = 60000,omega=0.01,alpha1=1,alpha2=0.103,alpha=3,beta1=1,beta2=9,
+                       sigma2prop_beta=0.4^2,sigma2prop_U=0.2,d=2,z=1:nrow(SampsonMonks_Directed_adj),
+                       p_eject=0.5,A=sampson_monks_group_cloisterville_NodeA,omega_c=1)
+end.time <- Sys.time()
+RDA_SampsonMonks_Directed_ZIPLPCM_Sup_2d_T60k_R1_time <- end.time - start.time
+RDA_SampsonMonks_Directed_ZIPLPCM_Sup_2d_T60k_R1_time
+# Time difference of 34.87837 mins
+
+
+#--------------------------------------------------------------------------------------------------------------------------
+#--------------------------------------------------------------------------------------------------------------------------
+
+# Windsurfers undirected real network unsupervised ZIP-LPCM d=2 T = 60000 round 1
+set.seed(1)
+start.time <- Sys.time()
+RDA_Windsurfers_UnDirected_ZIPLPCM_unSup_2d_T60k_R1 <- 
+  MwG_UnDirected_ZIPLPCM(Y = Windsurfers_adj,T = 60000,omega=0.01,alpha1=1,alpha2=0.103,alpha=3,beta1=1,beta2=19,
+                         sigma2prop_beta=0.15^2,sigma2prop_U=0.2,d=2,z=1:nrow(Windsurfers_adj),
+                         p_eject=0.5)
+end.time <- Sys.time()
+RDA_Windsurfers_UnDirected_ZIPLPCM_unSup_2d_T60k_R1_time <- end.time - start.time
+RDA_Windsurfers_UnDirected_ZIPLPCM_unSup_2d_T60k_R1_time
+# Time difference of 1.198135 hours
+
+#--------------------------------------------------------------------------------------------------------------------------
+#--------------------------------------------------------------------------------------------------------------------------
+
+# Train Bombing undirected real network unsupervised ZIP-LPCM d=2 T = 60000 round 1
+set.seed(1)
+start.time <- Sys.time()
+RDA_TrainBombing_UnDirected_ZIPLPCM_unSup_2d_T60k_R1 <- 
+  MwG_UnDirected_ZIPLPCM(Y = Train_bombing_adj,T = 60000,omega=0.01,alpha1=1,alpha2=0.103,alpha=3,beta1=1,beta2=9,
+                         sigma2prop_beta=0.3^2,sigma2prop_U=0.7,d=2,z=1:nrow(Train_bombing_adj),
+                         p_eject=0.5)
+end.time <- Sys.time()
+RDA_TrainBombing_UnDirected_ZIPLPCM_unSup_2d_T60k_R1_time <- end.time - start.time
+RDA_TrainBombing_UnDirected_ZIPLPCM_unSup_2d_T60k_R1_time
+# Time difference of 1.570117 hours
+
+#------------------------------------------------------------------------------------------------------------------------
+#------------------------------------------------------------------------------------------------------------------------
+
+# 'Ndrangheta Mafia undirected real network supervised ZIP-LPCM d=2 T = 60000 round 1
+set.seed(1)
+start.time <- Sys.time()
+RDA_Infinito_UnDirected_ZIPLPCM_Sup_2d_T60k_R1 <- 
+  MwG_UnDirected_ZIPLPCM(Y = RDA_criminalNet$Y,T = 60000,omega=0.01,alpha1=1,alpha2=0.103,alpha=3,beta1=1,beta2=6,
+                         sigma2prop_beta=0.125^2,sigma2prop_U=0.5,d=2,z=1:nrow(RDA_criminalNet$Y),
+                         p_eject=0.5,A=RDA_criminalNet$A,omega_c=1)
+end.time <- Sys.time()
+RDA_Infinito_UnDirected_ZIPLPCM_Sup_2d_T60k_R1_time <- end.time - start.time
+RDA_Infinito_UnDirected_ZIPLPCM_Sup_2d_T60k_R1_time
+# Time difference of 2.573009 hours
+```
+
+However, instead of the plots of 3-dimensional latent positions, we need some new code for visualizing the 2-dimensional latent positions for each real network as shown below.
+
+``` r
+# 2-dimensional visualization of Sampson monks
+library("igraph")
+library("RColorBrewer")
+My_colors <- c(brewer.pal(10,"RdBu")[c(4,7)],brewer.pal(10,"PRGn")[c(7,4)],brewer.pal(9,"YlOrBr")[4],
+               brewer.pal(10,"RdBu")[c(2,9)],brewer.pal(10,"PRGn")[c(9,2)],brewer.pal(9,"YlOrBr")[6],
+               brewer.pal(9,"Reds")[c(9,6)],brewer.pal(9,"RdPu")[5],brewer.pal(9,"Greys")[c(3,6,9)],brewer.pal(9,"GnBu")[5])
+g_obs_S <- graph_from_adjacency_matrix(SampsonMonks_Directed_adj,mode = "directed",weighted = TRUE)
+E(g_obs_S)$color <- colorRampPalette(brewer.pal(9,"Greys")[c(3,9)])(max(SampsonMonks_Directed_adj))[E(g_obs_S)$weight]
+betw <- betweenness(g_obs_S)
+V(g_obs_S)$size <- sqrt(betw/1.5+mean(betw))*0.75 # set the vertex size
+V(g_obs_S)$frame.color <- "black"
+V(g_obs_S)$label <- "" 
+Customized_colors <- My_colors[c(6,7,8)]
+V(g_obs_S)$color <- adjustcolor(Customized_colors[RDA_SampsonMonks_Directed_ZIPLPCM_Sup_Beta_1_9_T60k_2d_R1_hat_z], alpha.f = .7)
+par(mfrow=c(1,1),mai = c(0.05, 0.05, 0.05, 0.05),mgp = c(1,0.25,0))
+plot(g_obs_S, rescale=T,layout=RDA_SampsonMonks_Directed_ZIPLPCM_Sup_Beta_1_9_T60k_2d_R1_hat_U,edge.curved=0.0,edge.width=E(g_obs_S)$weight*0.5,edge.arrow.size=0.1,vertex.frame.width=0.001)
+par(mfrow=c(1,1),mai = c(1.02, 0.82, 0.82, 0.42))
+
+#--------------------------------------------------------------------------------------------------------------------------
+#--------------------------------------------------------------------------------------------------------------------------
+
+# 2-dimensional visualization of Windsurfers
+library("IMIFA")
+U_ref <- RDA_Windsurfers_UnDirected_ZIPLPCM_unSup_Beta_1_19_T60k_2d_R1_hat_U
+U_ref[RDA_Windsurfers_UnDirected_ZIPLPCM_unSup_Beta_1_19_T60k_2d_R1_hat_z==1,] <- c(3,-3)
+U_ref[RDA_Windsurfers_UnDirected_ZIPLPCM_unSup_Beta_1_19_T60k_2d_R1_hat_z==2,] <- c(3,-3)
+U_ref[RDA_Windsurfers_UnDirected_ZIPLPCM_unSup_Beta_1_19_T60k_2d_R1_hat_z==3,] <- c(-3,3)
+RDA_Windsurfers_UnDirected_ZIPLPCM_unSup_Beta_1_19_T60k_2d_R1_hat_U <- # rotate the whole plot to better match the pattern of 3-d visualization
+  Procrustes(RDA_Windsurfers_UnDirected_ZIPLPCM_unSup_Beta_1_19_T60k_2d_R1_hat_U,
+             U_ref, translate = TRUE ,dilate = FALSE)$X.new
+
+My_colors <- c(brewer.pal(10,"RdBu")[c(4,8)],brewer.pal(10,"PRGn")[c(7,4)],brewer.pal(9,"YlOrBr")[4],
+               brewer.pal(10,"RdBu")[c(2,9)],brewer.pal(10,"PRGn")[c(9,2)],brewer.pal(9,"YlOrBr")[6],
+               brewer.pal(9,"Reds")[c(9,6)],brewer.pal(9,"RdPu")[5],brewer.pal(9,"Greys")[c(3,6,9)],brewer.pal(9,"GnBu")[5])
+g_obs_W <- graph_from_adjacency_matrix(Windsurfers_adj,mode = "undirected",weighted = TRUE)
+E(g_obs_W)$color <- colorRampPalette(brewer.pal(9,"Greys")[c(3,9)])(max(Windsurfers_adj))[E(g_obs_W)$weight]
+betw <- betweenness(g_obs_W)
+V(g_obs_W)$size <- sqrt(betw/1.5+mean(betw))*0.8 # set the vertex size
+V(g_obs_W)$frame.color <- "black"
+V(g_obs_W)$label <- "" 
+Customized_colors <- My_colors[c(1,6,2)]
+V(g_obs_W)$color <- adjustcolor(Customized_colors[RDA_Windsurfers_UnDirected_ZIPLPCM_unSup_Beta_1_19_T60k_2d_R1_hat_z], alpha.f = .7)
+par(mfrow=c(1,1),mai = c(0.05, 0.05, 0.05, 0.05),mgp = c(1,0.25,0))
+plot(g_obs_W, rescale=T,layout=RDA_Windsurfers_UnDirected_ZIPLPCM_unSup_Beta_1_19_T60k_2d_R1_hat_U,edge.curved=0.0,edge.width=E(g_obs)$weight*0.25)
+par(mfrow=c(1,1),mai = c(1.02, 0.82, 0.82, 0.42))
+
+#--------------------------------------------------------------------------------------------------------------------------
+#--------------------------------------------------------------------------------------------------------------------------
+
+# 2-dimensional visualization of Train bombing suspects
+g_obs_T <- graph_from_adjacency_matrix(Train_bombing_adj,mode = "undirected",weighted = TRUE)
+E(g_obs_T)$color <- colorRampPalette(brewer.pal(9,"Greys")[c(3,9)])(max(Train_bombing_adj))[E(g_obs_T)$weight]
+betw <- betweenness(g_obs_T)
+V(g_obs_T)$size <- sqrt(betw/1.5+mean(betw))*0.65
+V(g_obs_T)$frame.color <- "black"
+V(g_obs_T)$label <- "" 
+Customized_colors <- My_colors[c(17)]
+V(g_obs_T)$color <- adjustcolor(Customized_colors[RDA_TrainBombing_UnDirected_ZIPLPCM_unSup_Beta_1_9_T60k_2d_R1_hat_z], alpha.f = .7)
+par(mfrow=c(1,1),mai = c(0.05, 0.05, 0.05, 0.05),mgp = c(1,0.25,0))
+plot(g_obs_T, rescale=T,layout=RDA_TrainBombing_UnDirected_ZIPLPCM_unSup_Beta_1_9_T60k_2d_R1_hat_U,edge.curved=0.0,edge.width=E(g_obs_T)$weight)
+par(mfrow=c(1,1),mai = c(1.02, 0.82, 0.82, 0.42))
+
+#--------------------------------------------------------------------------------------------------------------------------
+#--------------------------------------------------------------------------------------------------------------------------
+
+# 2-dimensional visualization of 'Ndrangheta Mafia criminals
+library("igraph")
+library("RColorBrewer")
+My_colors <- c(brewer.pal(10,"RdBu")[c(4,7)],brewer.pal(10,"PRGn")[c(7,4)],brewer.pal(9,"YlOrBr")[4],
+               brewer.pal(10,"RdBu")[c(2,9)],brewer.pal(10,"PRGn")[c(9,2)],brewer.pal(9,"YlOrBr")[6],
+               brewer.pal(9,"Reds")[c(9,6)],brewer.pal(9,"RdPu")[5],brewer.pal(9,"Greys")[c(3,6,9)],brewer.pal(9,"GnBu")[5])
+g_obs_I <- graph_from_adjacency_matrix(RDA_criminalNet$Y,mode = "undirected",weighted = TRUE)
+E(g_obs_I)$color <- colorRampPalette(brewer.pal(9,"Greys")[c(3,9)])(max(RDA_criminalNet$Y))[E(g_obs_I)$weight]
+betw <- betweenness(g_obs_I)
+V(g_obs_I)$size <- sqrt(betw/1.5+mean(betw))*0.45
+V(g_obs_I)$shape <- c("circle","square")[c(as.factor(RDA_criminalNet$role))]
+V(g_obs_I)$frame.color <- "black"
+V(g_obs_I)$label <- ""
+par(mfrow=c(1,2),mai = c(0.05, 0.05, 0.05, 0.05),mgp = c(1,0.25,0))
+# Make the plot of hat_U and z*
+V(g_obs_I)$color <- adjustcolor(My_colors[c(as.factor(RDA_criminalNet$RoleLocale))], alpha.f = 0.7)
+plot(g_obs_I, rescale=T,layout=-RDA_Infinito_UnDirected_ZIPLPCM_Sup_Beta_1_6_T60k_DA_2d_R1_hat_U,edge.curved=0.0,edge.width=E(g_obs_I)$weight*0.25,vertex.frame.width=0.001)
+# Make the plot of hat_U and hat_z
+Customized_colors <- My_colors[c(3,6,9,4,7,5,8)]
+V(g_obs_I)$color <- adjustcolor(Customized_colors[RDA_Infinito_UnDirected_ZIPLPCM_Sup_Beta_1_6_T60k_DA_2d_R1_hat_z], alpha.f = .7)
+plot(g_obs_I, rescale=T,layout=-RDA_Infinito_UnDirected_ZIPLPCM_Sup_Beta_1_6_T60k_DA_2d_R1_hat_U,edge.curved=0.0,edge.width=E(g_obs_I)$weight*0.25,vertex.frame.width=0.001)
+par(mfrow=c(1,1),mai = c(1.02, 0.82, 0.82, 0.42))
+```
+
+The **Figure 15** of the paper can thus be recovered.
+
 Here we complete this tutorial of the coding for the **ZIP-LPCM** paper.
+
 
