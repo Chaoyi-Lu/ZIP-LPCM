@@ -191,12 +191,13 @@ Simulation_UnDirected_ZIPLPCM <- function(beta,P,mu,tau,d=3,z=NULL,seed=NULL){
 
 # Label switching function based on  Strehl and J. Ghosh (2003) and Rastelli and Friel (2018)
 LabelSwitching_SG2003 <- 
-  function(z=NULL, Z=NULL, vector_1byK=NULL,matrix_dbyK=NULL,matrix_KbyK=NULL){
+  function(z=NULL, Z=NULL, vector_1byK=NULL,matrix_dbyK=NULL,matrix_KbyK=NULL,matrix2_KbyK=NULL){
     # z: the membership vector to be label-switched
     # Z: the membership matrix to be label-switched
     # vector_1byK: clustering dependent 1 X K vector to be label-switched
     # matrix_dbyK: clustering dependent d X K matrix to be label-switched
     # matrix_KbyK: clustering dependent K X K matrix to be label-switched
+    # matrix2_KbyK: the 2nd clustering dependent K X K matrix to be label-switched
     # Note that no empty groups are allowed to exist in this function
     
     if (!is.null(z)&is.null(Z)){
@@ -233,7 +234,10 @@ LabelSwitching_SG2003 <-
     if (!is.null(matrix_KbyK)){
       matrix_KbyK <- matrix_KbyK[reassignment_rule[,1],reassignment_rule[,1]]
     }
-    return(list(z=z, Z=Z, vector_1byK=vector_1byK,matrix_dbyK=matrix_dbyK,matrix_KbyK=matrix_KbyK))
+    if (!is.null(matrix2_KbyK)){
+      matrix2_KbyK <- matrix2_KbyK[reassignment_rule[,1],reassignment_rule[,1]]
+    }
+    return(list(z=z, Z=Z, vector_1byK=vector_1byK,matrix_dbyK=matrix_dbyK,matrix_KbyK=matrix_KbyK,matrix2_KbyK=matrix2_KbyK))
   }
 
 #--------------------------------------------------------------------------------------------------------------------------------------------
