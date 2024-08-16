@@ -1931,10 +1931,54 @@ sd(abs(SS2_Scenario1_Directed_ZIPSBM_Sup_ZIPLPCM_T12k_beta_1_19_R1_hat_nu[(SS2_S
 # 0.03203501
 ```
 
+Following similar code as above to implement for the **scenario 2** network would bring the MAE of the $\hat{\boldsymbol{\nu}}$ between the two cases as:
 
+``` r
+# SS2 Sce2 Mean and sd of the difference between each p_m0,ij for ZIP-LPCM Sup Beta(1,19) and ZIP-SBM Sup
+mean(abs(SS2_Scenario2_Directed_ZIPSBM_Sup_ZIPLPCM_T12k_beta_1_19_R1_hat_nu[(SS2_Scenario2_Directed_ZIPSBM$Y+diag(1,nrow(SS2_Scenario2_Directed_ZIPSBM$Y)))==0]-
+           SS2_Scenario2_Directed_ZIPSBM_Sup_ZIPSBM_T12k_R1_hat_nu[(SS2_Scenario2_Directed_ZIPSBM$Y+diag(1,nrow(SS2_Scenario2_Directed_ZIPSBM$Y)))==0]))
+# 0.03010545
+sd(abs(SS2_Scenario2_Directed_ZIPSBM_Sup_ZIPLPCM_T12k_beta_1_19_R1_hat_nu[(SS2_Scenario2_Directed_ZIPSBM$Y+diag(1,nrow(SS2_Scenario2_Directed_ZIPSBM$Y)))==0]-
+         SS2_Scenario2_Directed_ZIPSBM_Sup_ZIPSBM_T12k_R1_hat_nu[(SS2_Scenario2_Directed_ZIPSBM$Y+diag(1,nrow(SS2_Scenario2_Directed_ZIPSBM$Y)))==0]))
+# 0.0755925
+```
 
+Finally, we can also obtain the posterior samples of the individual-level unusual zero probability $p_{z_iz_j}$ and the individual-level Poisson rate $\lambda_{z_iz_j}$ as well as the corresponding posterior mean:
 
+``` r
+# Obtain the individual-level p and lambda for each iteration
+SS2_Scenario1_Directed_ZIPSBM_Sup_ZIPSBM_T12k_R1_p <- list()
+SS2_Scenario1_Directed_ZIPSBM_Sup_ZIPSBM_T12k_R1_lambda <- list()
+for (t in 1:nrow(SS2_Scenario1_Directed_ZIPSBM_Sup_ZIPSBM_T12k_R1$z)){
+  Z <- t(t(matrix(SS2_Scenario1_Directed_ZIPSBM_Sup_ZIPSBM_T12k_R1_LSz[t,],75,SS2_Scenario1_Directed_ZIPSBM_Sup_ZIPSBM_T12k_R1$K[t]))==(1:SS2_Scenario1_Directed_ZIPSBM_Sup_ZIPSBM_T12k_R1$K[t]))*1
+  SS2_Scenario1_Directed_ZIPSBM_Sup_ZIPSBM_T12k_R1_p[[t]] <- Z%*%SS2_Scenario1_Directed_ZIPSBM_Sup_ZIPSBM_T12k_R1_LSP[[t]]%*%t(Z)
+  SS2_Scenario1_Directed_ZIPSBM_Sup_ZIPSBM_T12k_R1_lambda[[t]] <- Z%*%SS2_Scenario1_Directed_ZIPSBM_Sup_ZIPSBM_T12k_R1_LSLambda[[t]]%*%t(Z)
+  if ((t%%1000) == 0){
+    cat("t=",t,"\n") # monitor the process
+  }
+}
+SS2_Scenario1_Directed_ZIPSBM_Sup_ZIPSBM_T12k_R1_hat_p <- Reduce("+",SS2_Scenario1_Directed_ZIPSBM_Sup_ZIPSBM_T12k_R1_p[iteration_after_burn_in])/length(iteration_after_burn_in)
+SS2_Scenario1_Directed_ZIPSBM_Sup_ZIPSBM_T12k_R1_hat_lambda <- Reduce("+",SS2_Scenario1_Directed_ZIPSBM_Sup_ZIPSBM_T12k_R1_lambda[iteration_after_burn_in])/length(iteration_after_burn_in)
+diag(SS2_Scenario1_Directed_ZIPSBM_Sup_ZIPSBM_T12k_R1_hat_p) <- 0
+diag(SS2_Scenario1_Directed_ZIPSBM_Sup_ZIPSBM_T12k_R1_hat_lambda) <- 0
+```
 
+Comparing to the reference values gives the MAE and the corresponding standard deviation being:
 
+``` r
+# Compare hat_p and reference p by MAE and sdAE
+mean(abs((SS2_Scenario1_Directed_ZIPSBM_Sup_ZIPSBM_T12k_R1_hat_p-SS2_Scenario1_Directed_ZIPSBM_p)[diag(nrow(SS2_Scenario1_Directed_ZIPSBM$Y))==0]))
+# 0.0311521
+sd(abs((SS2_Scenario1_Directed_ZIPSBM_Sup_ZIPSBM_T12k_R1_hat_p-SS2_Scenario1_Directed_ZIPSBM_p)[diag(nrow(SS2_Scenario1_Directed_ZIPSBM$Y))==0]))
+# 0.02074787
+# Compare hat_lambda and reference lambda by MAE and sdAE
+mean(abs((SS2_Scenario1_Directed_ZIPSBM_Sup_ZIPSBM_T12k_R1_hat_lambda-SS2_Scenario1_Directed_ZIPSBM_lambda)[diag(nrow(SS2_Scenario1_Directed_ZIPSBM$Y))==0]))
+# 0.04094313
+sd(abs((SS2_Scenario1_Directed_ZIPSBM_Sup_ZIPSBM_T12k_R1_hat_lambda-SS2_Scenario1_Directed_ZIPSBM_lambda)[diag(nrow(SS2_Scenario1_Directed_ZIPSBM$Y))==0]))
+# 0.04742156
+```
+
+which are better than those of the ZIP-LPCM implementations.
+However, considering the corresponding scale of the unusual probability $0\leq p_{z_iz_j} \leq 1$ and the Poisson rates $\lambda_{z_iz_j}$ ranges from 0 to 7, the errors compared to the reference are shown to be not deteriorated a lot for the ZIP-LPCM implementations.
 
 Here we complete the **simulation study 2** implementations and post-processings.
