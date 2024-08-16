@@ -1788,4 +1788,78 @@ sd(SS2_Scenario2_Directed_ZIPSBM_Sup_ZIPLPCM_T12k_beta_1_19_R1_hat_nu[(SS2_Scena
 # 0.1179308
 ```
 
+## 5. Simulation study 2 extra ZIP-SBM implementations and post-processing
+
+In this section, we further implement the **supervised ZIP-SBM** implementations with unusual zero probability prior proposed to be similar as before, that is, Beta(1,9), and with the Poisson rate prior being Gamma(1,1).
+These implementations and settings mimic the experiments explored in our another ZIP-SBM paper, and extend the applications to directed networks.
+The implementation function is also included in the [`Functions.R`] file of this repository.
+
+The implementations code are similar to those of ZIP-LPCM implementations for both scenarios but with slightly different input of prior parameters:
+
+``` r
+# SS2 Scenario 1 ZIP-SBM network Supervised ZIP-SBM-MFM implementations with T=12000 Beta(1,9) Round 1
+start.time <- Sys.time()
+SS2_Scenario1_Directed_ZIPSBM_Sup_ZIPSBM_T12k_R1 <- 
+  Gibbs_Directed_ZIPSBM(Y = SS2_Scenario1_Directed_ZIPSBM$Y,T = 12000,alpha1=1,alpha2=1,alpha=3,beta1=1,beta2=9,
+                        z=1:nrow(SS2_Scenario1_Directed_ZIPSBM$Y),
+                        p_eject=0.5,A=SS2_Scenario1_Directed_ZIPSBM$A,omega_c=1
+  )
+end.time <- Sys.time()
+SS2_Scenario1_Directed_ZIPSBM_Sup_ZIPSBM_T12k_R1_time <- end.time - start.time
+SS2_Scenario1_Directed_ZIPSBM_Sup_ZIPSBM_T12k_R1_time
+# Time difference of 20.61243 mins
+
+#--------------------------------------------------------------------------------------------------------------------------
+#--------------------------------------------------------------------------------------------------------------------------
+
+# SS2 Scenario 2 ZIP-SBM network Supervised ZIP-SBM-MFM implementations with T=12000 Beta(1,9) Round 1
+start.time <- Sys.time()
+SS2_Scenario2_Directed_ZIPSBM_Sup_ZIPSBM_T12k_R1 <- 
+  Gibbs_Directed_ZIPSBM(Y = SS2_Scenario2_Directed_ZIPSBM$Y,T = 12000,alpha1=1,alpha2=1,alpha=3,beta1=1,beta2=9,
+                        z=1:nrow(SS2_Scenario2_Directed_ZIPSBM$Y),p_eject=0.5,A=SS2_Scenario2_Directed_ZIPSBM$A,omega_c=1
+  )
+end.time <- Sys.time()
+SS2_Scenario2_Directed_ZIPSBM_Sup_ZIPSBM_T12k_R1_time <- end.time - start.time
+SS2_Scenario2_Directed_ZIPSBM_Sup_ZIPSBM_T12k_R1_time
+# Time difference of 20.64854 mins
+```
+
+The corresponding unsupervised implementations can also be applied:
+
+``` r
+# SS2 Scenario 1 ZIP-SBM network unSupervised ZIP-SBM-MFM implementations with T=12000 Beta(1,9) Round 1
+start.time <- Sys.time()
+SS2_Scenario1_Directed_ZIPSBM_unSup_ZIPSBM_T12k_R1 <- 
+  Gibbs_Directed_ZIPSBM(Y = SS2_Scenario1_Directed_ZIPSBM$Y,T = 12000,alpha1=1,alpha2=1,alpha=3,beta1=1,beta2=9,
+                        z=1:nrow(SS2_Scenario1_Directed_ZIPSBM$Y),
+                        p_eject=0.5
+  )
+end.time <- Sys.time()
+SS2_Scenario1_Directed_ZIPSBM_unSup_ZIPSBM_T12k_R1_time <- end.time - start.time
+SS2_Scenario1_Directed_ZIPSBM_unSup_ZIPSBM_T12k_R1_time
+# Time difference of 16.52392 mins
+
+#--------------------------------------------------------------------------------------------------------------------------
+#--------------------------------------------------------------------------------------------------------------------------
+
+# SS2 Scenario 2 ZIP-SBM network unSupervised ZIP-SBM-MFM implementations with T=12000 Beta(1,9) Round 1
+start.time <- Sys.time()
+SS2_Scenario2_Directed_ZIPSBM_unSup_ZIPSBM_T12k_R1 <- 
+  Gibbs_Directed_ZIPSBM(Y = SS2_Scenario2_Directed_ZIPSBM$Y,T = 12000,alpha1=1,alpha2=1,alpha=3,beta1=1,beta2=9,
+                        z=1:nrow(SS2_Scenario2_Directed_ZIPSBM$Y),p_eject=0.5#,A=SS2_Scenario2_Directed_ZIPSBM$A,omega_c=1
+  )
+end.time <- Sys.time()
+SS2_Scenario2_Directed_ZIPSBM_unSup_ZIPSBM_T12k_R1_time <- end.time - start.time
+SS2_Scenario2_Directed_ZIPSBM_unSup_ZIPSBM_T12k_R1_time
+# Time difference of 16.37383 mins
+```
+
+However, the conclusions obtained from the comparisons between the supervised and unsupervised versions remain the same as the ZIP-LPCM implementations shown in the previous sections.
+
+Here we take the 1st **supervised ZIP-SBM** case implemented on **SS1 scenario 1** network as an example to illustrate the post-processing code.
+The code are generally similar to those of ZIP-LPCM cases, but with a few differences.
+We start from the label-swicthing process shown below:
+
+
+
 Here we complete the **simulation study 2** implementations and post-processings.
