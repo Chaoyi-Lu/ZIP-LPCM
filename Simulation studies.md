@@ -1979,6 +1979,6 @@ sd(abs((SS2_Scenario1_Directed_ZIPSBM_Sup_ZIPSBM_T12k_R1_hat_lambda-SS2_Scenario
 ```
 
 which are better than those of the ZIP-LPCM implementations.
-However, considering the corresponding scale of the unusual probability $0\leq p_{z_iz_j} \leq 1$ and the Poisson rates $\lambda_{z_iz_j}$ ranges from 0 to 7, the errors compared to the reference are shown to be not deteriorated a lot for the ZIP-LPCM implementations.
+However, considering the corresponding scale of the unusual probability $p_{z_iz_j}$ which ranges from 0 to 1, and the Poisson rates $\lambda_{z_iz_j}$ which ranges from 0 to 7, the errors compared to the reference are shown to be not deteriorated a lot for the ZIP-LPCM implementations.
 
 Here we complete the **simulation study 2** implementations and post-processings.
