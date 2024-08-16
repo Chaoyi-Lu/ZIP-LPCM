@@ -1854,11 +1854,86 @@ SS2_Scenario2_Directed_ZIPSBM_unSup_ZIPSBM_T12k_R1_time
 # Time difference of 16.37383 mins
 ```
 
-However, the conclusions obtained from the comparisons between the supervised and unsupervised versions remain the same as the ZIP-LPCM implementations shown in the previous sections.
+However, the conclusions obtained from the comparisons between the supervised and unsupervised versions remain the same as the ZIP-LPCM implementations shown in the previous sections and in the **ZIP-LPCM** paper.
 
 Here we take the 1st **supervised ZIP-SBM** case implemented on **SS1 scenario 1** network as an example to illustrate the post-processing code.
 The code are generally similar to those of ZIP-LPCM cases, but with a few differences.
-We start from the label-swicthing process shown below:
+We start from the label-switching process shown below where we further need to label switch the posterior samples of Poisson rate $\boldsymbol{\lambda}$:
+
+``` r
+SS2_Scenario1_Directed_ZIPSBM_Sup_ZIPSBM_T12k_R1_LSz <- matrix(NA,nrow=nrow(SS2_Scenario1_Directed_ZIPSBM_Sup_ZIPSBM_T12k_R1$z),ncol=ncol(SS2_Scenario1_Directed_ZIPSBM_Sup_ZIPSBM_T12k_R1$z))
+SS2_Scenario1_Directed_ZIPSBM_Sup_ZIPSBM_T12k_R1_LSP <- list()
+SS2_Scenario1_Directed_ZIPSBM_Sup_ZIPSBM_T12k_R1_LSLambda <- list()
+for (t in 1:nrow(SS2_Scenario1_Directed_ZIPSBM_Sup_ZIPSBM_T12k_R1$z)){
+  LS_temp <- LabelSwitching_SG2003(z = SS2_Scenario1_Directed_ZIPSBM_Sup_ZIPSBM_T12k_R1$z[t,],
+                                   matrix_KbyK = SS2_Scenario1_Directed_ZIPSBM_Sup_ZIPSBM_T12k_R1$P[[t]],
+                                   matrix2_KbyK = SS2_Scenario1_Directed_ZIPSBM_Sup_ZIPSBM_T12k_R1$Lambda[[t]])
+  SS2_Scenario1_Directed_ZIPSBM_Sup_ZIPSBM_T12k_R1_LSz[t,] <- LS_temp$z
+  SS2_Scenario1_Directed_ZIPSBM_Sup_ZIPSBM_T12k_R1_LSP[[t]] <- LS_temp$matrix_KbyK
+  SS2_Scenario1_Directed_ZIPSBM_Sup_ZIPSBM_T12k_R1_LSLambda[[t]] <- LS_temp$matrix2_KbyK
+  if ((t%%1000) == 0){cat("t=",t,"\n")}
+}
+```
+
+Then we obtain the complete likelihood for each posterior sample state and check the mixing:
+
+``` r
+## Check the complete likelihood for each iteration
+SS2_Scenario1_Directed_ZIPSBM_Sup_ZIPSBM_T12k_R1_LSz_Like <- c()
+for (t in 1:nrow(SS2_Scenario1_Directed_ZIPSBM_Sup_ZIPSBM_T12k_R1$z)){
+  SS2_Scenario1_Directed_ZIPSBM_Sup_ZIPSBM_T12k_R1_LSz_Like <-
+    c(SS2_Scenario1_Directed_ZIPSBM_Sup_ZIPSBM_T12k_R1_LSz_Like,
+      Directed_ZIPSBM_MFM_CompleteLikelihood(X=SS2_Scenario1_Directed_ZIPSBM_Sup_ZIPSBM_T12k_R1$X[[t]],
+                                             Lambda=SS2_Scenario1_Directed_ZIPSBM_Sup_ZIPSBM_T12k_R1_LSLambda[[t]],
+                                             nu=SS2_Scenario1_Directed_ZIPSBM_Sup_ZIPSBM_T12k_R1$nu[[t]],
+                                             P=SS2_Scenario1_Directed_ZIPSBM_Sup_ZIPSBM_T12k_R1_LSP[[t]],
+                                             z=SS2_Scenario1_Directed_ZIPSBM_Sup_ZIPSBM_T12k_R1_LSz[t,],alpha=3,
+                                             A=SS2_Scenario1_Directed_ZIPSBM$A,omega_c=1)) 
+  if ((t%%1000) == 0){cat("t=",t,"\n")}
+}
+plot(SS2_Scenario1_Directed_ZIPSBM_Sup_ZIPSBM_T12k_R1_LSz_Like,type = "l",xlab = "",ylab = "", main = "Likelihood",cex.axis = 0.8)
+# Define the burn in
+iteration_after_burn_in <- 2002:12001
+burn_in <- 2001
+```
+
+The rest code for obtaining the point estimate of the posterior clustering are exactly the same as those of ZIP-LPCM post-processing, so we omit this part of the code here.
+Instead, we move directly to the $\hat{\boldsymbol{\nu}}$:
+
+``` r
+## Obtain posterior mean of nu, i.e. approximated P_m0
+SS2_Scenario1_Directed_ZIPSBM_Sup_ZIPSBM_T12k_R1_hat_nu <-
+  Reduce("+",SS2_Scenario1_Directed_ZIPSBM_Sup_ZIPSBM_T12k_R1$nu[iteration_after_burn_in])/length(iteration_after_burn_in)
+```
+
+And thus we can compare to the corresponding reference values by the mean absolute error (MAE) and the corresponding standard deviation:
+
+``` r
+# Compare the hat_P_m0 and reference P_m0
+# Mean and sd of the difference between each p_m0,ij and \hat{p_m0,ij}
+mean(abs(SS2_Scenario1_Directed_ZIPSBM_Sup_ZIPSBM_T12k_R1_hat_nu[(SS2_Scenario1_Directed_ZIPSBM$Y+diag(1,nrow(SS2_Scenario1_Directed_ZIPSBM$Y)))==0]-
+           SS2_Scenario1_Directed_ZIPSBM_P_m0[(SS2_Scenario1_Directed_ZIPSBM$Y+diag(1,nrow(SS2_Scenario1_Directed_ZIPSBM$Y)))==0]))
+# 0.03967798
+sd(abs(SS2_Scenario1_Directed_ZIPSBM_Sup_ZIPSBM_T12k_R1_hat_nu[(SS2_Scenario1_Directed_ZIPSBM$Y+diag(1,nrow(SS2_Scenario1_Directed_ZIPSBM$Y)))==0]-
+         SS2_Scenario1_Directed_ZIPSBM_P_m0[(SS2_Scenario1_Directed_ZIPSBM$Y+diag(1,nrow(SS2_Scenario1_Directed_ZIPSBM$Y)))==0]))
+# 0.03109405
+```
+
+Similarly, we can also compare to the best **ZIP-LPCM Sup Beta(1,19)** case shown in the paper and got the MAE and the sd we show in the paper when the $\hat{\boldsymbol{\nu}}$ of the **ZIP-LPCM Sup Beta(1,19)** implementation is available as `SS2_Scenario1_Directed_ZIPSBM_Sup_ZIPLPCM_T12k_beta_1_19_R1_hat_nu`:
+
+``` r
+# SS2 Sce1 Mean and sd of the difference between each p_m0,ij for ZIP-LPCM Sup Beta(1,19) and ZIP-SBM Sup
+mean(abs(SS2_Scenario1_Directed_ZIPSBM_Sup_ZIPLPCM_T12k_beta_1_19_R1_hat_nu[(SS2_Scenario1_Directed_ZIPSBM$Y+diag(1,nrow(SS2_Scenario1_Directed_ZIPSBM$Y)))==0]-
+           SS2_Scenario1_Directed_ZIPSBM_Sup_ZIPSBM_T12k_R1_hat_nu[(SS2_Scenario1_Directed_ZIPSBM$Y+diag(1,nrow(SS2_Scenario1_Directed_ZIPSBM$Y)))==0]))
+# 0.04033673
+sd(abs(SS2_Scenario1_Directed_ZIPSBM_Sup_ZIPLPCM_T12k_beta_1_19_R1_hat_nu[(SS2_Scenario1_Directed_ZIPSBM$Y+diag(1,nrow(SS2_Scenario1_Directed_ZIPSBM$Y)))==0]-
+         SS2_Scenario1_Directed_ZIPSBM_Sup_ZIPSBM_T12k_R1_hat_nu[(SS2_Scenario1_Directed_ZIPSBM$Y+diag(1,nrow(SS2_Scenario1_Directed_ZIPSBM$Y)))==0]))
+# 0.03203501
+```
+
+
+
+
 
 
 
