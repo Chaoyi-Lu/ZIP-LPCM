@@ -1787,7 +1787,7 @@ RDA_TrainBombing_UnDirected_ZIPLPCM_unSup_2d_T60k_R1_time
 #------------------------------------------------------------------------------------------------------------------------
 #------------------------------------------------------------------------------------------------------------------------
 
-# 'Ndrangheta Mafia undirected real network supervised ZIP-LPCM d=2 T = 60000 round 1
+# Summit attendance criminality undirected real network supervised ZIP-LPCM d=2 T = 60000 round 1
 set.seed(1)
 start.time <- Sys.time()
 RDA_CriminalSummit_UnDirected_ZIPLPCM_Sup_2d_T60k_R1 <- 
@@ -1868,7 +1868,7 @@ par(mfrow=c(1,1),mai = c(1.02, 0.82, 0.82, 0.42))
 #--------------------------------------------------------------------------------------------------------------------------
 #--------------------------------------------------------------------------------------------------------------------------
 
-# 2-dimensional visualization of 'Ndrangheta Mafia criminals
+# 2-dimensional visualization of summit attendance criminality network
 library("igraph")
 library("RColorBrewer")
 My_colors <- c(brewer.pal(10,"RdBu")[c(4,7)],brewer.pal(10,"PRGn")[c(7,4)],brewer.pal(9,"YlOrBr")[4],
