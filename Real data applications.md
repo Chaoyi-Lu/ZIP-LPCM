@@ -105,103 +105,13 @@ library(gdata)
 lowerTriangle(Train_bombing_adj,byrow=TRUE) <- upperTriangle(Train_bombing_adj)
 ```
 
-### 1.3 'Ndrangheta Mafia Network
+### 1.3 Summit attendance criminality Network
 
-The original data is available at [https://sites.google.com/site/ucinetsoftware/datasets/covert-networks/ndrangheta-mafia-2](https://sites.google.com/site/ucinetsoftware/datasets/covert-networks/ndrangheta-mafia-2) and we follow the same pre-processing steps as [Legramanti et al. (2022)](https://projecteuclid.org/journals/annals-of-applied-statistics/volume-16/issue-4/Extended-stochastic-block-models-with-application-to-criminal-networks/10.1214/21-AOAS1595.short) to process the raw data and to focus on the processed data for implementations.
-We refer to the [GitHub page](https://github.com/danieledurante/ESBM/blob/master/Application/application.md) of the paper Legramanti et al. (2022) for more details, and the following pre-processing code are extracted from their GitHub page with some minor modifications on variable names.
-
-``` r
-A <- read.csv(file="Datasets/NDRANGHETAMAFIA_2M.csv",header=TRUE, stringsAsFactors = TRUE)
-# Correct the recorded data based on the judicial acts
-A[23,20] <- 1
-A[48,23] <- 1
-A[78,35] <- 1
-A[115,22] <- 1
-# Suspects who never attended a summit
-sel_empty <- which(apply(as.matrix(A[,-1]),1,sum)==0)
-# Suspects who have not been recognized during the investigation process
-A[c(38,105,106,125,135),1]
-# Indicators of the two groups of suspects to be excluded
-sel_empty <- c(c(sel_empty),c(38,105,106,125,135))
-# remove these suspects from the dataset
-A <- A[-sel_empty,]
-# Create a vector with the actors' names
-actors <- A[,1]
-actors <- droplevels(actors)
-A <- as.matrix(A[,-1])
-A <- A%*%t(A)
-diag(A) <- 0
-dim(A)
-rownames(A) <- colnames(A) <- c(1:dim(A)[1])
-# ----------------------------------------------------
-# Locale membership ("OUT": Suspects not belonging to La Lombardia. "MISS": Information not available)
-Locale <- c("C","OUT","A","MISS","O","A","MISS","D","D","D","D","D","C","P","L","L","Q","MISS","B","OUT",
-            "B","B","I","MISS","OUT","D","A","O","N","N","H","OUT","D","E","G","G","L","A","OUT","Q",
-            "C","OUT","Q","L","C","MISS","C","C","F","C","OUT","D","A","B","B","E","M","MISS","C","C",
-            "C","B","H","C","C","E","E","E","E","C","MISS","L","A","A","E","E","C","E","E","E",
-            "C","MISS","OUT","C","C","E","G","A","A","B","I","I","A","B","B","OUT","I","A","G","N",
-            "E","D","F","OUT","OUT","C","D","C","MISS","MISS","C","MISS","E","E","C","MISS","OUT","B","L","A",
-            "D","D","O","MISS","B","D","O","D","D","A","A","I","C","MISS","MISS","MISS","A","A","F","E",
-            "C","Q","H","B","B","B")
-
-# ----------------------------------------------------
-# Leadership role ("miss": Information not available)
-Role <- c("aff","aff","aff","miss","aff","boss","miss","boss","boss","aff","aff","aff","aff","aff","aff","aff","aff","miss","aff","boss",
-          "boss","boss","boss","miss","boss","boss","aff","aff","aff","boss","aff","boss","aff","aff","aff","aff","aff","aff","boss","aff",
-          "aff","aff","boss","aff","aff","miss","aff","aff","aff","aff","boss","aff","aff","aff","aff","aff","boss","miss","aff","aff",
-          "aff","aff","boss","boss","boss","aff","boss","aff","aff","boss","miss","aff","aff","boss","boss","aff","aff","aff","aff","aff",
-          "aff","miss","boss","aff","aff","aff","aff","aff","aff","boss","aff","boss","aff","aff","aff","aff","boss","boss","boss","boss",
-          "aff","aff","aff","aff","aff","aff","aff","boss","miss","miss","aff","miss","aff","aff","aff","miss","aff","aff","boss","aff",
-          "aff","aff","aff","miss","aff","aff","boss","aff","boss","aff","aff","aff","aff","miss","miss","miss","aff","aff","boss","aff",
-          "aff","aff","boss","aff","aff","boss")
-
-# Indicators of those suspects who are not known to be part of the organization La Lombardia
-sel_miss <- which(Locale=="MISS" | Locale=="OUT")
-# Remove such suspects from the dataset
-Locale_temp <- Locale[-sel_miss]
-Role_temp <- Role[-sel_miss]
-actors_temp <- actors[-sel_miss]
-actors_temp <- droplevels(actors_temp)
-A <- A[-sel_miss,-sel_miss]
-rownames(A) <- colnames(A) <- c(1:dim(A)[1])
-dim(A)
-# Interaction between Locale and Role
-RoleLocale_temp <- paste(Role_temp,Locale_temp,sep="_")
-
-# Create the dataset used for modeling and inference
-sel <- which(Locale_temp=="A" | Locale_temp=="B" | Locale_temp=="C" | Locale_temp=="D" | Locale_temp=="E")
-CriminalNetwork <- A[sel,sel]
-RoleLocale <- RoleLocale_temp[sel]
-Role <- Role_temp[sel]
-Locale <- Locale_temp[sel]
-actors <- actors_temp[sel]
-actors <- droplevels(actors)
-rownames(CriminalNetwork) <- colnames(CriminalNetwork) <- c(1:dim(CriminalNetwork)[1])
-
-# Define the node attributes
-RDA_criminalNet_A <- c(as.factor(RoleLocale))
-RDA_criminalNet_A<- as.integer(RDA_criminalNet_A)
-RDA_criminalNet_A[which(RDA_criminalNet_A>5)] <- 7
-# Actors with known peripheral roles in locale D
-RDA_criminalNet_A[c(6,8,69,73)]<- 6
-```
-
-The `Rolelocale` above corresponds to the reference clustering throughout the experiments.
-We store the above processed data by:
+The original data was processed by [Legramanti et al. (2022)](https://projecteuclid.org/journals/annals-of-applied-statistics/volume-16/issue-4/Extended-stochastic-block-models-with-application-to-criminal-networks/10.1214/21-AOAS1595.short), and we focus on the processed data available at [GitHub page](https://github.com/danieledurante/ESBM/blob/master/Application/application.md) for implementations.
+Following the processing code therein with just changing the variable names, the processed data is also available at [`Datasets/`] file of this repository and can be directly loaded via:
 
 ``` r
-write.csv(CriminalNetwork,"Datasets/CriminalNet_Y.csv", row.names = FALSE)
-write.csv(RoleLocale,"Datasets/CriminalNet_RoleLocale.csv", row.names = FALSE)
-write.csv(actors,"Datasets/CriminalNet_actors.csv", row.names = FALSE)
-write.csv(Locale,"Datasets/CriminalNet_Locale.csv", row.names = FALSE)
-write.csv(Role,"Datasets/CriminalNet_Role.csv", row.names = FALSE) # "affiliate" or "Boss"
-write.csv(RDA_criminalNet_A,"Datasets/CriminalNet_A.csv", row.names = FALSE)
-```
-
-The data is uploaded at [`Datasets/`] file of this repository and can be directed loaded via:
-
-``` r
-# 'Ndrangheta Mafia Network, Undirected
+# Summit attendance criminality Network, Undirected
 RDA_criminalNet <- list(Y = as.matrix(read.csv("Datasets/CriminalNet_Y.csv",header = TRUE)),
                         RoleLocale = c(as.matrix(read.csv("Datasets/CriminalNet_RoleLocale.csv",header = TRUE))),
                         Actors = c(as.matrix(read.csv("Datasets/CriminalNet_actors.csv",header = TRUE))),
@@ -1338,23 +1248,23 @@ RDA_TrainBombing_UnDirected_ZIPLPCM_unSup_T60k_R1_hat_p_heatmap_draw <- cowplot:
 print(RDA_TrainBombing_UnDirected_ZIPLPCM_unSup_T60k_R1_hat_p_heatmap_draw)
 ```
 
-### 2.4 'Ndrangheta Mafia Network
+### 2.4 Summit attendance criminality Network
 
-The last real network we work on is the **'Ndrangheta Mafia** criminal network.
+The last real network we work on is the **Summit attendance criminality** network.
 This network is an undirected network and exogenous node attributes are available to us, i.e., `RDA_criminalNet$A` which is the one defined in Section 1.3 of this tutorial.
 The implementations and the post-processing follows:
 
 ``` r
-# 'Ndrangheta Mafia undirected real network supervised ZIP-LPCM T = 60000 round 1
+# Summit attendance criminality undirected real network supervised ZIP-LPCM T = 60000 round 1
 set.seed(1)
 start.time <- Sys.time()
-RDA_Infinito_UnDirected_ZIPLPCM_Sup_T60k_R1 <- 
+RDA_CriminalSummit_UnDirected_ZIPLPCM_Sup_T60k_R1 <- 
   MwG_UnDirected_ZIPLPCM(Y = RDA_criminalNet$Y,T = 60000,omega=0.01,alpha1=1,alpha2=0.103,alpha=3,beta1=1,beta2=6,
                          sigma2prop_beta=0.125^2,sigma2prop_U=0.5,d=3,z=1:nrow(RDA_criminalNet$Y),
                          p_eject=0.5,A=RDA_criminalNet$A,omega_c=1)
 end.time <- Sys.time()
-RDA_Infinito_UnDirected_ZIPLPCM_Sup_T60k_R1_time <- end.time - start.time
-RDA_Infinito_UnDirected_ZIPLPCM_Sup_T60k_R1_time
+RDA_CriminalSummit_UnDirected_ZIPLPCM_Sup_T60k_R1_time <- end.time - start.time
+RDA_CriminalSummit_UnDirected_ZIPLPCM_Sup_T60k_R1_time
 # Time difference of 2.744616 hours
 
 #--------------------------------------------------------------------------------------------------------------------------
@@ -1365,107 +1275,107 @@ iteration_after_burn_in <- 30002:60001
 burn_in <- 30001
 
 ## check U acceptance rate
-apply(RDA_Infinito_UnDirected_ZIPLPCM_Sup_T60k_R1$acceptance_count_U[iteration_after_burn_in-1,],2,mean)
-mean(apply(RDA_Infinito_UnDirected_ZIPLPCM_Sup_T60k_R1$acceptance_count_U[iteration_after_burn_in-1,],2,mean)) # 0.2191056
+apply(RDA_CriminalSummit_UnDirected_ZIPLPCM_Sup_T60k_R1$acceptance_count_U[iteration_after_burn_in-1,],2,mean)
+mean(apply(RDA_CriminalSummit_UnDirected_ZIPLPCM_Sup_T60k_R1$acceptance_count_U[iteration_after_burn_in-1,],2,mean)) # 0.2191056
 ## check beta acceptance rate
-mean(RDA_Infinito_UnDirected_ZIPLPCM_Sup_T60k_R1$acceptance_count_beta[iteration_after_burn_in-1]) # 0.2617
+mean(RDA_CriminalSummit_UnDirected_ZIPLPCM_Sup_T60k_R1$acceptance_count_beta[iteration_after_burn_in-1]) # 0.2617
 
 # Apply label switching on the post clustering z
-RDA_Infinito_UnDirected_ZIPLPCM_Sup_T60k_R1_LSz <- matrix(NA,nrow=nrow(RDA_Infinito_UnDirected_ZIPLPCM_Sup_T60k_R1$z),ncol=ncol(RDA_Infinito_UnDirected_ZIPLPCM_Sup_T60k_R1$z))
-RDA_Infinito_UnDirected_ZIPLPCM_Sup_T60k_R1_LSP <- list()
-for (t in 1:nrow(RDA_Infinito_UnDirected_ZIPLPCM_Sup_T60k_R1$z)){
-  LS_temp <- LabelSwitching_SG2003(z = RDA_Infinito_UnDirected_ZIPLPCM_Sup_T60k_R1$z[t,],
-                                   matrix_KbyK = RDA_Infinito_UnDirected_ZIPLPCM_Sup_T60k_R1$P[[t]])
-  RDA_Infinito_UnDirected_ZIPLPCM_Sup_T60k_R1_LSz[t,] <- LS_temp$z
-  RDA_Infinito_UnDirected_ZIPLPCM_Sup_T60k_R1_LSP[[t]] <- LS_temp$matrix_KbyK
+RDA_CriminalSummit_UnDirected_ZIPLPCM_Sup_T60k_R1_LSz <- matrix(NA,nrow=nrow(RDA_CriminalSummit_UnDirected_ZIPLPCM_Sup_T60k_R1$z),ncol=ncol(RDA_CriminalSummit_UnDirected_ZIPLPCM_Sup_T60k_R1$z))
+RDA_CriminalSummit_UnDirected_ZIPLPCM_Sup_T60k_R1_LSP <- list()
+for (t in 1:nrow(RDA_CriminalSummit_UnDirected_ZIPLPCM_Sup_T60k_R1$z)){
+  LS_temp <- LabelSwitching_SG2003(z = RDA_CriminalSummit_UnDirected_ZIPLPCM_Sup_T60k_R1$z[t,],
+                                   matrix_KbyK = RDA_CriminalSummit_UnDirected_ZIPLPCM_Sup_T60k_R1$P[[t]])
+  RDA_CriminalSummit_UnDirected_ZIPLPCM_Sup_T60k_R1_LSz[t,] <- LS_temp$z
+  RDA_CriminalSummit_UnDirected_ZIPLPCM_Sup_T60k_R1_LSP[[t]] <- LS_temp$matrix_KbyK
   if ((t%%1000) == 0){cat("t=",t,"\n")}
 }
 # Apply Procrustes Transform on posterior latent positions U
 library("IMIFA")
-RDA_Infinito_UnDirected_ZIPLPCM_Sup_T60k_R1_PTU <- list()
-for (t in 1:nrow(RDA_Infinito_UnDirected_ZIPLPCM_Sup_T60k_R1$z)){
-  RDA_Infinito_UnDirected_ZIPLPCM_Sup_T60k_R1_PTU[[t]] <-
-    Procrustes(RDA_Infinito_UnDirected_ZIPLPCM_Sup_T60k_R1$U[[t]],
-               RDA_Infinito_UnDirected_ZIPLPCM_Sup_T60k_R1$U[[60001]], translate = TRUE ,dilate = FALSE)$X.new
+RDA_CriminalSummit_UnDirected_ZIPLPCM_Sup_T60k_R1_PTU <- list()
+for (t in 1:nrow(RDA_CriminalSummit_UnDirected_ZIPLPCM_Sup_T60k_R1$z)){
+  RDA_CriminalSummit_UnDirected_ZIPLPCM_Sup_T60k_R1_PTU[[t]] <-
+    Procrustes(RDA_CriminalSummit_UnDirected_ZIPLPCM_Sup_T60k_R1$U[[t]],
+               RDA_CriminalSummit_UnDirected_ZIPLPCM_Sup_T60k_R1$U[[60001]], translate = TRUE ,dilate = FALSE)$X.new
   if ((t%%1000) == 0){cat("t=",t,"\n")}
 }
 
 #--------------------------------------------------------------------------------------------------------------------------
 ## Check complete likelihood for each iteration
-RDA_Infinito_UnDirected_ZIPLPCM_Sup_T60k_R1_LSz_Like <- c()
-for (t in 1:nrow(RDA_Infinito_UnDirected_ZIPLPCM_Sup_T60k_R1$z)){
-  RDA_Infinito_UnDirected_ZIPLPCM_Sup_T60k_R1_LSz_Like <-
-    c(RDA_Infinito_UnDirected_ZIPLPCM_Sup_T60k_R1_LSz_Like,
-      UnDirected_ZIPLPCM_MFM_CompleteLikelihood(X=RDA_Infinito_UnDirected_ZIPLPCM_Sup_T60k_R1$X[[t]],
-                                            U=RDA_Infinito_UnDirected_ZIPLPCM_Sup_T60k_R1_PTU[[t]],
-                                            beta=RDA_Infinito_UnDirected_ZIPLPCM_Sup_T60k_R1$beta[t],
-                                            nu=RDA_Infinito_UnDirected_ZIPLPCM_Sup_T60k_R1$nu[[t]],
-                                            P=RDA_Infinito_UnDirected_ZIPLPCM_Sup_T60k_R1_LSP[[t]],
-                                            z=RDA_Infinito_UnDirected_ZIPLPCM_Sup_T60k_R1_LSz[t,],
+RDA_CriminalSummit_UnDirected_ZIPLPCM_Sup_T60k_R1_LSz_Like <- c()
+for (t in 1:nrow(RDA_CriminalSummit_UnDirected_ZIPLPCM_Sup_T60k_R1$z)){
+  RDA_CriminalSummit_UnDirected_ZIPLPCM_Sup_T60k_R1_LSz_Like <-
+    c(RDA_CriminalSummit_UnDirected_ZIPLPCM_Sup_T60k_R1_LSz_Like,
+      UnDirected_ZIPLPCM_MFM_CompleteLikelihood(X=RDA_CriminalSummit_UnDirected_ZIPLPCM_Sup_T60k_R1$X[[t]],
+                                            U=RDA_CriminalSummit_UnDirected_ZIPLPCM_Sup_T60k_R1_PTU[[t]],
+                                            beta=RDA_CriminalSummit_UnDirected_ZIPLPCM_Sup_T60k_R1$beta[t],
+                                            nu=RDA_CriminalSummit_UnDirected_ZIPLPCM_Sup_T60k_R1$nu[[t]],
+                                            P=RDA_CriminalSummit_UnDirected_ZIPLPCM_Sup_T60k_R1_LSP[[t]],
+                                            z=RDA_CriminalSummit_UnDirected_ZIPLPCM_Sup_T60k_R1_LSz[t,],
                                             alpha1=1,alpha2=0.103,omega=0.01,  alpha=3,
                                             A=RDA_criminalNet$DanieleA,omega_c=1))
   if ((t%%1000) == 0){cat("t=",t,"\n")}
 }
-plot(RDA_Infinito_UnDirected_ZIPLPCM_Sup_T60k_R1_LSz_Like,type = "l",xlab = "",ylab = "", main = "Likelihood",cex.axis = 0.8)
+plot(RDA_CriminalSummit_UnDirected_ZIPLPCM_Sup_T60k_R1_LSz_Like,type = "l",xlab = "",ylab = "", main = "Likelihood",cex.axis = 0.8)
 
 # Check the trace plot of K
-plot(RDA_Infinito_UnDirected_ZIPLPCM_Sup_T60k_R1$K,type = "l",xlab = "",ylab = "", main = "K Trace Plot",cex.axis = 0.8)
+plot(RDA_CriminalSummit_UnDirected_ZIPLPCM_Sup_T60k_R1$K,type = "l",xlab = "",ylab = "", main = "K Trace Plot",cex.axis = 0.8)
 
 #--------------------------------------------------------------------------------------------------------------------------
 # Summarize posterior clustering z by the greedy algorithm proposed by Rastelli and Friel (2018)
 # We start from obtaining the marginal posterior mode of the posterior z chain
-RDA_Infinito_UnDirected_ZIPLPCM_Sup_T60k_R1_LSz_States <- c() # initialize a list which will store different clustering states; the clustering states are labeled from 1,2,3... and are put at the 1st,2nd,3rd... row of the matrix, respectively
-RDA_Infinito_UnDirected_ZIPLPCM_Sup_T60k_R1_LSz_StatesIteration <- list() # store all the t's (iteration number) which provides the same cluster as the clustering state 1,2,3...
-RDA_Infinito_UnDirected_ZIPLPCM_Sup_T60k_R1_LSz_IterationLoop <- iteration_after_burn_in # the "IterationLoop" which stores all the iteration t's which we focus on, that is, all the iteration t's after burn-in
+RDA_CriminalSummit_UnDirected_ZIPLPCM_Sup_T60k_R1_LSz_States <- c() # initialize a list which will store different clustering states; the clustering states are labeled from 1,2,3... and are put at the 1st,2nd,3rd... row of the matrix, respectively
+RDA_CriminalSummit_UnDirected_ZIPLPCM_Sup_T60k_R1_LSz_StatesIteration <- list() # store all the t's (iteration number) which provides the same cluster as the clustering state 1,2,3...
+RDA_CriminalSummit_UnDirected_ZIPLPCM_Sup_T60k_R1_LSz_IterationLoop <- iteration_after_burn_in # the "IterationLoop" which stores all the iteration t's which we focus on, that is, all the iteration t's after burn-in
 StatesLabelIndicator = 0 # initialize the label for the clustering states
-while (length(RDA_Infinito_UnDirected_ZIPLPCM_Sup_T60k_R1_LSz_IterationLoop)!=0){ # if the "IterationLoop" is not empty
+while (length(RDA_CriminalSummit_UnDirected_ZIPLPCM_Sup_T60k_R1_LSz_IterationLoop)!=0){ # if the "IterationLoop" is not empty
   StatesLabelIndicator <- StatesLabelIndicator + 1 # assign the next label to the next clustering state
-  RDA_Infinito_UnDirected_ZIPLPCM_Sup_T60k_R1_LSz_FirstState <- RDA_Infinito_UnDirected_ZIPLPCM_Sup_T60k_R1_LSz[RDA_Infinito_UnDirected_ZIPLPCM_Sup_T60k_R1_LSz_IterationLoop[1],] # extract the first clustering state for the "IterationLoop"
-  RDA_Infinito_UnDirected_ZIPLPCM_Sup_T60k_R1_LSz_States <- rbind(RDA_Infinito_UnDirected_ZIPLPCM_Sup_T60k_R1_LSz_States,
-                                                                              RDA_Infinito_UnDirected_ZIPLPCM_Sup_T60k_R1_LSz_FirstState) # store the first state within the "IterationLoop" with label "StatesLabelIndicator" in the list which will contain all different unique states
-  RDA_Infinito_UnDirected_ZIPLPCM_Sup_T60k_R1_LSz_StatesIteration_temp <- c() # create a vector to temporarily store all the iteration t's whose clustering is the same as the first clustering state within the "IterationLoop"
-  for (t in RDA_Infinito_UnDirected_ZIPLPCM_Sup_T60k_R1_LSz_IterationLoop){ # loop over all the current existing iterations in "IterationLoop"
-    if (sum(RDA_Infinito_UnDirected_ZIPLPCM_Sup_T60k_R1_LSz[t,]==RDA_Infinito_UnDirected_ZIPLPCM_Sup_T60k_R1_LSz_FirstState)==length(RDA_Infinito_UnDirected_ZIPLPCM_Sup_T60k_R1_LSz_FirstState)){ # if the t's clustering is the same as the "FirstState"
-      RDA_Infinito_UnDirected_ZIPLPCM_Sup_T60k_R1_LSz_StatesIteration_temp <- c(RDA_Infinito_UnDirected_ZIPLPCM_Sup_T60k_R1_LSz_StatesIteration_temp,t) # store the iteration t in the temporary vector
+  RDA_CriminalSummit_UnDirected_ZIPLPCM_Sup_T60k_R1_LSz_FirstState <- RDA_CriminalSummit_UnDirected_ZIPLPCM_Sup_T60k_R1_LSz[RDA_CriminalSummit_UnDirected_ZIPLPCM_Sup_T60k_R1_LSz_IterationLoop[1],] # extract the first clustering state for the "IterationLoop"
+  RDA_CriminalSummit_UnDirected_ZIPLPCM_Sup_T60k_R1_LSz_States <- rbind(RDA_CriminalSummit_UnDirected_ZIPLPCM_Sup_T60k_R1_LSz_States,
+                                                                              RDA_CriminalSummit_UnDirected_ZIPLPCM_Sup_T60k_R1_LSz_FirstState) # store the first state within the "IterationLoop" with label "StatesLabelIndicator" in the list which will contain all different unique states
+  RDA_CriminalSummit_UnDirected_ZIPLPCM_Sup_T60k_R1_LSz_StatesIteration_temp <- c() # create a vector to temporarily store all the iteration t's whose clustering is the same as the first clustering state within the "IterationLoop"
+  for (t in RDA_CriminalSummit_UnDirected_ZIPLPCM_Sup_T60k_R1_LSz_IterationLoop){ # loop over all the current existing iterations in "IterationLoop"
+    if (sum(RDA_CriminalSummit_UnDirected_ZIPLPCM_Sup_T60k_R1_LSz[t,]==RDA_CriminalSummit_UnDirected_ZIPLPCM_Sup_T60k_R1_LSz_FirstState)==length(RDA_CriminalSummit_UnDirected_ZIPLPCM_Sup_T60k_R1_LSz_FirstState)){ # if the t's clustering is the same as the "FirstState"
+      RDA_CriminalSummit_UnDirected_ZIPLPCM_Sup_T60k_R1_LSz_StatesIteration_temp <- c(RDA_CriminalSummit_UnDirected_ZIPLPCM_Sup_T60k_R1_LSz_StatesIteration_temp,t) # store the iteration t in the temporary vector
     }
   }
-  RDA_Infinito_UnDirected_ZIPLPCM_Sup_T60k_R1_LSz_StatesIteration[[StatesLabelIndicator]] <- RDA_Infinito_UnDirected_ZIPLPCM_Sup_T60k_R1_LSz_StatesIteration_temp # store all the t's as the list element
-  RDA_Infinito_UnDirected_ZIPLPCM_Sup_T60k_R1_LSz_IterationLoop <-
-    (iteration_after_burn_in)[-(unlist(RDA_Infinito_UnDirected_ZIPLPCM_Sup_T60k_R1_LSz_StatesIteration)-burn_in)] # remove all the iterations we have stored and then move to the next clustering state
+  RDA_CriminalSummit_UnDirected_ZIPLPCM_Sup_T60k_R1_LSz_StatesIteration[[StatesLabelIndicator]] <- RDA_CriminalSummit_UnDirected_ZIPLPCM_Sup_T60k_R1_LSz_StatesIteration_temp # store all the t's as the list element
+  RDA_CriminalSummit_UnDirected_ZIPLPCM_Sup_T60k_R1_LSz_IterationLoop <-
+    (iteration_after_burn_in)[-(unlist(RDA_CriminalSummit_UnDirected_ZIPLPCM_Sup_T60k_R1_LSz_StatesIteration)-burn_in)] # remove all the iterations we have stored and then move to the next clustering state
 }
-rownames(RDA_Infinito_UnDirected_ZIPLPCM_Sup_T60k_R1_LSz_States) <- NULL
-nrow(RDA_Infinito_UnDirected_ZIPLPCM_Sup_T60k_R1_LSz_States) # check the number of different clustering states
-RDA_Infinito_UnDirected_ZIPLPCM_Sup_T60k_R1_LSz_StatesFrequency <- c() # check the number of times one clustering state occurs
-for (t in 1:nrow(RDA_Infinito_UnDirected_ZIPLPCM_Sup_T60k_R1_LSz_States)){
-  RDA_Infinito_UnDirected_ZIPLPCM_Sup_T60k_R1_LSz_StatesFrequency <-
-    c(RDA_Infinito_UnDirected_ZIPLPCM_Sup_T60k_R1_LSz_StatesFrequency,
-      length(RDA_Infinito_UnDirected_ZIPLPCM_Sup_T60k_R1_LSz_StatesIteration[[t]]))
+rownames(RDA_CriminalSummit_UnDirected_ZIPLPCM_Sup_T60k_R1_LSz_States) <- NULL
+nrow(RDA_CriminalSummit_UnDirected_ZIPLPCM_Sup_T60k_R1_LSz_States) # check the number of different clustering states
+RDA_CriminalSummit_UnDirected_ZIPLPCM_Sup_T60k_R1_LSz_StatesFrequency <- c() # check the number of times one clustering state occurs
+for (t in 1:nrow(RDA_CriminalSummit_UnDirected_ZIPLPCM_Sup_T60k_R1_LSz_States)){
+  RDA_CriminalSummit_UnDirected_ZIPLPCM_Sup_T60k_R1_LSz_StatesFrequency <-
+    c(RDA_CriminalSummit_UnDirected_ZIPLPCM_Sup_T60k_R1_LSz_StatesFrequency,
+      length(RDA_CriminalSummit_UnDirected_ZIPLPCM_Sup_T60k_R1_LSz_StatesIteration[[t]]))
 }
-RDA_Infinito_UnDirected_ZIPLPCM_Sup_T60k_R1_LSz_StatesFrequency
-sort(RDA_Infinito_UnDirected_ZIPLPCM_Sup_T60k_R1_LSz_StatesFrequency,decreasing=TRUE) # check the clustering state frequency in decreasing order
-order(RDA_Infinito_UnDirected_ZIPLPCM_Sup_T60k_R1_LSz_StatesFrequency,decreasing=TRUE) # check the corresponding positions
-which.max(RDA_Infinito_UnDirected_ZIPLPCM_Sup_T60k_R1_LSz_StatesFrequency) # find the marginal posterior mode, i.e. the most frequent clustering state
-RDA_Infinito_UnDirected_ZIPLPCM_Sup_T60k_R1_LSz_StatesFrequency[which.max(RDA_Infinito_UnDirected_ZIPLPCM_Sup_T60k_R1_LSz_StatesFrequency)] # Find the most frequency
+RDA_CriminalSummit_UnDirected_ZIPLPCM_Sup_T60k_R1_LSz_StatesFrequency
+sort(RDA_CriminalSummit_UnDirected_ZIPLPCM_Sup_T60k_R1_LSz_StatesFrequency,decreasing=TRUE) # check the clustering state frequency in decreasing order
+order(RDA_CriminalSummit_UnDirected_ZIPLPCM_Sup_T60k_R1_LSz_StatesFrequency,decreasing=TRUE) # check the corresponding positions
+which.max(RDA_CriminalSummit_UnDirected_ZIPLPCM_Sup_T60k_R1_LSz_StatesFrequency) # find the marginal posterior mode, i.e. the most frequent clustering state
+RDA_CriminalSummit_UnDirected_ZIPLPCM_Sup_T60k_R1_LSz_StatesFrequency[which.max(RDA_CriminalSummit_UnDirected_ZIPLPCM_Sup_T60k_R1_LSz_StatesFrequency)] # Find the most frequency
 library(GreedyEPL) # obtain the summarized z by the greedy algorithm proposed by Rastelli and Friel (2018)
-output <- MinimiseEPL(RDA_Infinito_UnDirected_ZIPLPCM_Sup_T60k_R1_LSz[iteration_after_burn_in,],
-                      list(Kup = 20, loss_type = "VI",decision_init = RDA_Infinito_UnDirected_ZIPLPCM_Sup_T60k_R1_LSz_States[
-                        which.max(RDA_Infinito_UnDirected_ZIPLPCM_Sup_T60k_R1_LSz_StatesFrequency),]))
+output <- MinimiseEPL(RDA_CriminalSummit_UnDirected_ZIPLPCM_Sup_T60k_R1_LSz[iteration_after_burn_in,],
+                      list(Kup = 20, loss_type = "VI",decision_init = RDA_CriminalSummit_UnDirected_ZIPLPCM_Sup_T60k_R1_LSz_States[
+                        which.max(RDA_CriminalSummit_UnDirected_ZIPLPCM_Sup_T60k_R1_LSz_StatesFrequency),]))
 table(output$decision,RDA_criminalNet$OurA,dnn = c("","")) # check whether the the output is the same as the marginal posterior mode
 output$EPL # check minEVI posterior loss: 0.2661251
-RDA_Infinito_UnDirected_ZIPLPCM_Sup_T60k_R1_hat_z <- output$decision # Save output as summarized z
+RDA_CriminalSummit_UnDirected_ZIPLPCM_Sup_T60k_R1_hat_z <- output$decision # Save output as summarized z
 
 
 #--------------------------------------------------------------------------------------------------------------------------
 # Obtain summarized U
-RDA_Infinito_UnDirected_ZIPLPCM_Sup_T60k_R1_LSz_hat_zIteration <- # extract all the iterations whose clustering is identical to hat_z
-  RDA_Infinito_UnDirected_ZIPLPCM_Sup_T60k_R1_LSz_StatesIteration[[
-    which(apply(t(RDA_Infinito_UnDirected_ZIPLPCM_Sup_T60k_R1_LSz_States)==
-                  RDA_Infinito_UnDirected_ZIPLPCM_Sup_T60k_R1_hat_z,2,sum)==length(RDA_Infinito_UnDirected_ZIPLPCM_Sup_T60k_R1_hat_z))
+RDA_CriminalSummit_UnDirected_ZIPLPCM_Sup_T60k_R1_LSz_hat_zIteration <- # extract all the iterations whose clustering is identical to hat_z
+  RDA_CriminalSummit_UnDirected_ZIPLPCM_Sup_T60k_R1_LSz_StatesIteration[[
+    which(apply(t(RDA_CriminalSummit_UnDirected_ZIPLPCM_Sup_T60k_R1_LSz_States)==
+                  RDA_CriminalSummit_UnDirected_ZIPLPCM_Sup_T60k_R1_hat_z,2,sum)==length(RDA_CriminalSummit_UnDirected_ZIPLPCM_Sup_T60k_R1_hat_z))
   ]]
-RDA_Infinito_UnDirected_ZIPLPCM_Sup_T60k_R1_MaxLikeHatz_iteration <- RDA_Infinito_UnDirected_ZIPLPCM_Sup_T60k_R1_LSz_hat_zIteration[
-  which.max(RDA_Infinito_UnDirected_ZIPLPCM_Sup_T60k_R1_LSz_Like[RDA_Infinito_UnDirected_ZIPLPCM_Sup_T60k_R1_LSz_hat_zIteration])]
-RDA_Infinito_UnDirected_ZIPLPCM_Sup_T60k_R1_hat_U <-
-  RDA_Infinito_UnDirected_ZIPLPCM_Sup_T60k_R1_PTU[[RDA_Infinito_UnDirected_ZIPLPCM_Sup_T60k_R1_MaxLikeHatz_iteration]]
+RDA_CriminalSummit_UnDirected_ZIPLPCM_Sup_T60k_R1_MaxLikeHatz_iteration <- RDA_CriminalSummit_UnDirected_ZIPLPCM_Sup_T60k_R1_LSz_hat_zIteration[
+  which.max(RDA_CriminalSummit_UnDirected_ZIPLPCM_Sup_T60k_R1_LSz_Like[RDA_CriminalSummit_UnDirected_ZIPLPCM_Sup_T60k_R1_LSz_hat_zIteration])]
+RDA_CriminalSummit_UnDirected_ZIPLPCM_Sup_T60k_R1_hat_U <-
+  RDA_CriminalSummit_UnDirected_ZIPLPCM_Sup_T60k_R1_PTU[[RDA_CriminalSummit_UnDirected_ZIPLPCM_Sup_T60k_R1_MaxLikeHatz_iteration]]
 ```
 
 Provided with the reference clustering $`\boldsymbol{z}^*`$, i.e., the role-locale information stored as `RDA_criminalNet$RoleLocale`, as well as the summarized latent positions $\hat{\boldsymbol{U}}$, we first obtain the 3-dimensional interactive plot of $\hat{\boldsymbol{U}}$ plotting along with the $`\boldsymbol{z}^*`$.
@@ -1488,9 +1398,9 @@ VertexSize <- sqrt(betw/1.5+mean(betw))*1.25
 library("plotly")
 # Plot the reference clustering z* and hat_U
 fig <- plot_ly() %>%
-  add_markers(x = RDA_Infinito_UnDirected_ZIPLPCM_Sup_T60k_R1_hat_U[,1],
-              y = RDA_Infinito_UnDirected_ZIPLPCM_Sup_T60k_R1_hat_U[,2],
-              z = RDA_Infinito_UnDirected_ZIPLPCM_Sup_T60k_R1_hat_U[,3],
+  add_markers(x = RDA_CriminalSummit_UnDirected_ZIPLPCM_Sup_T60k_R1_hat_U[,1],
+              y = RDA_CriminalSummit_UnDirected_ZIPLPCM_Sup_T60k_R1_hat_U[,2],
+              z = RDA_CriminalSummit_UnDirected_ZIPLPCM_Sup_T60k_R1_hat_U[,3],
               text=paste("Node:",1:nrow(RDA_criminalNet$Y),"<br>z*:",RDA_criminalNet$RoleLocale,"<br>c:",RDA_criminalNet$A),
               size=VertexSize,sizes=c(200,400),
               color=as.factor(RDA_criminalNet$RoleLocale),colors=My_colors[1:10],
@@ -1500,9 +1410,9 @@ fig <- plot_ly() %>%
 Edges <- get.edgelist(g_obs)
 for (i in 1:nrow(Edges)){
   fig <- fig %>%
-    add_trace(x = RDA_Infinito_UnDirected_ZIPLPCM_Sup_T60k_R1_hat_U[Edges[i,],1],
-              y = RDA_Infinito_UnDirected_ZIPLPCM_Sup_T60k_R1_hat_U[Edges[i,],2],
-              z = RDA_Infinito_UnDirected_ZIPLPCM_Sup_T60k_R1_hat_U[Edges[i,],3],
+    add_trace(x = RDA_CriminalSummit_UnDirected_ZIPLPCM_Sup_T60k_R1_hat_U[Edges[i,],1],
+              y = RDA_CriminalSummit_UnDirected_ZIPLPCM_Sup_T60k_R1_hat_U[Edges[i,],2],
+              z = RDA_CriminalSummit_UnDirected_ZIPLPCM_Sup_T60k_R1_hat_U[Edges[i,],3],
               text=paste("Weight:",E(g_obs)$weight[i]),
               type = "scatter3d", mode = "lines", showlegend = FALSE,line = list(color = E(g_obs)$color[i], width = 0.5*E(g_obs)$weight[i]))
 }
@@ -1510,30 +1420,30 @@ fig <- fig %>% layout(title = "hat_U and z*",scene = list(xaxis = list(title = '
 fig
 ```
 
-The 3-d interactive plot of the $\hat{\boldsymbol{U}}$ and $`\boldsymbol{z}^*`$ is available at [`/Interactive 3-d latent positions plots/RDA_NdranghetaMafia_InteractivePlot_Ref_z.html`] of this repository.
+The 3-d interactive plot of the $\hat{\boldsymbol{U}}$ and $`\boldsymbol{z}^*`$ is available at [`/Interactive 3-d latent positions plots/RDA_CriminalSummit_InteractivePlot_Ref_z.html`] of this repository.
 Different from the 3-d interactive plots we show in the previous sections, if the readers put the mouse pointer on each node of the interactive plot, the comment bracket will also show the exogenous node attributes $\boldsymbol{c}$ we used in practice in our experiments.
-Note that the **Windsurfers**, **Train Bombing** and the **'Ndrangheta Mafia** networks are undirected networks, the comment bracket of each edge in the 3-d interactive plots no longer show the direction of the edge.
+Note that the **Windsurfers**, **Train Bombing** and the **Summit attendance criminality** networks are undirected networks, the comment bracket of each edge in the 3-d interactive plots no longer show the direction of the edge.
 
-Similarly, the 3-d interactive plot of the $\hat{\boldsymbol{U}}$ and $\hat{\boldsymbol{z}}$ is available to be downloaded at [`/Interactive 3-d latent positions plots/RDA_NdranghetaMafia_InteractivePlot_Hat_z.html`] of this repository, and can be reproduced following the code:
+Similarly, the 3-d interactive plot of the $\hat{\boldsymbol{U}}$ and $\hat{\boldsymbol{z}}$ is available to be downloaded at [`/Interactive 3-d latent positions plots/RDA_CriminalSummit_InteractivePlot_Hat_z.html`] of this repository, and can be reproduced following the code:
 
 ``` r
 # Plot the hat_z and hat_U
 fig <- plot_ly() %>%
-  add_markers(x = RDA_Infinito_UnDirected_ZIPLPCM_Sup_T60k_R1_hat_U[,1],
-              y = RDA_Infinito_UnDirected_ZIPLPCM_Sup_T60k_R1_hat_U[,2],
-              z = RDA_Infinito_UnDirected_ZIPLPCM_Sup_T60k_R1_hat_U[,3],
+  add_markers(x = RDA_CriminalSummit_UnDirected_ZIPLPCM_Sup_T60k_R1_hat_U[,1],
+              y = RDA_CriminalSummit_UnDirected_ZIPLPCM_Sup_T60k_R1_hat_U[,2],
+              z = RDA_CriminalSummit_UnDirected_ZIPLPCM_Sup_T60k_R1_hat_U[,3],
               text=paste("Node:",1:nrow(RDA_criminalNet$Y),"<br>z*:",RDA_criminalNet$RoleLocale,"<br>c:",RDA_criminalNet$A),
               size=VertexSize,sizes=c(200,400),
-              color=as.factor(RDA_Infinito_UnDirected_ZIPLPCM_Sup_T60k_R1_hat_z),colors=My_colors[c(3,1,6,9,4,5,7,10,8,2)],
+              color=as.factor(RDA_CriminalSummit_UnDirected_ZIPLPCM_Sup_T60k_R1_hat_z),colors=My_colors[c(3,1,6,9,4,5,7,10,8,2)],
               stroke = I("black"), span = I(1),
               symbol=as.factor(RDA_criminalNet$role),symbols = c("circle","square")
   )
 Edges <- get.edgelist(g_obs)
 for (i in 1:nrow(Edges)){
   fig <- fig %>%
-    add_trace(x = RDA_Infinito_UnDirected_ZIPLPCM_Sup_T60k_R1_hat_U[Edges[i,],1],
-              y = RDA_Infinito_UnDirected_ZIPLPCM_Sup_T60k_R1_hat_U[Edges[i,],2],
-              z = RDA_Infinito_UnDirected_ZIPLPCM_Sup_T60k_R1_hat_U[Edges[i,],3],
+    add_trace(x = RDA_CriminalSummit_UnDirected_ZIPLPCM_Sup_T60k_R1_hat_U[Edges[i,],1],
+              y = RDA_CriminalSummit_UnDirected_ZIPLPCM_Sup_T60k_R1_hat_U[Edges[i,],2],
+              z = RDA_CriminalSummit_UnDirected_ZIPLPCM_Sup_T60k_R1_hat_U[Edges[i,],3],
               text=paste("Weight:",E(g_obs)$weight[i]),
               type = "scatter3d", mode = "lines", showlegend = FALSE,line = list(color = E(g_obs)$color[i], width = 0.5*E(g_obs)$weight[i]))
 }
@@ -1548,22 +1458,22 @@ Thus we can check within how many posterior samples of clustering each pair of t
 ``` r
 ### Check clustering of the heterogeneous bosses after burn-in
 ## Check how often orange boss 41 and blue boss 53 in the same group
-sum((RDA_Infinito_UnDirected_ZIPLPCM_Sup_T60k_R1_LSz[iteration_after_burn_in,41]==
-       RDA_Infinito_UnDirected_ZIPLPCM_Sup_T60k_R1_LSz[iteration_after_burn_in,53]))/length(iteration_after_burn_in)
+sum((RDA_CriminalSummit_UnDirected_ZIPLPCM_Sup_T60k_R1_LSz[iteration_after_burn_in,41]==
+       RDA_CriminalSummit_UnDirected_ZIPLPCM_Sup_T60k_R1_LSz[iteration_after_burn_in,53]))/length(iteration_after_burn_in)
 # 0.6912667
 ## Check how often green boss 38 and blue boss 53 in the same group
-sum((RDA_Infinito_UnDirected_ZIPLPCM_Sup_T60k_R1_LSz[iteration_after_burn_in,38]==
-       RDA_Infinito_UnDirected_ZIPLPCM_Sup_T60k_R1_LSz[iteration_after_burn_in,53]))/length(iteration_after_burn_in)
+sum((RDA_CriminalSummit_UnDirected_ZIPLPCM_Sup_T60k_R1_LSz[iteration_after_burn_in,38]==
+       RDA_CriminalSummit_UnDirected_ZIPLPCM_Sup_T60k_R1_LSz[iteration_after_burn_in,53]))/length(iteration_after_burn_in)
 # 0.2982667
 ## Check how often green boss 38 and orange boss 41 in the same group
-sum((RDA_Infinito_UnDirected_ZIPLPCM_Sup_T60k_R1_LSz[iteration_after_burn_in,38]==
-       RDA_Infinito_UnDirected_ZIPLPCM_Sup_T60k_R1_LSz[iteration_after_burn_in,41]))/length(iteration_after_burn_in)
+sum((RDA_CriminalSummit_UnDirected_ZIPLPCM_Sup_T60k_R1_LSz[iteration_after_burn_in,38]==
+       RDA_CriminalSummit_UnDirected_ZIPLPCM_Sup_T60k_R1_LSz[iteration_after_burn_in,41]))/length(iteration_after_burn_in)
 # 0.002133333
 ## Check how often green boss 38 and orange boss 41 and blue boss 53 in the same group
-sum((RDA_Infinito_UnDirected_ZIPLPCM_Sup_T60k_R1_LSz[iteration_after_burn_in,38]==
-       RDA_Infinito_UnDirected_ZIPLPCM_Sup_T60k_R1_LSz[iteration_after_burn_in,41])*
-      (RDA_Infinito_UnDirected_ZIPLPCM_Sup_T60k_R1_LSz[iteration_after_burn_in,38]==
-         RDA_Infinito_UnDirected_ZIPLPCM_Sup_T60k_R1_LSz[iteration_after_burn_in,53]))/length(iteration_after_burn_in)
+sum((RDA_CriminalSummit_UnDirected_ZIPLPCM_Sup_T60k_R1_LSz[iteration_after_burn_in,38]==
+       RDA_CriminalSummit_UnDirected_ZIPLPCM_Sup_T60k_R1_LSz[iteration_after_burn_in,41])*
+      (RDA_CriminalSummit_UnDirected_ZIPLPCM_Sup_T60k_R1_LSz[iteration_after_burn_in,38]==
+         RDA_CriminalSummit_UnDirected_ZIPLPCM_Sup_T60k_R1_LSz[iteration_after_burn_in,53]))/length(iteration_after_burn_in)
 # 0.002133333
 ```
 
@@ -1573,8 +1483,8 @@ The green boss node no.38 is not likely to be within the core of the orange loca
 
 ``` r
 ## Check how often another orange boss 35 and green boss 38 in the same group
-sum((RDA_Infinito_UnDirected_ZIPLPCM_Sup_T60k_R1_LSz[iteration_after_burn_in,38]==
-       RDA_Infinito_UnDirected_ZIPLPCM_Sup_T60k_R1_LSz[iteration_after_burn_in,35]))/length(iteration_after_burn_in)
+sum((RDA_CriminalSummit_UnDirected_ZIPLPCM_Sup_T60k_R1_LSz[iteration_after_burn_in,38]==
+       RDA_CriminalSummit_UnDirected_ZIPLPCM_Sup_T60k_R1_LSz[iteration_after_burn_in,35]))/length(iteration_after_burn_in)
 # 0.9975
 ```
 
@@ -1584,9 +1494,9 @@ The **Figure 13** illustrated in the **ZIP-LPCM** paper can be reproduced by:
 # First plot the reference clustering z* and hat_U
 # Plot the front angle of the latent positions
 fig1 <- plot_ly(scene ="scene1") %>%
-  add_markers(x = RDA_Infinito_UnDirected_ZIPLPCM_Sup_T60k_R1_hat_U[,1],
-              y = RDA_Infinito_UnDirected_ZIPLPCM_Sup_T60k_R1_hat_U[,2],
-              z = RDA_Infinito_UnDirected_ZIPLPCM_Sup_T60k_R1_hat_U[,3],
+  add_markers(x = RDA_CriminalSummit_UnDirected_ZIPLPCM_Sup_T60k_R1_hat_U[,1],
+              y = RDA_CriminalSummit_UnDirected_ZIPLPCM_Sup_T60k_R1_hat_U[,2],
+              z = RDA_CriminalSummit_UnDirected_ZIPLPCM_Sup_T60k_R1_hat_U[,3],
               text=paste("Node:",1:nrow(RDA_criminalNet$Y),"<br>z*:",RDA_criminalNet$RoleLocale,"<br>c:",RDA_criminalNet$A),
               size=VertexSize,sizes=c(200,400), showlegend = FALSE,
               color=as.factor(RDA_criminalNet$RoleLocale),colors=My_colors[1:10],
@@ -1596,18 +1506,18 @@ fig1 <- plot_ly(scene ="scene1") %>%
 Edges <- get.edgelist(g_obs)
 for (i in 1:nrow(Edges)){
   fig1 <- fig1 %>%
-    add_trace(x = RDA_Infinito_UnDirected_ZIPLPCM_Sup_T60k_R1_hat_U[Edges[i,],1],
-              y = RDA_Infinito_UnDirected_ZIPLPCM_Sup_T60k_R1_hat_U[Edges[i,],2],
-              z = RDA_Infinito_UnDirected_ZIPLPCM_Sup_T60k_R1_hat_U[Edges[i,],3],
+    add_trace(x = RDA_CriminalSummit_UnDirected_ZIPLPCM_Sup_T60k_R1_hat_U[Edges[i,],1],
+              y = RDA_CriminalSummit_UnDirected_ZIPLPCM_Sup_T60k_R1_hat_U[Edges[i,],2],
+              z = RDA_CriminalSummit_UnDirected_ZIPLPCM_Sup_T60k_R1_hat_U[Edges[i,],3],
               text=paste("Weight:",E(g_obs)$weight[i]),
               type = "scatter3d", mode = "lines", showlegend = FALSE,line = list(color = E(g_obs)$color[i], width = 0.5*E(g_obs)$weight[i]))
 }
 
 # Plot the right angle of the latent positions
 fig2 <- plot_ly(scene ="scene2") %>%
-  add_markers(x = RDA_Infinito_UnDirected_ZIPLPCM_Sup_T60k_R1_hat_U[,1],
-              y = RDA_Infinito_UnDirected_ZIPLPCM_Sup_T60k_R1_hat_U[,2],
-              z = RDA_Infinito_UnDirected_ZIPLPCM_Sup_T60k_R1_hat_U[,3],
+  add_markers(x = RDA_CriminalSummit_UnDirected_ZIPLPCM_Sup_T60k_R1_hat_U[,1],
+              y = RDA_CriminalSummit_UnDirected_ZIPLPCM_Sup_T60k_R1_hat_U[,2],
+              z = RDA_CriminalSummit_UnDirected_ZIPLPCM_Sup_T60k_R1_hat_U[,3],
               text=paste("Node:",1:nrow(RDA_criminalNet$Y),"<br>z*:",RDA_criminalNet$RoleLocale,"<br>c:",RDA_criminalNet$A),
               size=VertexSize,sizes=c(200,400),showlegend = FALSE,
               color=as.factor(RDA_criminalNet$RoleLocale),colors=My_colors[1:10],
@@ -1617,9 +1527,9 @@ fig2 <- plot_ly(scene ="scene2") %>%
 Edges <- get.edgelist(g_obs)
 for (i in 1:nrow(Edges)){
   fig2 <- fig2 %>%
-    add_trace(x = RDA_Infinito_UnDirected_ZIPLPCM_Sup_T60k_R1_hat_U[Edges[i,],1],
-              y = RDA_Infinito_UnDirected_ZIPLPCM_Sup_T60k_R1_hat_U[Edges[i,],2],
-              z = RDA_Infinito_UnDirected_ZIPLPCM_Sup_T60k_R1_hat_U[Edges[i,],3],
+    add_trace(x = RDA_CriminalSummit_UnDirected_ZIPLPCM_Sup_T60k_R1_hat_U[Edges[i,],1],
+              y = RDA_CriminalSummit_UnDirected_ZIPLPCM_Sup_T60k_R1_hat_U[Edges[i,],2],
+              z = RDA_CriminalSummit_UnDirected_ZIPLPCM_Sup_T60k_R1_hat_U[Edges[i,],3],
               text=paste("Weight:",E(g_obs)$weight[i]),
               type = "scatter3d", mode = "lines", showlegend = FALSE,line = list(color = E(g_obs)$color[i], width = 0.5*E(g_obs)$weight[i]))
 }
@@ -1635,49 +1545,49 @@ Fig1 <- Fig1 %>% layout(title = "", margin = list(l = 0,r = 0,b = 0,t = 0,pad = 
                                       camera = list(eye = list(x = -1.50*sqrt(3)/2, y = 1.50/2, z = 0.50)),
                                       aspectmode='auto'))
 # Fig1
-orca(Fig1, "RDA_Infinito_hat_U_RoleLocale.pdf",scale=1,width=1800,height=850)
+orca(Fig1, "RDA_CriminalSummit_hat_U_RoleLocale.pdf",scale=1,width=1800,height=850)
 
 #--------------------------------------------------------------------------------------------------------------------------
 # Then plot the summarized clustering hat_z and hat_U
 
 # Plot the front angle of the latent positions
 fig3 <- plot_ly(scene ="scene3") %>%
-  add_markers(x = RDA_Infinito_UnDirected_ZIPLPCM_Sup_T60k_R1_hat_U[,1],
-              y = RDA_Infinito_UnDirected_ZIPLPCM_Sup_T60k_R1_hat_U[,2],
-              z = RDA_Infinito_UnDirected_ZIPLPCM_Sup_T60k_R1_hat_U[,3],
+  add_markers(x = RDA_CriminalSummit_UnDirected_ZIPLPCM_Sup_T60k_R1_hat_U[,1],
+              y = RDA_CriminalSummit_UnDirected_ZIPLPCM_Sup_T60k_R1_hat_U[,2],
+              z = RDA_CriminalSummit_UnDirected_ZIPLPCM_Sup_T60k_R1_hat_U[,3],
               text=paste("Node:",1:nrow(RDA_criminalNet$Y),"<br>z*:",RDA_criminalNet$RoleLocale,"<br>c:",RDA_criminalNet$A),
               size=VertexSize,sizes=c(200,400),showlegend = FALSE,
-              color=as.factor(RDA_Infinito_UnDirected_ZIPLPCM_Sup_T60k_R1_hat_z),colors=My_colors[c(3,1,6,9,4,5,7,10,8,2)],
+              color=as.factor(RDA_CriminalSummit_UnDirected_ZIPLPCM_Sup_T60k_R1_hat_z),colors=My_colors[c(3,1,6,9,4,5,7,10,8,2)],
               stroke = I("black"), span = I(1),
               symbol=as.factor(RDA_criminalNet$role),symbols = c("circle","square")
   )
 Edges <- get.edgelist(g_obs)
 for (i in 1:nrow(Edges)){
   fig3 <- fig3 %>%
-    add_trace(x = RDA_Infinito_UnDirected_ZIPLPCM_Sup_T60k_R1_hat_U[Edges[i,],1],
-              y = RDA_Infinito_UnDirected_ZIPLPCM_Sup_T60k_R1_hat_U[Edges[i,],2],
-              z = RDA_Infinito_UnDirected_ZIPLPCM_Sup_T60k_R1_hat_U[Edges[i,],3],
+    add_trace(x = RDA_CriminalSummit_UnDirected_ZIPLPCM_Sup_T60k_R1_hat_U[Edges[i,],1],
+              y = RDA_CriminalSummit_UnDirected_ZIPLPCM_Sup_T60k_R1_hat_U[Edges[i,],2],
+              z = RDA_CriminalSummit_UnDirected_ZIPLPCM_Sup_T60k_R1_hat_U[Edges[i,],3],
               text=paste("Weight:",E(g_obs)$weight[i]),
               type = "scatter3d", mode = "lines", showlegend = FALSE,line = list(color = E(g_obs)$color[i], width = 0.5*E(g_obs)$weight[i]))
 }
 
 # Plot the right angle of the latent positions
 fig4 <- plot_ly(scene ="scene4") %>% # plot the hat_z and hat_U
-  add_markers(x = RDA_Infinito_UnDirected_ZIPLPCM_Sup_T60k_R1_hat_U[,1],
-              y = RDA_Infinito_UnDirected_ZIPLPCM_Sup_T60k_R1_hat_U[,2],
-              z = RDA_Infinito_UnDirected_ZIPLPCM_Sup_T60k_R1_hat_U[,3],
+  add_markers(x = RDA_CriminalSummit_UnDirected_ZIPLPCM_Sup_T60k_R1_hat_U[,1],
+              y = RDA_CriminalSummit_UnDirected_ZIPLPCM_Sup_T60k_R1_hat_U[,2],
+              z = RDA_CriminalSummit_UnDirected_ZIPLPCM_Sup_T60k_R1_hat_U[,3],
               text=paste("Node:",1:nrow(RDA_criminalNet$Y),"<br>z*:",RDA_criminalNet$RoleLocale,"<br>c:",RDA_criminalNet$A),
               size=VertexSize,sizes=c(200,400),showlegend = FALSE,
-              color=as.factor(RDA_Infinito_UnDirected_ZIPLPCM_Sup_T60k_R1_hat_z),colors=My_colors[c(3,1,6,9,4,5,7,10,8,2)],
+              color=as.factor(RDA_CriminalSummit_UnDirected_ZIPLPCM_Sup_T60k_R1_hat_z),colors=My_colors[c(3,1,6,9,4,5,7,10,8,2)],
               stroke = I("black"), span = I(1),
               symbol=as.factor(RDA_criminalNet$role),symbols = c("circle","square")
   )
 Edges <- get.edgelist(g_obs)
 for (i in 1:nrow(Edges)){
   fig4 <- fig4 %>%
-    add_trace(x = RDA_Infinito_UnDirected_ZIPLPCM_Sup_T60k_R1_hat_U[Edges[i,],1],
-              y = RDA_Infinito_UnDirected_ZIPLPCM_Sup_T60k_R1_hat_U[Edges[i,],2],
-              z = RDA_Infinito_UnDirected_ZIPLPCM_Sup_T60k_R1_hat_U[Edges[i,],3],
+    add_trace(x = RDA_CriminalSummit_UnDirected_ZIPLPCM_Sup_T60k_R1_hat_U[Edges[i,],1],
+              y = RDA_CriminalSummit_UnDirected_ZIPLPCM_Sup_T60k_R1_hat_U[Edges[i,],2],
+              z = RDA_CriminalSummit_UnDirected_ZIPLPCM_Sup_T60k_R1_hat_U[Edges[i,],3],
               text=paste("Weight:",E(g_obs)$weight[i]),
               type = "scatter3d", mode = "lines", showlegend = FALSE,line = list(color = E(g_obs)$color[i], width = 0.5*E(g_obs)$weight[i]))
 }
@@ -1692,59 +1602,59 @@ Fig2 <- Fig2 %>% layout(title = "", margin = list(l = 0,r = 0,b = 0,t = 0,pad = 
                                       camera = list(eye = list(x = -1.50*sqrt(3)/2, y = 1.50/2, z = 0.50)),
                                       aspectmode='auto'))
 # Fig2
-orca(Fig2, "RDA_Infinito_hat_U_hat_z.pdf",scale=1,width=1800,height=850)
+orca(Fig2, "RDA_CriminalSummit_hat_U_hat_z.pdf",scale=1,width=1800,height=850)
 ```
 
 Similar to all the previous experiments, we can following the code below to obtain the summary statistics: (i) the posterior mean of intercept $\hat{\beta}$; (ii) the posterior mean of unusual zero indicator $\hat{\boldsymbol{\nu}}$ which approximates the conditional probability of missing zeros provided that the corresponding interactions are zeros, i.e., the `P_m0` we denote in the code and the equation (22) of the **ZIP-LPCM** paper; (iii) the individual-level unusual probability $\boldsymbol{p}$ which is a $N \times N$ matrix with each entry $i,j$ being the $p_{z_iz_j}$ for each posterior state, and thus the posterior mean brings the $\hat{\boldsymbol{p}}$ accounting for the uncertainty of the posterior clustering; (iv) the individual-level Poisson rate $N \times N$ matrix `lambda` we denote in the code with each entry being the $\lambda_{ij}=\text{exp}(\beta-||\boldsymbol{u_i}-\boldsymbol{u_j}||)$ obtained by the corresponding $\beta$ and $\boldsymbol{U}$ for each posterior state, and the corresponding posterior mean `hat_lambda` can thus be obtained.
 
 ``` r
 ## Summarize beta
-RDA_Infinito_UnDirected_ZIPLPCM_Sup_T60k_R1_hat_beta <-
-  mean(RDA_Infinito_UnDirected_ZIPLPCM_Sup_T60k_R1$beta[iteration_after_burn_in])
-RDA_Infinito_UnDirected_ZIPLPCM_Sup_T60k_R1_hat_beta # 2.169797
+RDA_CriminalSummit_UnDirected_ZIPLPCM_Sup_T60k_R1_hat_beta <-
+  mean(RDA_CriminalSummit_UnDirected_ZIPLPCM_Sup_T60k_R1$beta[iteration_after_burn_in])
+RDA_CriminalSummit_UnDirected_ZIPLPCM_Sup_T60k_R1_hat_beta # 2.169797
 #--------------------------------------------------------------------------------------------------------------------------
 ## Obtain posterior mean of nu, i.e. approximated P_m0
-RDA_Infinito_UnDirected_ZIPLPCM_Sup_T60k_R1_hat_nu <-
-  Reduce("+",RDA_Infinito_UnDirected_ZIPLPCM_Sup_T60k_R1$nu[iteration_after_burn_in])/length(iteration_after_burn_in)
+RDA_CriminalSummit_UnDirected_ZIPLPCM_Sup_T60k_R1_hat_nu <-
+  Reduce("+",RDA_CriminalSummit_UnDirected_ZIPLPCM_Sup_T60k_R1$nu[iteration_after_burn_in])/length(iteration_after_burn_in)
 #--------------------------------------------------------------------------------------------------------------------------
 # Obtain individual-level unusual zero probability p for each iteration
-RDA_Infinito_UnDirected_ZIPLPCM_Sup_T60k_R1_p <- list()
+RDA_CriminalSummit_UnDirected_ZIPLPCM_Sup_T60k_R1_p <- list()
 library(Rfast)
-for (t in 1:nrow(RDA_Infinito_UnDirected_ZIPLPCM_Sup_T60k_R1$z)){
-  Z <- t(t(matrix(RDA_Infinito_UnDirected_ZIPLPCM_Sup_T60k_R1_LSz[t,],length(RDA_Infinito_UnDirected_ZIPLPCM_Sup_T60k_R1_LSz[t,]),
-                  RDA_Infinito_UnDirected_ZIPLPCM_Sup_T60k_R1$K[t]))==(1:RDA_Infinito_UnDirected_ZIPLPCM_Sup_T60k_R1$K[t]))*1
-  RDA_Infinito_UnDirected_ZIPLPCM_Sup_T60k_R1_p[[t]] <- Z%*%RDA_Infinito_UnDirected_ZIPLPCM_Sup_T60k_R1_LSP[[t]]%*%t(Z)
+for (t in 1:nrow(RDA_CriminalSummit_UnDirected_ZIPLPCM_Sup_T60k_R1$z)){
+  Z <- t(t(matrix(RDA_CriminalSummit_UnDirected_ZIPLPCM_Sup_T60k_R1_LSz[t,],length(RDA_CriminalSummit_UnDirected_ZIPLPCM_Sup_T60k_R1_LSz[t,]),
+                  RDA_CriminalSummit_UnDirected_ZIPLPCM_Sup_T60k_R1$K[t]))==(1:RDA_CriminalSummit_UnDirected_ZIPLPCM_Sup_T60k_R1$K[t]))*1
+  RDA_CriminalSummit_UnDirected_ZIPLPCM_Sup_T60k_R1_p[[t]] <- Z%*%RDA_CriminalSummit_UnDirected_ZIPLPCM_Sup_T60k_R1_LSP[[t]]%*%t(Z)
   if ((t%%1000) == 0){cat("t=",t,"\n")}
 }
-RDA_Infinito_UnDirected_ZIPLPCM_Sup_T60k_R1_hat_p <- Reduce("+",RDA_Infinito_UnDirected_ZIPLPCM_Sup_T60k_R1_p[iteration_after_burn_in])/length(iteration_after_burn_in)
+RDA_CriminalSummit_UnDirected_ZIPLPCM_Sup_T60k_R1_hat_p <- Reduce("+",RDA_CriminalSummit_UnDirected_ZIPLPCM_Sup_T60k_R1_p[iteration_after_burn_in])/length(iteration_after_burn_in)
 
 #--------------------------------------------------------------------------------------------------------------------------
 # Obtain individual-level Poisson rate lambda for each iteration
-RDA_Infinito_UnDirected_ZIPLPCM_Sup_T60k_R1_lambda <- list()
+RDA_CriminalSummit_UnDirected_ZIPLPCM_Sup_T60k_R1_lambda <- list()
 library(Rfast) # for Rfast::Dist()
-for (t in 1:nrow(RDA_Infinito_UnDirected_ZIPLPCM_Sup_T60k_R1$z)){
-  Z <- t(t(matrix(RDA_Infinito_UnDirected_ZIPLPCM_Sup_T60k_R1_LSz[t,],length(RDA_Infinito_UnDirected_ZIPLPCM_Sup_T60k_R1_LSz[t,]),RDA_Infinito_UnDirected_ZIPLPCM_Sup_T60k_R1$K[t]))==(1:RDA_Infinito_UnDirected_ZIPLPCM_Sup_T60k_R1$K[t]))*1
-  Dist_U <- Rfast::Dist(RDA_Infinito_UnDirected_ZIPLPCM_Sup_T60k_R1_PTU[[t]])
-  RDA_Infinito_UnDirected_ZIPLPCM_Sup_T60k_R1_lambda[[t]] <- exp(RDA_Infinito_UnDirected_ZIPLPCM_Sup_T60k_R1$beta[t]-Dist_U)
+for (t in 1:nrow(RDA_CriminalSummit_UnDirected_ZIPLPCM_Sup_T60k_R1$z)){
+  Z <- t(t(matrix(RDA_CriminalSummit_UnDirected_ZIPLPCM_Sup_T60k_R1_LSz[t,],length(RDA_CriminalSummit_UnDirected_ZIPLPCM_Sup_T60k_R1_LSz[t,]),RDA_CriminalSummit_UnDirected_ZIPLPCM_Sup_T60k_R1$K[t]))==(1:RDA_CriminalSummit_UnDirected_ZIPLPCM_Sup_T60k_R1$K[t]))*1
+  Dist_U <- Rfast::Dist(RDA_CriminalSummit_UnDirected_ZIPLPCM_Sup_T60k_R1_PTU[[t]])
+  RDA_CriminalSummit_UnDirected_ZIPLPCM_Sup_T60k_R1_lambda[[t]] <- exp(RDA_CriminalSummit_UnDirected_ZIPLPCM_Sup_T60k_R1$beta[t]-Dist_U)
   if ((t%%1000) == 0){cat("t=",t,"\n")}
 }
-RDA_Infinito_UnDirected_ZIPLPCM_Sup_T60k_R1_hat_lambda <- Reduce("+",RDA_Infinito_UnDirected_ZIPLPCM_Sup_T60k_R1_lambda[iteration_after_burn_in])/length(iteration_after_burn_in)
+RDA_CriminalSummit_UnDirected_ZIPLPCM_Sup_T60k_R1_hat_lambda <- Reduce("+",RDA_CriminalSummit_UnDirected_ZIPLPCM_Sup_T60k_R1_lambda[iteration_after_burn_in])/length(iteration_after_burn_in)
 ```
 
 The heatmap plots shown in **Figure 14** of the **ZIP-LPCM** paper can be recoverred by first creating a new clustering which label-switches the $\hat{\boldsymbol{z}}$ so that the inferred groups which contain bosses are sorted to have higher group numbers, that is,
 
 ``` r
-RDA_Infinito_UnDirected_ZIPLPCM_Sup_T60k_R1_hat_z_Manual <- RDA_Infinito_UnDirected_ZIPLPCM_Sup_T60k_R1_hat_z
-RDA_Infinito_UnDirected_ZIPLPCM_Sup_T60k_R1_hat_z_Manual[RDA_Infinito_UnDirected_ZIPLPCM_Sup_T60k_R1_hat_z==2]<-4
-RDA_Infinito_UnDirected_ZIPLPCM_Sup_T60k_R1_hat_z_Manual[RDA_Infinito_UnDirected_ZIPLPCM_Sup_T60k_R1_hat_z==10]<-2
-RDA_Infinito_UnDirected_ZIPLPCM_Sup_T60k_R1_hat_z_Manual[RDA_Infinito_UnDirected_ZIPLPCM_Sup_T60k_R1_hat_z==1]<-3
-RDA_Infinito_UnDirected_ZIPLPCM_Sup_T60k_R1_hat_z_Manual[RDA_Infinito_UnDirected_ZIPLPCM_Sup_T60k_R1_hat_z==5]<-1
-RDA_Infinito_UnDirected_ZIPLPCM_Sup_T60k_R1_hat_z_Manual[RDA_Infinito_UnDirected_ZIPLPCM_Sup_T60k_R1_hat_z==6]<-5
-RDA_Infinito_UnDirected_ZIPLPCM_Sup_T60k_R1_hat_z_Manual[RDA_Infinito_UnDirected_ZIPLPCM_Sup_T60k_R1_hat_z==3]<-9
-RDA_Infinito_UnDirected_ZIPLPCM_Sup_T60k_R1_hat_z_Manual[RDA_Infinito_UnDirected_ZIPLPCM_Sup_T60k_R1_hat_z==7]<-7
-RDA_Infinito_UnDirected_ZIPLPCM_Sup_T60k_R1_hat_z_Manual[RDA_Infinito_UnDirected_ZIPLPCM_Sup_T60k_R1_hat_z==9]<-8
-RDA_Infinito_UnDirected_ZIPLPCM_Sup_T60k_R1_hat_z_Manual[RDA_Infinito_UnDirected_ZIPLPCM_Sup_T60k_R1_hat_z==4]<-6
-RDA_Infinito_UnDirected_ZIPLPCM_Sup_T60k_R1_hat_z_Manual[RDA_Infinito_UnDirected_ZIPLPCM_Sup_T60k_R1_hat_z==8]<-10
+RDA_CriminalSummit_UnDirected_ZIPLPCM_Sup_T60k_R1_hat_z_Manual <- RDA_CriminalSummit_UnDirected_ZIPLPCM_Sup_T60k_R1_hat_z
+RDA_CriminalSummit_UnDirected_ZIPLPCM_Sup_T60k_R1_hat_z_Manual[RDA_CriminalSummit_UnDirected_ZIPLPCM_Sup_T60k_R1_hat_z==2]<-4
+RDA_CriminalSummit_UnDirected_ZIPLPCM_Sup_T60k_R1_hat_z_Manual[RDA_CriminalSummit_UnDirected_ZIPLPCM_Sup_T60k_R1_hat_z==10]<-2
+RDA_CriminalSummit_UnDirected_ZIPLPCM_Sup_T60k_R1_hat_z_Manual[RDA_CriminalSummit_UnDirected_ZIPLPCM_Sup_T60k_R1_hat_z==1]<-3
+RDA_CriminalSummit_UnDirected_ZIPLPCM_Sup_T60k_R1_hat_z_Manual[RDA_CriminalSummit_UnDirected_ZIPLPCM_Sup_T60k_R1_hat_z==5]<-1
+RDA_CriminalSummit_UnDirected_ZIPLPCM_Sup_T60k_R1_hat_z_Manual[RDA_CriminalSummit_UnDirected_ZIPLPCM_Sup_T60k_R1_hat_z==6]<-5
+RDA_CriminalSummit_UnDirected_ZIPLPCM_Sup_T60k_R1_hat_z_Manual[RDA_CriminalSummit_UnDirected_ZIPLPCM_Sup_T60k_R1_hat_z==3]<-9
+RDA_CriminalSummit_UnDirected_ZIPLPCM_Sup_T60k_R1_hat_z_Manual[RDA_CriminalSummit_UnDirected_ZIPLPCM_Sup_T60k_R1_hat_z==7]<-7
+RDA_CriminalSummit_UnDirected_ZIPLPCM_Sup_T60k_R1_hat_z_Manual[RDA_CriminalSummit_UnDirected_ZIPLPCM_Sup_T60k_R1_hat_z==9]<-8
+RDA_CriminalSummit_UnDirected_ZIPLPCM_Sup_T60k_R1_hat_z_Manual[RDA_CriminalSummit_UnDirected_ZIPLPCM_Sup_T60k_R1_hat_z==4]<-6
+RDA_CriminalSummit_UnDirected_ZIPLPCM_Sup_T60k_R1_hat_z_Manual[RDA_CriminalSummit_UnDirected_ZIPLPCM_Sup_T60k_R1_hat_z==8]<-10
 ```
 
 In this way, the left color bars of **Figure 14** plots showing the reference clustering $\boldsymbol{z}^*$ would let the groups which contain bosses sit in the bottom and let the groups only containing affiliates sit at top.
@@ -1764,44 +1674,44 @@ My_colors <- c(brewer.pal(10,"RdBu")[c(4,7)],brewer.pal(10,"PRGn")[c(7,4)],brewe
 RDA_criminalNet_Y_dataframe <- as.data.frame(RDA_criminalNet$Y)
 rownames(RDA_criminalNet_Y_dataframe) <- colnames(RDA_criminalNet_Y_dataframe) <- 1:nrow(RDA_criminalNet$Y)
 
-RDA_Infinito_UnDirected_ZIPLPCM_Sup_T60k_R1_hat_nu_dataframe <- as.data.frame(RDA_Infinito_UnDirected_ZIPLPCM_Sup_T60k_R1_hat_nu)
-rownames(RDA_Infinito_UnDirected_ZIPLPCM_Sup_T60k_R1_hat_nu_dataframe) <- colnames(RDA_Infinito_UnDirected_ZIPLPCM_Sup_T60k_R1_hat_nu_dataframe) <- 1:nrow(RDA_criminalNet$Y)
+RDA_CriminalSummit_UnDirected_ZIPLPCM_Sup_T60k_R1_hat_nu_dataframe <- as.data.frame(RDA_CriminalSummit_UnDirected_ZIPLPCM_Sup_T60k_R1_hat_nu)
+rownames(RDA_CriminalSummit_UnDirected_ZIPLPCM_Sup_T60k_R1_hat_nu_dataframe) <- colnames(RDA_CriminalSummit_UnDirected_ZIPLPCM_Sup_T60k_R1_hat_nu_dataframe) <- 1:nrow(RDA_criminalNet$Y)
 
 annotation_row_z_ref <- as.data.frame(as.factor(matrix(RDA_criminalNet$RoleLocale,length(RDA_criminalNet$RoleLocale),1)))
 colnames(annotation_row_z_ref) <- "z_ref"
 annotation_colors_z_ref <- My_colors[c(1:10)]
 names(annotation_colors_z_ref) <- sort(unique(annotation_row_z_ref$z_ref))
 
-RDA_Infinito_UnDirected_ZIPLPCM_Sup_T60k_R1_Y_hat_z_heatmap <-
-  pheatmap(RDA_criminalNet_Y_dataframe[order(RDA_Infinito_UnDirected_ZIPLPCM_Sup_T60k_R1_hat_z_Manual),order(RDA_Infinito_UnDirected_ZIPLPCM_Sup_T60k_R1_hat_z_Manual)],
+RDA_CriminalSummit_UnDirected_ZIPLPCM_Sup_T60k_R1_Y_hat_z_heatmap <-
+  pheatmap(RDA_criminalNet_Y_dataframe[order(RDA_CriminalSummit_UnDirected_ZIPLPCM_Sup_T60k_R1_hat_z_Manual),order(RDA_CriminalSummit_UnDirected_ZIPLPCM_Sup_T60k_R1_hat_z_Manual)],
            color=c(brewer.pal(9,"Greys")[3],colorRampPalette(brewer.pal(9,"YlOrRd"))(max(RDA_criminalNet$Y))),
            cluster_cols = FALSE,cluster_rows= FALSE,show_rownames=FALSE,show_colnames=FALSE,border_color=FALSE,legend=TRUE,
            annotation_row = annotation_row_z_ref,annotation_col = annotation_row_z_ref,
            annotation_colors=list(z_ref=annotation_colors_z_ref),annotation_names_row=FALSE,annotation_names_col=FALSE,annotation_legend=FALSE,
-           gaps_row=c(which(diff(sort(RDA_Infinito_UnDirected_ZIPLPCM_Sup_T60k_R1_hat_z_Manual))!=0)),gaps_col=c(which(diff(sort(RDA_Infinito_UnDirected_ZIPLPCM_Sup_T60k_R1_hat_z_Manual))!=0))
+           gaps_row=c(which(diff(sort(RDA_CriminalSummit_UnDirected_ZIPLPCM_Sup_T60k_R1_hat_z_Manual))!=0)),gaps_col=c(which(diff(sort(RDA_CriminalSummit_UnDirected_ZIPLPCM_Sup_T60k_R1_hat_z_Manual))!=0))
   )
 
-RDA_Infinito_UnDirected_ZIPLPCM_Sup_T60k_R1_hat_P_m0_heatmap <-
-  pheatmap(RDA_Infinito_UnDirected_ZIPLPCM_Sup_T60k_R1_hat_nu_dataframe[order(RDA_Infinito_UnDirected_ZIPLPCM_Sup_T60k_R1_hat_z_Manual),order(RDA_Infinito_UnDirected_ZIPLPCM_Sup_T60k_R1_hat_z_Manual)],
+RDA_CriminalSummit_UnDirected_ZIPLPCM_Sup_T60k_R1_hat_P_m0_heatmap <-
+  pheatmap(RDA_CriminalSummit_UnDirected_ZIPLPCM_Sup_T60k_R1_hat_nu_dataframe[order(RDA_CriminalSummit_UnDirected_ZIPLPCM_Sup_T60k_R1_hat_z_Manual),order(RDA_CriminalSummit_UnDirected_ZIPLPCM_Sup_T60k_R1_hat_z_Manual)],
            color=c(brewer.pal(9,"Greys")[3],colorRampPalette(brewer.pal(9,"YlOrRd")[1:8])(5000)),cluster_cols = FALSE,cluster_rows= FALSE,show_rownames=FALSE,show_colnames=FALSE,border_color=FALSE,legend=TRUE,
            annotation_row = annotation_row_z_ref,annotation_col = annotation_row_z_ref,
            annotation_colors=list(z_ref=annotation_colors_z_ref),annotation_names_row=FALSE,annotation_names_col=FALSE,annotation_legend=FALSE,
-           gaps_row=c(which(diff(sort(RDA_Infinito_UnDirected_ZIPLPCM_Sup_T60k_R1_hat_z_Manual))!=0)),gaps_col=c(which(diff(sort(RDA_Infinito_UnDirected_ZIPLPCM_Sup_T60k_R1_hat_z_Manual))!=0))
+           gaps_row=c(which(diff(sort(RDA_CriminalSummit_UnDirected_ZIPLPCM_Sup_T60k_R1_hat_z_Manual))!=0)),gaps_col=c(which(diff(sort(RDA_CriminalSummit_UnDirected_ZIPLPCM_Sup_T60k_R1_hat_z_Manual))!=0))
   )
 
-RDA_Infinito_UnDirected_ZIPLPCM_Sup_T60k_R1_hat_P_m0_Non0_heatmap <-
-  pheatmap((RDA_Infinito_UnDirected_ZIPLPCM_Sup_T60k_R1_hat_nu_dataframe*(1-dpois(0,RDA_Infinito_UnDirected_ZIPLPCM_Sup_T60k_R1_hat_Lambdaij)))[order(RDA_Infinito_UnDirected_ZIPLPCM_Sup_T60k_R1_hat_z_Manual),order(RDA_Infinito_UnDirected_ZIPLPCM_Sup_T60k_R1_hat_z_Manual)],
+RDA_CriminalSummit_UnDirected_ZIPLPCM_Sup_T60k_R1_hat_P_m0_Non0_heatmap <-
+  pheatmap((RDA_CriminalSummit_UnDirected_ZIPLPCM_Sup_T60k_R1_hat_nu_dataframe*(1-dpois(0,RDA_CriminalSummit_UnDirected_ZIPLPCM_Sup_T60k_R1_hat_Lambdaij)))[order(RDA_CriminalSummit_UnDirected_ZIPLPCM_Sup_T60k_R1_hat_z_Manual),order(RDA_CriminalSummit_UnDirected_ZIPLPCM_Sup_T60k_R1_hat_z_Manual)],
            color=c(brewer.pal(9,"Greys")[3],colorRampPalette(brewer.pal(9,"YlOrRd")[1:6])(5000)),cluster_cols = FALSE,cluster_rows= FALSE,show_rownames=FALSE,show_colnames=FALSE,border_color=FALSE,legend=TRUE,
            annotation_row = annotation_row_z_ref,annotation_col = annotation_row_z_ref,
            annotation_colors=list(z_ref=annotation_colors_z_ref),annotation_names_row=FALSE,annotation_names_col=FALSE,annotation_legend=FALSE,
-           gaps_row=c(which(diff(sort(RDA_Infinito_UnDirected_ZIPLPCM_Sup_T60k_R1_hat_z_Manual))!=0)),gaps_col=c(which(diff(sort(RDA_Infinito_UnDirected_ZIPLPCM_Sup_T60k_R1_hat_z_Manual))!=0))
+           gaps_row=c(which(diff(sort(RDA_CriminalSummit_UnDirected_ZIPLPCM_Sup_T60k_R1_hat_z_Manual))!=0)),gaps_col=c(which(diff(sort(RDA_CriminalSummit_UnDirected_ZIPLPCM_Sup_T60k_R1_hat_z_Manual))!=0))
   )
 
 library("grid")
 library("gridExtra")
-g <- grid.arrange(RDA_Infinito_UnDirected_ZIPLPCM_Sup_T60k_R1_Y_hat_z_heatmap[[4]],
-                  RDA_Infinito_UnDirected_ZIPLPCM_Sup_T60k_R1_hat_P_m0_heatmap[[4]],
-                  RDA_Infinito_UnDirected_ZIPLPCM_Sup_T60k_R1_hat_P_m0_Non0_heatmap[[4]],
+g <- grid.arrange(RDA_CriminalSummit_UnDirected_ZIPLPCM_Sup_T60k_R1_Y_hat_z_heatmap[[4]],
+                  RDA_CriminalSummit_UnDirected_ZIPLPCM_Sup_T60k_R1_hat_P_m0_heatmap[[4]],
+                  RDA_CriminalSummit_UnDirected_ZIPLPCM_Sup_T60k_R1_hat_P_m0_Non0_heatmap[[4]],
                   nrow=1,ncol=3,vp=viewport(width=1, height=1))
 Fig <- cowplot::ggdraw(g)+ theme(plot.background = element_rect(colour = "white", linewidth = 0))
 Fig
@@ -1811,16 +1721,16 @@ Similarly, we can also produce the heatmap plot of the summarized individual-lev
 
 ``` r
 # Plot the posterior mean summary statistic hat_p
-RDA_Infinito_UnDirected_ZIPLPCM_Sup_T60k_R1_hat_p_dataframe <- as.data.frame(RDA_Infinito_UnDirected_ZIPLPCM_Sup_T60k_R1_hat_p)
-rownames(RDA_Infinito_UnDirected_ZIPLPCM_Sup_T60k_R1_hat_p_dataframe) <- colnames(RDA_Infinito_UnDirected_ZIPLPCM_Sup_T60k_R1_hat_p_dataframe) <- 1:nrow(RDA_criminalNet$Y)
-RDA_Infinito_UnDirected_ZIPLPCM_Sup_T60k_R1_hat_p_heatmap <-
-  pheatmap(RDA_Infinito_UnDirected_ZIPLPCM_Sup_T60k_R1_hat_p_dataframe[order(RDA_Infinito_UnDirected_ZIPLPCM_Sup_T60k_R1_hat_z),order(RDA_Infinito_UnDirected_ZIPLPCM_Sup_T60k_R1_hat_z)],
+RDA_CriminalSummit_UnDirected_ZIPLPCM_Sup_T60k_R1_hat_p_dataframe <- as.data.frame(RDA_CriminalSummit_UnDirected_ZIPLPCM_Sup_T60k_R1_hat_p)
+rownames(RDA_CriminalSummit_UnDirected_ZIPLPCM_Sup_T60k_R1_hat_p_dataframe) <- colnames(RDA_CriminalSummit_UnDirected_ZIPLPCM_Sup_T60k_R1_hat_p_dataframe) <- 1:nrow(RDA_criminalNet$Y)
+RDA_CriminalSummit_UnDirected_ZIPLPCM_Sup_T60k_R1_hat_p_heatmap <-
+  pheatmap(RDA_CriminalSummit_UnDirected_ZIPLPCM_Sup_T60k_R1_hat_p_dataframe[order(RDA_CriminalSummit_UnDirected_ZIPLPCM_Sup_T60k_R1_hat_z),order(RDA_CriminalSummit_UnDirected_ZIPLPCM_Sup_T60k_R1_hat_z)],
            color=c(brewer.pal(9,"Greys")[3],colorRampPalette(brewer.pal(9,"YlOrRd")[1:7])(5000)),cluster_cols = FALSE,cluster_rows= FALSE,show_rownames=FALSE,show_colnames=FALSE,border_color=FALSE,legend=TRUE,
            annotation_row = annotation_row_z_ref,annotation_col = annotation_row_z_ref,
            annotation_colors=list(z_ref=annotation_colors_z_ref),annotation_names_row=FALSE,annotation_names_col=FALSE,annotation_legend=FALSE,
-           gaps_row=c(which(diff(sort(RDA_Infinito_UnDirected_ZIPLPCM_Sup_T60k_R1_hat_z))!=0)),gaps_col=c(which(diff(sort(RDA_Infinito_UnDirected_ZIPLPCM_Sup_T60k_R1_hat_z))!=0)))
-RDA_Infinito_UnDirected_ZIPLPCM_Sup_T60k_R1_hat_p_heatmap_draw <- cowplot::ggdraw(RDA_Infinito_UnDirected_ZIPLPCM_Sup_T60k_R1_hat_p_heatmap[[4]])+ theme(plot.background =element_rect(fill=brewer.pal(9,"Greys")[3]))
-print(RDA_Infinito_UnDirected_ZIPLPCM_Sup_T60k_R1_hat_p_heatmap_draw)
+           gaps_row=c(which(diff(sort(RDA_CriminalSummit_UnDirected_ZIPLPCM_Sup_T60k_R1_hat_z))!=0)),gaps_col=c(which(diff(sort(RDA_CriminalSummit_UnDirected_ZIPLPCM_Sup_T60k_R1_hat_z))!=0)))
+RDA_CriminalSummit_UnDirected_ZIPLPCM_Sup_T60k_R1_hat_p_heatmap_draw <- cowplot::ggdraw(RDA_CriminalSummit_UnDirected_ZIPLPCM_Sup_T60k_R1_hat_p_heatmap[[4]])+ theme(plot.background =element_rect(fill=brewer.pal(9,"Greys")[3]))
+print(RDA_CriminalSummit_UnDirected_ZIPLPCM_Sup_T60k_R1_hat_p_heatmap_draw)
 ```
 
 ### 2.5 Comparisons to 2-Dimensional Inference
@@ -1880,13 +1790,13 @@ RDA_TrainBombing_UnDirected_ZIPLPCM_unSup_2d_T60k_R1_time
 # 'Ndrangheta Mafia undirected real network supervised ZIP-LPCM d=2 T = 60000 round 1
 set.seed(1)
 start.time <- Sys.time()
-RDA_Infinito_UnDirected_ZIPLPCM_Sup_2d_T60k_R1 <- 
+RDA_CriminalSummit_UnDirected_ZIPLPCM_Sup_2d_T60k_R1 <- 
   MwG_UnDirected_ZIPLPCM(Y = RDA_criminalNet$Y,T = 60000,omega=0.01,alpha1=1,alpha2=0.103,alpha=3,beta1=1,beta2=6,
                          sigma2prop_beta=0.125^2,sigma2prop_U=0.5,d=2,z=1:nrow(RDA_criminalNet$Y),
                          p_eject=0.5,A=RDA_criminalNet$A,omega_c=1)
 end.time <- Sys.time()
-RDA_Infinito_UnDirected_ZIPLPCM_Sup_2d_T60k_R1_time <- end.time - start.time
-RDA_Infinito_UnDirected_ZIPLPCM_Sup_2d_T60k_R1_time
+RDA_CriminalSummit_UnDirected_ZIPLPCM_Sup_2d_T60k_R1_time <- end.time - start.time
+RDA_CriminalSummit_UnDirected_ZIPLPCM_Sup_2d_T60k_R1_time
 # Time difference of 2.573009 hours
 ```
 
@@ -1974,11 +1884,11 @@ V(g_obs_I)$label <- ""
 par(mfrow=c(1,2),mai = c(0.05, 0.05, 0.05, 0.05),mgp = c(1,0.25,0))
 # Make the plot of hat_U and z*
 V(g_obs_I)$color <- adjustcolor(My_colors[c(as.factor(RDA_criminalNet$RoleLocale))], alpha.f = 0.7)
-plot(g_obs_I, rescale=T,layout=-RDA_Infinito_UnDirected_ZIPLPCM_Sup_Beta_1_6_T60k_DA_2d_R1_hat_U,edge.curved=0.0,edge.width=E(g_obs_I)$weight*0.25,vertex.frame.width=0.001)
+plot(g_obs_I, rescale=T,layout=-RDA_CriminalSummit_UnDirected_ZIPLPCM_Sup_Beta_1_6_T60k_DA_2d_R1_hat_U,edge.curved=0.0,edge.width=E(g_obs_I)$weight*0.25,vertex.frame.width=0.001)
 # Make the plot of hat_U and hat_z
 Customized_colors <- My_colors[c(3,6,9,4,7,5,8)]
-V(g_obs_I)$color <- adjustcolor(Customized_colors[RDA_Infinito_UnDirected_ZIPLPCM_Sup_Beta_1_6_T60k_DA_2d_R1_hat_z], alpha.f = .7)
-plot(g_obs_I, rescale=T,layout=-RDA_Infinito_UnDirected_ZIPLPCM_Sup_Beta_1_6_T60k_DA_2d_R1_hat_U,edge.curved=0.0,edge.width=E(g_obs_I)$weight*0.25,vertex.frame.width=0.001)
+V(g_obs_I)$color <- adjustcolor(Customized_colors[RDA_CriminalSummit_UnDirected_ZIPLPCM_Sup_Beta_1_6_T60k_DA_2d_R1_hat_z], alpha.f = .7)
+plot(g_obs_I, rescale=T,layout=-RDA_CriminalSummit_UnDirected_ZIPLPCM_Sup_Beta_1_6_T60k_DA_2d_R1_hat_U,edge.curved=0.0,edge.width=E(g_obs_I)$weight*0.25,vertex.frame.width=0.001)
 par(mfrow=c(1,1),mai = c(1.02, 0.82, 0.82, 0.42))
 ```
 
