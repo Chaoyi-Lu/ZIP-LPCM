@@ -1312,7 +1312,7 @@ for (t in 1:nrow(RDA_CriminalSummit_UnDirected_ZIPLPCM_Sup_T60k_R1$z)){
                                             P=RDA_CriminalSummit_UnDirected_ZIPLPCM_Sup_T60k_R1_LSP[[t]],
                                             z=RDA_CriminalSummit_UnDirected_ZIPLPCM_Sup_T60k_R1_LSz[t,],
                                             alpha1=1,alpha2=0.103,omega=0.01,  alpha=3,
-                                            A=RDA_criminalNet$DanieleA,omega_c=1))
+                                            A=RDA_criminalNet$A,omega_c=1))
   if ((t%%1000) == 0){cat("t=",t,"\n")}
 }
 plot(RDA_CriminalSummit_UnDirected_ZIPLPCM_Sup_T60k_R1_LSz_Like,type = "l",xlab = "",ylab = "", main = "Likelihood",cex.axis = 0.8)
