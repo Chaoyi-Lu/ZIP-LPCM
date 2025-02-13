@@ -105,17 +105,16 @@ library(gdata)
 lowerTriangle(Train_bombing_adj,byrow=TRUE) <- upperTriangle(Train_bombing_adj)
 ```
 
-### 1.3 Summit attendance criminality Network
+### 1.3 Summit co-attendance criminality Network
 
 The original data was processed by [Legramanti et al. (2022)](https://projecteuclid.org/journals/annals-of-applied-statistics/volume-16/issue-4/Extended-stochastic-block-models-with-application-to-criminal-networks/10.1214/21-AOAS1595.short), and we focus on the processed data available at [GitHub page](https://github.com/danieledurante/ESBM/blob/master/Application/application.md) for implementations.
 Following the processing code therein with just changing the variable names, the processed data is also available at [`Datasets/`] file of this repository and can be directly loaded via:
 
 ``` r
-# Summit attendance criminality Network, Undirected
+# Summit co-attendance criminality Network, Undirected
 RDA_criminalNet <- list(Y = as.matrix(read.csv("Datasets/CriminalNet_Y.csv",header = TRUE)),
-                        RoleLocale = c(as.matrix(read.csv("Datasets/CriminalNet_RoleLocale.csv",header = TRUE))),
-                        Actors = c(as.matrix(read.csv("Datasets/CriminalNet_actors.csv",header = TRUE))),
-                        Locale = c(as.matrix(read.csv("Datasets/CriminalNet_Locale.csv",header = TRUE))),
+                        RoleAffiliation = c(as.matrix(read.csv("Datasets/CriminalNet_RoleAffiliation.csv",header = TRUE))),
+                        Affiliation = c(as.matrix(read.csv("Datasets/CriminalNet_Affiliation.csv",header = TRUE))),
                         role = c(as.matrix(read.csv("Datasets/CriminalNet_Role.csv",header = TRUE))),
                         A = c(as.matrix(read.csv("Datasets/CriminalNet_A.csv",header = TRUE))))
 colnames(RDA_criminalNet$Y) <- c()
@@ -1248,14 +1247,14 @@ RDA_TrainBombing_UnDirected_ZIPLPCM_unSup_T60k_R1_hat_p_heatmap_draw <- cowplot:
 print(RDA_TrainBombing_UnDirected_ZIPLPCM_unSup_T60k_R1_hat_p_heatmap_draw)
 ```
 
-### 2.4 Summit attendance criminality Network
+### 2.4 Summit co-attendance criminality Network
 
-The last real network we work on is the **Summit attendance criminality** network.
+The last real network we work on is the **Summit co-attendance criminality** network.
 This network is an undirected network and exogenous node attributes are available to us, i.e., `RDA_criminalNet$A` which is the one defined in Section 1.3 of this tutorial.
 The implementations and the post-processing follows:
 
 ``` r
-# Summit attendance criminality undirected real network supervised ZIP-LPCM T = 60000 round 1
+# Summit co-attendance criminality undirected real network supervised ZIP-LPCM T = 60000 round 1
 set.seed(1)
 start.time <- Sys.time()
 RDA_CriminalSummit_UnDirected_ZIPLPCM_Sup_T60k_R1 <- 
@@ -1378,7 +1377,7 @@ RDA_CriminalSummit_UnDirected_ZIPLPCM_Sup_T60k_R1_hat_U <-
   RDA_CriminalSummit_UnDirected_ZIPLPCM_Sup_T60k_R1_PTU[[RDA_CriminalSummit_UnDirected_ZIPLPCM_Sup_T60k_R1_MaxLikeHatz_iteration]]
 ```
 
-Provided with the reference clustering $`\boldsymbol{z}^*`$, i.e., the role-locale information stored as `RDA_criminalNet$RoleLocale`, as well as the summarized latent positions $\hat{\boldsymbol{U}}$, we first obtain the 3-dimensional interactive plot of $\hat{\boldsymbol{U}}$ plotting along with the $`\boldsymbol{z}^*`$.
+Provided with the reference clustering $`\boldsymbol{z}^*`$, i.e., the role-affiliation information stored as `RDA_criminalNet$RoleAffiliation`, as well as the summarized latent positions $\hat{\boldsymbol{U}}$, we first obtain the 3-dimensional interactive plot of $\hat{\boldsymbol{U}}$ plotting along with the $`\boldsymbol{z}^*`$.
 This is the one we illustrate as the 1st row plots of **Figure 13** in the paper:
 
 ``` r
@@ -1401,9 +1400,9 @@ fig <- plot_ly() %>%
   add_markers(x = RDA_CriminalSummit_UnDirected_ZIPLPCM_Sup_T60k_R1_hat_U[,1],
               y = RDA_CriminalSummit_UnDirected_ZIPLPCM_Sup_T60k_R1_hat_U[,2],
               z = RDA_CriminalSummit_UnDirected_ZIPLPCM_Sup_T60k_R1_hat_U[,3],
-              text=paste("Node:",1:nrow(RDA_criminalNet$Y),"<br>z*:",RDA_criminalNet$RoleLocale,"<br>c:",RDA_criminalNet$A),
+              text=paste("Node:",1:nrow(RDA_criminalNet$Y),"<br>z*:",RDA_criminalNet$RoleAffiliation,"<br>c:",RDA_criminalNet$A),
               size=VertexSize,sizes=c(200,400),
-              color=as.factor(RDA_criminalNet$RoleLocale),colors=My_colors[1:10],
+              color=as.factor(RDA_criminalNet$RoleAffiliation),colors=My_colors[1:10],
               stroke = I("black"), span = I(1),
               symbol=as.factor(RDA_criminalNet$role),symbols = c("circle","square")
   )
@@ -1422,7 +1421,7 @@ fig
 
 The 3-d interactive plot of the $\hat{\boldsymbol{U}}$ and $`\boldsymbol{z}^*`$ is available at [`/Interactive 3-d latent positions plots/RDA_CriminalSummit_InteractivePlot_Ref_z.html`] of this repository.
 Different from the 3-d interactive plots we show in the previous sections, if the readers put the mouse pointer on each node of the interactive plot, the comment bracket will also show the exogenous node attributes $\boldsymbol{c}$ we used in practice in our experiments.
-Note that the **Windsurfers**, **Train Bombing** and the **Summit attendance criminality** networks are undirected networks, the comment bracket of each edge in the 3-d interactive plots no longer show the direction of the edge.
+Note that the **Windsurfers**, **Train Bombing** and the **Summit co-attendance criminality** networks are undirected networks, the comment bracket of each edge in the 3-d interactive plots no longer show the direction of the edge.
 
 Similarly, the 3-d interactive plot of the $\hat{\boldsymbol{U}}$ and $\hat{\boldsymbol{z}}$ is available to be downloaded at [`/Interactive 3-d latent positions plots/RDA_CriminalSummit_InteractivePlot_Hat_z.html`] of this repository, and can be reproduced following the code:
 
@@ -1432,7 +1431,7 @@ fig <- plot_ly() %>%
   add_markers(x = RDA_CriminalSummit_UnDirected_ZIPLPCM_Sup_T60k_R1_hat_U[,1],
               y = RDA_CriminalSummit_UnDirected_ZIPLPCM_Sup_T60k_R1_hat_U[,2],
               z = RDA_CriminalSummit_UnDirected_ZIPLPCM_Sup_T60k_R1_hat_U[,3],
-              text=paste("Node:",1:nrow(RDA_criminalNet$Y),"<br>z*:",RDA_criminalNet$RoleLocale,"<br>c:",RDA_criminalNet$A),
+              text=paste("Node:",1:nrow(RDA_criminalNet$Y),"<br>z*:",RDA_criminalNet$RoleAffiliation,"<br>c:",RDA_criminalNet$A),
               size=VertexSize,sizes=c(200,400),
               color=as.factor(RDA_CriminalSummit_UnDirected_ZIPLPCM_Sup_T60k_R1_hat_z),colors=My_colors[c(3,1,6,9,4,5,7,10,8,2)],
               stroke = I("black"), span = I(1),
@@ -1451,7 +1450,7 @@ fig <- fig %>% layout(title = "hat_U and hat_z",scene = list(xaxis = list(title 
 fig
 ```
 
-As we discussed in the **ZIP-LPCM** paper, it's interesting that there are three heterogeneous bosses whose corresponding inferred latent positions are close to each other and to the orange locale.
+As we discussed in the **ZIP-LPCM** paper, it's interesting that there are three heterogeneous bosses whose corresponding inferred latent positions are close to each other and to the orange affiliation.
 These three bosses are, respectively, a blue boss node no.53, an orange boss node no.41 and a green boss node no.38.
 Thus we can check within how many posterior samples of clustering each pair of these three bosses are clustered together in one group:
 
@@ -1478,8 +1477,8 @@ sum((RDA_CriminalSummit_UnDirected_ZIPLPCM_Sup_T60k_R1_LSz[iteration_after_burn_
 ```
 
 Thus it shows that the three heterogeneous bosses are not likely to be clustered into the same group.
-Though the clustering of the blue boss node no.53 is arguable as shown above, this boss is more likely to be clustered with the orange boss node no.41 who is clustered inside the core group of the orange locale based on our inferred clustering $\hat{\boldsymbol{z}}$.
-The green boss node no.38 is not likely to be within the core of the orange locale and most of the time is clustered with another orange boss node no.35 in the same group:
+Though the clustering of the blue boss node no.53 is arguable as shown above, this boss is more likely to be clustered with the orange boss node no.41 who is clustered inside the core group of the orange affiliation based on our inferred clustering $\hat{\boldsymbol{z}}$.
+The green boss node no.38 is not likely to be within the core of the orange affiliation and most of the time is clustered with another orange boss node no.35 in the same group:
 
 ``` r
 ## Check how often another orange boss 35 and green boss 38 in the same group
@@ -1497,9 +1496,9 @@ fig1 <- plot_ly(scene ="scene1") %>%
   add_markers(x = RDA_CriminalSummit_UnDirected_ZIPLPCM_Sup_T60k_R1_hat_U[,1],
               y = RDA_CriminalSummit_UnDirected_ZIPLPCM_Sup_T60k_R1_hat_U[,2],
               z = RDA_CriminalSummit_UnDirected_ZIPLPCM_Sup_T60k_R1_hat_U[,3],
-              text=paste("Node:",1:nrow(RDA_criminalNet$Y),"<br>z*:",RDA_criminalNet$RoleLocale,"<br>c:",RDA_criminalNet$A),
+              text=paste("Node:",1:nrow(RDA_criminalNet$Y),"<br>z*:",RDA_criminalNet$RoleAffiliation,"<br>c:",RDA_criminalNet$A),
               size=VertexSize,sizes=c(200,400), showlegend = FALSE,
-              color=as.factor(RDA_criminalNet$RoleLocale),colors=My_colors[1:10],
+              color=as.factor(RDA_criminalNet$RoleAffiliation),colors=My_colors[1:10],
               stroke = I("black"), span = I(1),
               symbol=as.factor(RDA_criminalNet$role),symbols = c("circle","square")
   )
@@ -1518,9 +1517,9 @@ fig2 <- plot_ly(scene ="scene2") %>%
   add_markers(x = RDA_CriminalSummit_UnDirected_ZIPLPCM_Sup_T60k_R1_hat_U[,1],
               y = RDA_CriminalSummit_UnDirected_ZIPLPCM_Sup_T60k_R1_hat_U[,2],
               z = RDA_CriminalSummit_UnDirected_ZIPLPCM_Sup_T60k_R1_hat_U[,3],
-              text=paste("Node:",1:nrow(RDA_criminalNet$Y),"<br>z*:",RDA_criminalNet$RoleLocale,"<br>c:",RDA_criminalNet$A),
+              text=paste("Node:",1:nrow(RDA_criminalNet$Y),"<br>z*:",RDA_criminalNet$RoleAffiliation,"<br>c:",RDA_criminalNet$A),
               size=VertexSize,sizes=c(200,400),showlegend = FALSE,
-              color=as.factor(RDA_criminalNet$RoleLocale),colors=My_colors[1:10],
+              color=as.factor(RDA_criminalNet$RoleAffiliation),colors=My_colors[1:10],
               stroke = I("black"), span = I(1),
               symbol=as.factor(RDA_criminalNet$role),symbols = c("circle","square")
   )
@@ -1545,7 +1544,7 @@ Fig1 <- Fig1 %>% layout(title = "", margin = list(l = 0,r = 0,b = 0,t = 0,pad = 
                                       camera = list(eye = list(x = -1.50*sqrt(3)/2, y = 1.50/2, z = 0.50)),
                                       aspectmode='auto'))
 # Fig1
-orca(Fig1, "RDA_CriminalSummit_hat_U_RoleLocale.pdf",scale=1,width=1800,height=850)
+orca(Fig1, "RDA_CriminalSummit_hat_U_RoleAffiliation.pdf",scale=1,width=1800,height=850)
 
 #--------------------------------------------------------------------------------------------------------------------------
 # Then plot the summarized clustering hat_z and hat_U
@@ -1555,7 +1554,7 @@ fig3 <- plot_ly(scene ="scene3") %>%
   add_markers(x = RDA_CriminalSummit_UnDirected_ZIPLPCM_Sup_T60k_R1_hat_U[,1],
               y = RDA_CriminalSummit_UnDirected_ZIPLPCM_Sup_T60k_R1_hat_U[,2],
               z = RDA_CriminalSummit_UnDirected_ZIPLPCM_Sup_T60k_R1_hat_U[,3],
-              text=paste("Node:",1:nrow(RDA_criminalNet$Y),"<br>z*:",RDA_criminalNet$RoleLocale,"<br>c:",RDA_criminalNet$A),
+              text=paste("Node:",1:nrow(RDA_criminalNet$Y),"<br>z*:",RDA_criminalNet$RoleAffiliation,"<br>c:",RDA_criminalNet$A),
               size=VertexSize,sizes=c(200,400),showlegend = FALSE,
               color=as.factor(RDA_CriminalSummit_UnDirected_ZIPLPCM_Sup_T60k_R1_hat_z),colors=My_colors[c(3,1,6,9,4,5,7,10,8,2)],
               stroke = I("black"), span = I(1),
@@ -1576,7 +1575,7 @@ fig4 <- plot_ly(scene ="scene4") %>% # plot the hat_z and hat_U
   add_markers(x = RDA_CriminalSummit_UnDirected_ZIPLPCM_Sup_T60k_R1_hat_U[,1],
               y = RDA_CriminalSummit_UnDirected_ZIPLPCM_Sup_T60k_R1_hat_U[,2],
               z = RDA_CriminalSummit_UnDirected_ZIPLPCM_Sup_T60k_R1_hat_U[,3],
-              text=paste("Node:",1:nrow(RDA_criminalNet$Y),"<br>z*:",RDA_criminalNet$RoleLocale,"<br>c:",RDA_criminalNet$A),
+              text=paste("Node:",1:nrow(RDA_criminalNet$Y),"<br>z*:",RDA_criminalNet$RoleAffiliation,"<br>c:",RDA_criminalNet$A),
               size=VertexSize,sizes=c(200,400),showlegend = FALSE,
               color=as.factor(RDA_CriminalSummit_UnDirected_ZIPLPCM_Sup_T60k_R1_hat_z),colors=My_colors[c(3,1,6,9,4,5,7,10,8,2)],
               stroke = I("black"), span = I(1),
@@ -1677,7 +1676,7 @@ rownames(RDA_criminalNet_Y_dataframe) <- colnames(RDA_criminalNet_Y_dataframe) <
 RDA_CriminalSummit_UnDirected_ZIPLPCM_Sup_T60k_R1_hat_nu_dataframe <- as.data.frame(RDA_CriminalSummit_UnDirected_ZIPLPCM_Sup_T60k_R1_hat_nu)
 rownames(RDA_CriminalSummit_UnDirected_ZIPLPCM_Sup_T60k_R1_hat_nu_dataframe) <- colnames(RDA_CriminalSummit_UnDirected_ZIPLPCM_Sup_T60k_R1_hat_nu_dataframe) <- 1:nrow(RDA_criminalNet$Y)
 
-annotation_row_z_ref <- as.data.frame(as.factor(matrix(RDA_criminalNet$RoleLocale,length(RDA_criminalNet$RoleLocale),1)))
+annotation_row_z_ref <- as.data.frame(as.factor(matrix(RDA_criminalNet$RoleAffiliation,length(RDA_criminalNet$RoleAffiliation),1)))
 colnames(annotation_row_z_ref) <- "z_ref"
 annotation_colors_z_ref <- My_colors[c(1:10)]
 names(annotation_colors_z_ref) <- sort(unique(annotation_row_z_ref$z_ref))
@@ -1787,7 +1786,7 @@ RDA_TrainBombing_UnDirected_ZIPLPCM_unSup_2d_T60k_R1_time
 #------------------------------------------------------------------------------------------------------------------------
 #------------------------------------------------------------------------------------------------------------------------
 
-# Summit attendance criminality undirected real network supervised ZIP-LPCM d=2 T = 60000 round 1
+# Summit co-attendance criminality undirected real network supervised ZIP-LPCM d=2 T = 60000 round 1
 set.seed(1)
 start.time <- Sys.time()
 RDA_CriminalSummit_UnDirected_ZIPLPCM_Sup_2d_T60k_R1 <- 
@@ -1868,7 +1867,7 @@ par(mfrow=c(1,1),mai = c(1.02, 0.82, 0.82, 0.42))
 #--------------------------------------------------------------------------------------------------------------------------
 #--------------------------------------------------------------------------------------------------------------------------
 
-# 2-dimensional visualization of summit attendance criminality network
+# 2-dimensional visualization of Summit co-attendance criminality network
 library("igraph")
 library("RColorBrewer")
 My_colors <- c(brewer.pal(10,"RdBu")[c(4,7)],brewer.pal(10,"PRGn")[c(7,4)],brewer.pal(9,"YlOrBr")[4],
@@ -1883,7 +1882,7 @@ V(g_obs_I)$frame.color <- "black"
 V(g_obs_I)$label <- ""
 par(mfrow=c(1,2),mai = c(0.05, 0.05, 0.05, 0.05),mgp = c(1,0.25,0))
 # Make the plot of hat_U and z*
-V(g_obs_I)$color <- adjustcolor(My_colors[c(as.factor(RDA_criminalNet$RoleLocale))], alpha.f = 0.7)
+V(g_obs_I)$color <- adjustcolor(My_colors[c(as.factor(RDA_criminalNet$RoleAffiliation))], alpha.f = 0.7)
 plot(g_obs_I, rescale=T,layout=-RDA_CriminalSummit_UnDirected_ZIPLPCM_Sup_Beta_1_6_T60k_DA_2d_R1_hat_U,edge.curved=0.0,edge.width=E(g_obs_I)$weight*0.25,vertex.frame.width=0.001)
 # Make the plot of hat_U and hat_z
 Customized_colors <- My_colors[c(3,6,9,4,7,5,8)]
