@@ -317,7 +317,7 @@ If the readers put the mouse pointer on each node of the interactive plot, there
 Since in this real data application the inferred $\hat{\boldsymbol{z}}$ is exactly the same as the reference clustering, so we replace the reference clustering shown in such comment brackets with the node attributes `sampson_monks_group_cloisterville` in the rest 3-d plots shown next.
 If the mouse pointer is put on each non-zero interaction, the bracket will show (i) either the start coordinate or the end coordinate of the interaction vector, (ii) the interaction weight, (iii) an indicator of whether the interaction is from node $i$ to node $j$ where $i\< j$, i.e., whether the corresponding $y_{ij}$ is the upper-diagonal entry of the $\boldsymbol{Y}$ for the directed networks.
 
-The **Figure 7** of the **ZIP-LPCM** paper can thus be reproduced by the `subplot()` and the `orca()` functions following the code below.
+The **Figure 8** of the **ZIP-LPCM** paper can thus be reproduced by the `subplot()` and the `orca()` functions following the code below.
 The `subplot()` function helps us add two interactive plots with different default viewing angle into one figure while the `orca()` function can produce a high quality screenshot of the interactive plots.
 Directly taking a screenshot of the interactive plots would bring a low-quality figure which is not satisfactory.
 However, the readers need to first download the "orca" app following [https://plotly.com/r/static-image-export/](https://plotly.com/r/static-image-export/) and [https://github.com/plotly/orca#installation](https://github.com/plotly/orca#installation) in order to use the `orca()` function in the `plotly` package.
@@ -437,7 +437,7 @@ RDA_SampsonMonks_Directed_ZIPLPCM_Sup_T60k_R1_hat_lambda <- Reduce("+",RDA_Samps
 diag(RDA_SampsonMonks_Directed_ZIPLPCM_Sup_T60k_R1_hat_lambda) <- 0
 ```
 
-Based on the above individual-level statistics, the heatmap plots shown in **Figure 8** of the **ZIP-LPCM** paper can be recovered by:
+Based on the above individual-level statistics, the heatmap plots shown in **Figure 7** of the **ZIP-LPCM** paper can be recovered by:
 
 ``` r
 library("RColorBrewer")
@@ -1247,10 +1247,10 @@ RDA_TrainBombing_UnDirected_ZIPLPCM_unSup_T60k_R1_hat_p_heatmap_draw <- cowplot:
 print(RDA_TrainBombing_UnDirected_ZIPLPCM_unSup_T60k_R1_hat_p_heatmap_draw)
 ```
 
-### 2.4 Summit co-attendance criminality Network
+### 2.4 Summit Co-attendance Criminality Network
 
-The last real network we work on is the **Summit co-attendance criminality** network.
-This network is an undirected network and exogenous node attributes are available to us, i.e., `RDA_criminalNet$A` which is the one defined in Section 1.3 of this tutorial.
+The last real network we work on is the **Summit Co-attendance Criminality** network.
+This network is an undirected network and exogenous node attributes are available to us, i.e., `RDA_criminalNet$A` which is available in Section 1.3 of this tutorial.
 The implementations and the post-processing follows:
 
 ``` r
@@ -1421,7 +1421,7 @@ fig
 
 The 3-d interactive plot of the $\hat{\boldsymbol{U}}$ and $`\boldsymbol{z}^*`$ is available at [`/Interactive 3-d latent positions plots/RDA_CriminalSummit_InteractivePlot_Ref_z.html`] of this repository.
 Different from the 3-d interactive plots we show in the previous sections, if the readers put the mouse pointer on each node of the interactive plot, the comment bracket will also show the exogenous node attributes $\boldsymbol{c}$ we used in practice in our experiments.
-Note that the **Windsurfers**, **Train Bombing** and the **Summit co-attendance criminality** networks are undirected networks, the comment bracket of each edge in the 3-d interactive plots no longer show the direction of the edge.
+Note that the **Windsurfers**, **Train Bombing** and the **Summit Co-attendance Criminality** networks are undirected networks, the comment bracket of each edge in the 3-d interactive plots no longer show the direction of the edge.
 
 Similarly, the 3-d interactive plot of the $\hat{\boldsymbol{U}}$ and $\hat{\boldsymbol{z}}$ is available to be downloaded at [`/Interactive 3-d latent positions plots/RDA_CriminalSummit_InteractivePlot_Hat_z.html`] of this repository, and can be reproduced following the code:
 
@@ -1450,7 +1450,7 @@ fig <- fig %>% layout(title = "hat_U and hat_z",scene = list(xaxis = list(title 
 fig
 ```
 
-As we discussed in the **ZIP-LPCM** paper, it's interesting that there are three heterogeneous bosses whose corresponding inferred latent positions are close to each other and to the orange affiliation.
+As we discussed in the **ZIP-LPCM** paper, it's interesting that there are three heterogeneous core criminal suspects (bosses) whose corresponding inferred latent positions are close to each other and to the orange affiliation.
 These three bosses are, respectively, a blue boss node no.53, an orange boss node no.41 and a green boss node no.38.
 Thus we can check within how many posterior samples of clustering each pair of these three bosses are clustered together in one group:
 
@@ -1604,7 +1604,7 @@ Fig2 <- Fig2 %>% layout(title = "", margin = list(l = 0,r = 0,b = 0,t = 0,pad = 
 orca(Fig2, "RDA_CriminalSummit_hat_U_hat_z.pdf",scale=1,width=1800,height=850)
 ```
 
-Similar to all the previous experiments, we can following the code below to obtain the summary statistics: (i) the posterior mean of intercept $\hat{\beta}$; (ii) the posterior mean of unusual zero indicator $\hat{\boldsymbol{\nu}}$ which approximates the conditional probability of missing zeros provided that the corresponding interactions are zeros, i.e., the `P_m0` we denote in the code and the equation (22) of the **ZIP-LPCM** paper; (iii) the individual-level unusual probability $\boldsymbol{p}$ which is a $N \times N$ matrix with each entry $i,j$ being the $p_{z_iz_j}$ for each posterior state, and thus the posterior mean brings the $\hat{\boldsymbol{p}}$ accounting for the uncertainty of the posterior clustering; (iv) the individual-level Poisson rate $N \times N$ matrix `lambda` we denote in the code with each entry being the $\lambda_{ij}=\text{exp}(\beta-||\boldsymbol{u_i}-\boldsymbol{u_j}||)$ obtained by the corresponding $\beta$ and $\boldsymbol{U}$ for each posterior state, and the corresponding posterior mean `hat_lambda` can thus be obtained.
+Similar to all the previous experiments, we can follow the code below to obtain the summary statistics: (i) the posterior mean of intercept $\hat{\beta}$; (ii) the posterior mean of unusual zero indicator $\hat{\boldsymbol{\nu}}$ which approximates the conditional probability of missing zeros provided that the corresponding interactions are zeros, i.e., the `P_m0` we denote in the code and the equation (22) of the **ZIP-LPCM** paper; (iii) the individual-level unusual probability $\boldsymbol{p}$ which is a $N \times N$ matrix with each entry $i,j$ being the $p_{z_iz_j}$ for each posterior state, and thus the posterior mean brings the $\hat{\boldsymbol{p}}$ accounting for the uncertainty of the posterior clustering; (iv) the individual-level Poisson rate $N \times N$ matrix `lambda` we denote in the code with each entry being the $\lambda_{ij}=\text{exp}(\beta-||\boldsymbol{u_i}-\boldsymbol{u_j}||)$ obtained by the corresponding $\beta$ and $\boldsymbol{U}$ for each posterior state, and the corresponding posterior mean `hat_lambda` can thus be obtained.
 
 ``` r
 ## Summarize beta
