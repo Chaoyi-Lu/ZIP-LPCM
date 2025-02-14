@@ -2,8 +2,8 @@
 
 This repository is a complementary material for the paper **"A Zero-Inflated Latent Position Cluster Model" (ZIP-LPCM)** to provide tutorials for the coding of the experiments illustrated in the paper.
 This paper mainly works on the ZIP-LPCM incorporated with the **mixture-of-finite-mixtures (MFM)** clustering prior.
-A supervised version of the method is also provided.
 The inference is based on a novel **partially collapsed Metropolis-within-Gibbs (PCMwG)** sampler with a newly proposed **truncated absorb-eject (TAE)** move embedded inside.
+A supervised version of the method is also provided.
 
 The notebooks [`Simulation studies.md`] and [`Real data applications.md`] are the main focuses in this repository where step-by-step tutorials are provided.
 In [`Simulation studies.md`], the code for the two simulation studies with two different scenarios within each of them illustrated in the **ZIP-LPCM** paper are provided.
