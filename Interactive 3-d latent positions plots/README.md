@@ -3,14 +3,14 @@ we upload all the 3-dimensional interactive plots of the latent positions and cl
 in the the paper **"A Zero-Inflated Poisson Latent Position Cluster Model" (ZIP-LPCM)**.
 These 3-d plots can also be directly accessed by browsers (Google Chrome recommended) via: [https://chaoyi-lu.github.io/ZIP_LPCM_3_Dimensional_Visualization/](https://chaoyi-lu.github.io/ZIP_LPCM_3_Dimensional_Visualization/).
 
-Within each 3-d interactive plot, the readers are free to rotate, zoom in or zoom out the plot.
+Within each 3-d interactive plot, readers are free to rotate, zoom in or zoom out the plot.
 There is also an operation panel placed on top-right of the 3-d interactive plot for readers to play with.
 More details can be found in [https://plotly.com/r/3d-charts/](https://plotly.com/r/3d-charts/).
 
-If the readers put the mouse pointer on each node of the 3-d interactive plot, a comment bracket would appear within which some basic information about the corresponding node/individual is included: (i) the coordinate of the node, (ii) the node number (e.g. node 1, node 2, ...).
+If readers put the mouse pointer on each node of the 3-d interactive plot, a comment bracket would appear within which some basic information about the corresponding node/individual is included: (i) the coordinate of the node, (ii) the node number (e.g. node 1, node 2, ...).
 Depending on different network data, some extra information might also be included, for example, the reference clustering we ednote as $\boldsymbol{z}^*$, the exogenous node attributes $\boldsymbol{c}$ and so on.
 
-If the readers put the mouse pointer on each edge of the 3-d interactive plot, the comment bracket would show (i) either the start coordinate or the end coordinate of the interaction vector, (ii) the interaction weight.
+If readers put the mouse pointer on each edge of the 3-d interactive plot, the comment bracket would show (i) either the start coordinate or the end coordinate of the interaction vector, (ii) the interaction weight.
 If the network is directed, the comment bracket would also show a variable `UpperDiag?` which is a `TRUE` or `FALSE` variable indicating whether or not the corresponding $y_{ij}$ is placed at the upper-diagonal part of the adjacency matrix $\boldsymbol{Y}$ for each edge, so that we could know the direction the edges.
 
 Each 3-d interactive plot contained in this file, respectively, corresponds to:
