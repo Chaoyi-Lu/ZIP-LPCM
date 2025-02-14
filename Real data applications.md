@@ -308,19 +308,18 @@ fig <- fig %>% layout(title = "hat_U and hat_z",scene = list(xaxis = list(title 
 fig
 ```
 
-which is uploaded at [`/Interactive 3-d latent positions plots/RDA_SampsonMonks_InteractivePlot.html`] of this repository.
-Since the GitHub page cannot directly view this file, we suggest the readers to download it first and then the 3-d interactive plot would be free to play with.
+the file of which is uploaded at [`/Interactive 3-d latent positions plots/RDA_SampsonMonks_InteractivePlot.html`] of this repository, and can be directed accessed via: [https://chaoyi-lu.github.io/ZIP_LPCM_3_Dimensional_Visualization/](https://chaoyi-lu.github.io/ZIP_LPCM_3_Dimensional_Visualization/).
 Note that running the code above would bring some warning messages and these are raised by some package bugs which are not yet resolved.
-However, these bugs would not affect our output and the readers can ignore those warning messages.
+However, these bugs would not affect our output, and readers can ignore those warning messages.
 The above code for the interactive 3-d plot also attached some texts or notes for each node and each non-zero interaction to help readers have a better understanding of the network.
-If the readers put the mouse pointer on each node of the interactive plot, there will be a comment bracket showing (i) the coordinate of the node, (ii) the node number (e.g. node 1, node 2, ...), (iii) the reference clustering of the node.
+If readers put the mouse pointer on each node of the interactive plot, there will be a comment bracket showing (i) the coordinate of the node, (ii) the node number (e.g. node 1, node 2, ...), (iii) the reference clustering of the node.
 Since in this real data application the inferred $\hat{\boldsymbol{z}}$ is exactly the same as the reference clustering, so we replace the reference clustering shown in such comment brackets with the node attributes `sampson_monks_group_cloisterville` in the rest 3-d plots shown next.
 If the mouse pointer is put on each non-zero interaction, the bracket will show (i) either the start coordinate or the end coordinate of the interaction vector, (ii) the interaction weight, (iii) an indicator of whether the interaction is from node $i$ to node $j$ where $i\< j$, i.e., whether the corresponding $y_{ij}$ is the upper-diagonal entry of the $\boldsymbol{Y}$ for the directed networks.
 
 The **Figure 8** of the **ZIP-LPCM** paper can thus be reproduced by the `subplot()` and the `orca()` functions following the code below.
 The `subplot()` function helps us add two interactive plots with different default viewing angle into one figure while the `orca()` function can produce a high quality screenshot of the interactive plots.
 Directly taking a screenshot of the interactive plots would bring a low-quality figure which is not satisfactory.
-However, the readers need to first download the "orca" app following [https://plotly.com/r/static-image-export/](https://plotly.com/r/static-image-export/) and [https://github.com/plotly/orca#installation](https://github.com/plotly/orca#installation) in order to use the `orca()` function in the `plotly` package.
+However, readers need to first download the "orca" app following [https://plotly.com/r/static-image-export/](https://plotly.com/r/static-image-export/) and [https://github.com/plotly/orca#installation](https://github.com/plotly/orca#installation) in order to use the `orca()` function in the `plotly` package.
 
 ``` r
 # Use subplot() to plot two interactive plot with different viewing angle
@@ -732,7 +731,7 @@ fig <- fig %>% layout(title = "hat_U and hat_z",scene = list(xaxis = list(title 
 fig
 ```
 
-Such an interactive 3-d plot is uploaded as [`/Interactive 3-d latent positions plots/RDA_Windsurfers_InteractivePlot.html`] of this repository.
+Such an interactive 3-d plot is uploaded as [`/Interactive 3-d latent positions plots/RDA_Windsurfers_InteractivePlot.html`] of this repository, and can be accessed directly via: [https://chaoyi-lu.github.io/ZIP_LPCM_3_Dimensional_Visualization/](https://chaoyi-lu.github.io/ZIP_LPCM_3_Dimensional_Visualization/).
 The **Figure 9** of the **ZIP-LPCM** paper can thus be reporduced following:
 
 ``` r
@@ -1074,7 +1073,7 @@ fig <- fig %>% layout(title = "hat_U and hat_z",scene = list(xaxis = list(title 
 fig
 ```
 
-Such a 3-d plot can be downloaded at [`/Interactive 3-d latent positions plots/RDA_TrainBombing_InteractivePlot.html`] of this repository.
+Such a 3-d plot is available at [https://chaoyi-lu.github.io/ZIP_LPCM_3_Dimensional_Visualization/](https://chaoyi-lu.github.io/ZIP_LPCM_3_Dimensional_Visualization/) and can be downloaded at [`/Interactive 3-d latent positions plots/RDA_TrainBombing_InteractivePlot.html`] of this repository.
 Following the above code for the 3-d plotting, the **Figure 11** in the **ZIP-LPCM** paper can be reproduced by:
 
 ``` r
@@ -1419,11 +1418,11 @@ fig <- fig %>% layout(title = "hat_U and z*",scene = list(xaxis = list(title = '
 fig
 ```
 
-The 3-d interactive plot of the $\hat{\boldsymbol{U}}$ and $`\boldsymbol{z}^*`$ is available at [`/Interactive 3-d latent positions plots/RDA_CriminalSummit_InteractivePlot_Ref_z.html`] of this repository.
-Different from the 3-d interactive plots we show in the previous sections, if the readers put the mouse pointer on each node of the interactive plot, the comment bracket will also show the exogenous node attributes $\boldsymbol{c}$ we used in practice in our experiments.
+The 3-d interactive plot of the $\hat{\boldsymbol{U}}$ and $`\boldsymbol{z}^*`$ is available at [`/Interactive 3-d latent positions plots/RDA_CriminalSummit_InteractivePlot_Ref_z.html`] of this repository, and can be directed accessed by browser via: [https://chaoyi-lu.github.io/ZIP_LPCM_3_Dimensional_Visualization/](https://chaoyi-lu.github.io/ZIP_LPCM_3_Dimensional_Visualization/).
+Different from the 3-d interactive plots we show in the previous sections, if readers put the mouse pointer on each node of the interactive plot, the comment bracket will also show the exogenous node attributes $\boldsymbol{c}$ we used in practice in our experiments.
 Note that the **Windsurfers**, **Train Bombing** and the **Summit Co-attendance Criminality** networks are undirected networks, the comment bracket of each edge in the 3-d interactive plots no longer show the direction of the edge.
 
-Similarly, the 3-d interactive plot of the $\hat{\boldsymbol{U}}$ and $\hat{\boldsymbol{z}}$ is available to be downloaded at [`/Interactive 3-d latent positions plots/RDA_CriminalSummit_InteractivePlot_Hat_z.html`] of this repository, and can be reproduced following the code:
+Similarly, the 3-d interactive plot of the $\hat{\boldsymbol{U}}$ and $\hat{\boldsymbol{z}}$ is available at [https://chaoyi-lu.github.io/ZIP_LPCM_3_Dimensional_Visualization/](https://chaoyi-lu.github.io/ZIP_LPCM_3_Dimensional_Visualization/) and can be downloaded at [`/Interactive 3-d latent positions plots/RDA_CriminalSummit_InteractivePlot_Hat_z.html`] of this repository, and can be reproduced following the code:
 
 ``` r
 # Plot the hat_z and hat_U
@@ -1737,7 +1736,7 @@ print(RDA_CriminalSummit_UnDirected_ZIPLPCM_Sup_T60k_R1_hat_p_heatmap_draw)
 This subsection corresponds to **Section 5.5** of the **ZIP-LPCM** paper where we compare the 3-d inference output to the corresponding 2-d inference output obtained following the similar steps shown in the previous subsections of this tutorial.
 The only difference in the 2-d inference is that the dimension of the latent positions is set as $d=2$ during the implementations.
 Here we provide some example code to begin with and omit the rest repeated post-processing code.
-The readers can simply modify the code variable names of 3-d cases for the implementations of 2-d inference.
+Readers can simply modify the code variable names of 3-d cases for the implementations of 2-d inference.
 
 ``` r
 # Sampson monks directed real network supervised ZIP-LPCM d=2 T = 60000 round 1 
