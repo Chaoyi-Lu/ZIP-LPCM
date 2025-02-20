@@ -1,6 +1,6 @@
 In this [`Interactive 3-d latent positions plots`] file, 
 we upload all the 3-dimensional interactive plots of the latent positions and clustering we illusrate 
-in the the paper **"A Zero-Inflated Poisson Latent Position Cluster Model" (ZIP-LPCM)**.
+in the the paper [**"A Zero-Inflated Poisson Latent Position Cluster Model" (ZIP-LPCM)**](https://arxiv.org/abs/2502.13790).
 These 3-d plots can also be directly accessed by browsers (Google Chrome recommended) via: [https://chaoyi-lu.github.io/ZIP_LPCM_3_Dimensional_Visualization/](https://chaoyi-lu.github.io/ZIP_LPCM_3_Dimensional_Visualization/).
 
 Within each 3-d interactive plot, readers are free to rotate, zoom in or zoom out the plot.
