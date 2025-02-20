@@ -6,7 +6,7 @@ The inference is based on a novel **Partially Collapsed Metropolis-within-Gibbs 
 A supervised version of the method is also provided.
 
 The **3-dimensional interactive plots** of the simulation study synthetic networks and the real networks we focus on in the paper are available at: [https://chaoyi-lu.github.io/ZIP_LPCM_3_Dimensional_Visualization/](https://chaoyi-lu.github.io/ZIP_LPCM_3_Dimensional_Visualization/). 
-Readers can also download those 3-dimensional interactive plots in the [`Interactive 3-d latent positions plots`] file following the [`README.md`] file included inside.
+Readers can also download those plots in the [`Interactive 3-d latent positions plots`] file following the [`README.md`] file included inside.
 
 The notebooks [`Simulation studies.md`] and [`Real data applications.md`] are the main focuses in this repository, where step-by-step tutorials are provided therein.
 In [`Simulation studies.md`], the code for the two simulation studies with two different scenarios within each of them illustrated in the **ZIP-LPCM** paper are provided.
