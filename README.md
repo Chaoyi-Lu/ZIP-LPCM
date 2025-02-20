@@ -1,9 +1,9 @@
 # A Zero-Inflated Poisson Latent Position Cluster Model
 
 This repository is a complementary material for the paper [**"A Zero-Inflated Poisson Latent Position Cluster Model" (ZIP-LPCM)**](https://arxiv.org/abs/2502.13790) to provide tutorials for the coding of the experiments illustrated in the paper.
-This paper mainly works on the ZIP-LPCM incorporated with the **Mixture-of-Finite-Mixtures (MFM)** clustering prior.
+This paper mainly works on the **ZIP-LPCM** incorporated with the **Mixture-of-Finite-Mixtures (MFM)** clustering prior.
 The inference is based on a novel **Partially Collapsed Metropolis-within-Gibbs (PCMwG)** sampler with a newly proposed **Truncated Absorb-Eject (TAE)** move embedded inside.
-A supervised version of the method is also provided.
+A **supervised** version of the method is also provided.
 
 The **3-dimensional interactive plots** of the simulation study synthetic networks and the real networks we focus on in the paper are available at: [https://chaoyi-lu.github.io/ZIP_LPCM_3_Dimensional_Visualization/](https://chaoyi-lu.github.io/ZIP_LPCM_3_Dimensional_Visualization/). 
 Readers can also download those plots in the [`Interactive 3-d latent positions plots`] file following the [`README.md`] file included inside.
